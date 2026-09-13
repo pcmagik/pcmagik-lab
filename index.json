@@ -30,6 +30,32 @@
     "linie": 986,
     "strona": "episodes/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_karpathy/index.html",
     "zrzut": "episodes/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_karpathy/screenshot-1920.png"
+   },
+   {
+    "bieg": "2026-09-13_qwen3.8-27b_bare",
+    "model": "qwen/qwen3.8-27b",
+    "wariant": "bare",
+    "harness": "opencode",
+    "sekundy": 1399.23,
+    "tokeny": 52252,
+    "myslenie_pct": 49,
+    "tok_s": 37.34,
+    "linie": 1162,
+    "strona": "episodes/01-karpathy-vs-bare/2026-09-13_qwen3.8-27b_bare/index.html",
+    "zrzut": "episodes/01-karpathy-vs-bare/2026-09-13_qwen3.8-27b_bare/screenshot-1920.png"
+   },
+   {
+    "bieg": "2026-09-13_qwen3.8-27b_karpathy",
+    "model": "qwen/qwen3.8-27b",
+    "wariant": "karpathy",
+    "harness": "opencode",
+    "sekundy": 1216.88,
+    "tokeny": 40264,
+    "myslenie_pct": 47,
+    "tok_s": 33.09,
+    "linie": 799,
+    "strona": "episodes/01-karpathy-vs-bare/2026-09-13_qwen3.8-27b_karpathy/index.html",
+    "zrzut": "episodes/01-karpathy-vs-bare/2026-09-13_qwen3.8-27b_karpathy/screenshot-1920.png"
    }
   ]
  }

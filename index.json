@@ -1,0 +1,36 @@
+[
+ {
+  "slug": "01-karpathy-vs-bare",
+  "title": "Qwen3.8 27B: Karpathy skills vs bare | PC Magik Lab",
+  "task": "easy",
+  "youtube": "",
+  "runs": [
+   {
+    "bieg": "2026-09-12_qwen3.8-27b_bare",
+    "model": "qwen/qwen3.8-27b",
+    "wariant": "bare",
+    "harness": "opencode",
+    "sekundy": 3121.01,
+    "tokeny": 85828,
+    "myslenie_pct": 66,
+    "tok_s": 27.5,
+    "linie": 662,
+    "strona": "odcinki/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_bare/index.html",
+    "zrzut": "odcinki/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_bare/zrzut-1920.png"
+   },
+   {
+    "bieg": "2026-09-12_qwen3.8-27b_karpathy",
+    "model": "qwen/qwen3.8-27b",
+    "wariant": "karpathy",
+    "harness": "opencode",
+    "sekundy": 2591.72,
+    "tokeny": 69130,
+    "myslenie_pct": 63,
+    "tok_s": 26.67,
+    "linie": 986,
+    "strona": "odcinki/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_karpathy/index.html",
+    "zrzut": "odcinki/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_karpathy/zrzut-1920.png"
+   }
+  ]
+ }
+]

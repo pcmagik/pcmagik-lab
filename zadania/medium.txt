@@ -1,0 +1,25 @@
+TASK MEDIUM — Windows XP desktop in the browser (reduced scope)
+
+Build a working imitation of the Windows XP desktop as one self-contained HTML file.
+
+Deliverable:
+- One file `index.html` written to the current working directory.
+- No external CSS, JavaScript, fonts, images or network requests of any kind. No base64-encoded images. All icons, wallpaper and window chrome are drawn with CSS or inline SVG.
+- Works opened directly from disk (file://). Zero errors in the browser console.
+- Target: desktop browsers, mouse and keyboard, viewport 1280×720 and 1920×1080. Mobile support is not required.
+- UI language: Polish, matching the Polish edition of Windows XP: „Start", „Mój komputer", „Kosz", „Notatnik", „Kalkulator", „Saper", „Wyloguj", „Wyłącz komputer". Correct diacritics everywhere. Code and identifiers in English.
+
+Look: the classic blue theme of Windows XP (blue rounded title bars, green Start button, blue taskbar, silver window bodies, Tahoma-like sans-serif at 11 px). Wallpaper: a green hill under a blue sky drawn with CSS gradients as an allusion, not a copy of any photograph.
+
+Requirements:
+1. Desktop: at least five icons with labels: Mój komputer, Kosz, Notatnik, Kalkulator, Saper. Single click selects (highlight), double click or Enter opens. Icons are arranged in a column on the left.
+2. Taskbar at the bottom: Start button, one button per open window (click toggles focus and minimize; the active window's button looks pressed), system tray with a clock showing the real local time as HH:MM, updated every minute.
+3. Start menu: opens on Start click. Two-column layout: left column with Notatnik, Kalkulator, Saper; right column with Moje dokumenty, Mój komputer, Panel sterowania (the last two entries may be non-functional). Header with the user name „Użytkownik". Bottom bar with „Wyloguj" and „Wyłącz komputer" (both may only close the menu). Clicking a program opens its window. The menu closes on Esc or on a click outside it.
+4. Windows: title bar with app name and three buttons: minimize, maximize/restore, close. Draggable by the title bar, kept inside the desktop area. Clicking anywhere in a window brings it to the front. Minimize hides the window and leaves its taskbar button. Maximize fills the desktop above the taskbar; restore brings the previous size and position back. At least three windows can be open at once. Each app is single-instance: opening it again focuses the existing window. Mój komputer opens a window listing two drives (C:, D:) with fake free-space bars; Kosz opens an empty window with the text „Kosz jest pusty".
+5. Notatnik: menu bar with Plik (Nowy, Zapisz, Otwórz, Zakończ) and Format (Zawijanie wierszy, toggle). A full-window textarea in a monospace font. Window title „Bez tytułu - Notatnik", with `*` prepended when the text is modified. Zapisz asks for a name and stores the text in localStorage; Otwórz shows the list of saved names and loads the chosen one.
+6. Kalkulator: standard view with digits, decimal point, +, −, ×, ÷, =, C, CE, Backspace, ±, √ and %. Keyboard input works while the window is focused. Evaluation is left to right, as in the XP standard mode; operator precedence is not required. Division by zero shows the text „Nie można dzielić przez zero".
+7. Saper: 9×9 grid with 10 mines (the „Początkujący" level). Left click reveals a cell, right click cycles flag, question mark, none. The first click never hits a mine. Empty cells flood-fill. Mine counter on the left, timer on the right, a face button in the middle restarts the game and changes on win and on loss. Win when every safe cell is revealed. Loss reveals all mines. Menu Gra with Nowa gra.
+
+Quality bar: no console errors, no layout overlap at either viewport size, every listed function works with the mouse, the keyboard shortcuts listed above work, the page never scrolls.
+
+Finish with at most five lines of explanation. Do not include any other files.

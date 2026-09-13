@@ -38,7 +38,7 @@ Once finished, review your code, make sure everything works correctly, and fix a
 
 | Run | Model | Variant | Harness | Time | Output tokens | Thinking | tok/s | Lines | Page | Screenshot |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 2026-09-12_qwen3.8-27b_bare | qwen/qwen3.8-27b | bare | opencode | 52 min 01 s | 85,828 | 66% | 28 | 662 | [open](https://lab.pcmagik.pl/odcinki/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_bare/index.html) | [png](https://lab.pcmagik.pl/odcinki/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_bare/zrzut-1920.png) |
-| 2026-09-12_qwen3.8-27b_karpathy | qwen/qwen3.8-27b | karpathy | opencode | 43 min 12 s | 69,130 | 63% | 27 | 986 | [open](https://lab.pcmagik.pl/odcinki/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_karpathy/index.html) | [png](https://lab.pcmagik.pl/odcinki/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_karpathy/zrzut-1920.png) |
+| 2026-09-12_qwen3.8-27b_bare | qwen/qwen3.8-27b | bare | opencode | 52 min 01 s | 85,828 | 66% | 28 | 662 | [open](https://lab.pcmagik.pl/episodes/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_bare/index.html) | [png](https://lab.pcmagik.pl/episodes/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_bare/screenshot-1920.png) |
+| 2026-09-12_qwen3.8-27b_karpathy | qwen/qwen3.8-27b | karpathy | opencode | 43 min 12 s | 69,130 | 63% | 27 | 986 | [open](https://lab.pcmagik.pl/episodes/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_karpathy/index.html) | [png](https://lab.pcmagik.pl/episodes/01-karpathy-vs-bare/2026-09-12_qwen3.8-27b_karpathy/screenshot-1920.png) |
 
 Rig: Ryzen 5 PRO 3600 · 32 GB DDR4 ECC · RTX 3090 24 GB · LM Studio. One variable changed per test. Numbers come straight from the run's metrics.json.

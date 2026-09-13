@@ -1,22 +1,22 @@
 TASK GAME — first-person raycasting shooter
 RUN MODE: {{RUN_MODE}}
 
-Build „Serwerownia": a first-person shooter in the style of the 1993 raycasting classics, as one self-contained HTML file. The player is a sysadmin clearing a basement server room of rogue mining rigs; the exit of each level is the main breaker („Główny wyłącznik"). Original theme only: no third-party names, assets, maps or sounds.
+Build "Server Room": a first-person shooter in the style of the 1993 raycasting classics, as one self-contained HTML file. The player is a sysadmin clearing a basement server room of rogue mining rigs; the exit of each level is the main breaker. Original theme only: no third-party names, assets, maps or sounds.
 
 Deliverable and constraints:
 - One file `index.html` in the current working directory.
 - Canvas 2D only. No WebGL, no libraries, no external files, no base64 assets, no network requests. Every texture, sprite and sound is generated procedurally in code.
 - Internal rendering resolution 320×200, scaled to the largest 16:10 rectangle that fits the window, `image-rendering: pixelated`. Fixed-timestep game logic, rendering on `requestAnimationFrame`. Must hold 30 frames per second or more on an integrated laptop GPU.
 - Controls, keyboard: W and S move, A and D strafe, left and right arrows turn, Space fires, E uses doors and the exit, M toggles the minimap, N mutes sound, P pauses, Enter starts and restarts. Optional: mouse look with pointer lock.
-- On-screen text in Polish with correct diacritics. Code and identifiers in English. One `<script>`, no globals except a single `game` namespace. Zero console errors. Works from file://.
+- On-screen text in English. Code and identifiers in English. One `<script>`, no globals except a single `game` namespace. Zero console errors. Works from file://.
 
 Requirements:
 1. Raycaster: levels defined as ASCII string maps, each at least 24×24 cells; DDA raycasting with fisheye correction; textured walls with at least three procedural textures (brick, server rack, concrete) and distance shading; floor and ceiling shaded by distance; wall collision with sliding along walls; doors that open on E and close by themselves after four seconds unless something stands in them.
 2. Sprites: billboard sprites sorted by distance and clipped against wall depth with a per-column depth buffer. Pickups: health (+25, maximum 100) and ammo (+10).
-3. Enemies: at least two types, a slow melee type („koparka") and a ranged type („wentylator"), with states idle, chase when the player is in line of sight, attack in range; ranged attacks damage the player; a two-frame procedural death animation; at least six enemies per level.
+3. Enemies: at least two types, a slow melee type ("miner") and a ranged type ("fan"), with states idle, chase when the player is in line of sight, attack in range; ranged attacks damage the player; a two-frame procedural death animation; at least six enemies per level.
 4. Weapon: a pistol drawn at the bottom of the screen with a two-frame firing animation and muzzle flash; hit-scan against the closest enemy under the crosshair; the player starts with 20 rounds; firing with no ammo makes a click and does nothing.
 5. HUD: health, ammo, level number, kills out of total, a one-line status message; red screen flash on damage; minimap with walls, player and discovered doors.
-6. Game flow: title screen with the controls; three levels of rising difficulty; on every level a key card („karta dostępu") that unlocks the exit door; level-complete screen with time and kills; death screen with restart; victory screen after level three. Restart resets every piece of state.
+6. Game flow: title screen with the controls; three levels of rising difficulty; on every level a key card that unlocks the exit door; level-complete screen with time and kills; death screen with restart; victory screen after level three. Restart resets every piece of state.
 7. Sound: Web Audio API generated in code: shot, enemy hit, pickup, door, player damage. Sound starts only after the first user input. N mutes and unmutes.
 
 Phases (used only when RUN MODE is a phase):

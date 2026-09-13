@@ -1,8 +1,8 @@
-Create a single HTML file for the website of {{SERIES_NAME}}, a YouTube series about running AI models on real, local GPUs. Tagline, Polish, use verbatim: „Lokalne modele, prawdziwe GPU".
+Create a single HTML file for the website of {{SERIES_NAME}}, a YouTube series about running AI models on real, local GPUs. Tagline, use verbatim: "Local models, real GPUs."
 
 The site should include a polished hero section, an episodes section built from the episode data below, a hardware section (one rig: NVIDIA RTX 3090 24 GB, LM Studio as the model server), an about section explaining that every episode is one measurement with one changed variable and one number on screen, links to the YouTube channel ({{YOUTUBE_URL}}) and to the repository with prompts and result files ({{REPO_URL}}), and a footer crediting the author PC Magik (Mateusz Piekut), computer service and homelab operator from Poland.
 
-Make it look like a real, modern tech series website with a dark glass-and-neon style, glowing accents, responsive layout, smooth scrolling, hover effects, animated numbers, and interactive episode cards. All visible text in Polish with correct diacritics (ą ć ę ł ń ó ś ź ż); code and identifiers in English.
+Make it look like a real, modern tech series website with a dark glass-and-neon style, glowing accents, responsive layout, smooth scrolling, hover effects, animated numbers, and interactive episode cards. All visible text in English; code and identifiers in English.
 
 Episode data (real measurements, use them exactly; more episodes will be added later):
 [
@@ -10,12 +10,12 @@ Episode data (real measurements, use them exactly; more episodes will be added l
     "id": "s1",
     "tag": "Karpathy vs bare",
     "date": "2026-09-08",
-    "title": "Qwen3.8 27B: reguły Karpathy'ego kontra bez reguł",
-    "headline_number": "−37% tokenów",
-    "result": "Z regułami: 174,87 s i 9 764 tokeny. Bez reguł: 282,55 s i 15 391 tokenów.",
+    "title": "Qwen3.8 27B: Karpathy rules vs no rules",
+    "headline_number": "−37% tokens",
+    "result": "With rules: 174.87 s and 9,764 tokens. Without rules: 282.55 s and 15,391 tokens.",
     "models": ["Qwen3.8 27B"],
     "files": 2,
-    "work_url": "./prace/s1/",
+    "work_url": "./work/s1/",
     "video_url": "{{YOUTUBE_URL}}"
   }
 ]

@@ -4,7 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
-| 01 | [Qwen3.8 27B: Karpathy skills vs bare | PC Magik Lab](episodes/01-karpathy-vs-bare/README.md) | easy | 4 | soon |
+| 01 | [Qwen3.8 27B: Karpathy skills vs bare | PC Magik Lab](episodes/01-karpathy-vs-bare/README.md) | easy | 2 | soon |
 
 ## Layout
 

@@ -49,7 +49,7 @@
       <canvas id="neural-canvas" aria-hidden="true"></canvas>
       <div class="scene-label"><span class="cross">+</span> NEURAL CORE <span>/ INTERACTIVE</span></div>
       <div class="telemetry telemetry-hardware glass"><span class="tiny-label"><span class="dot"></span> BENCHMARK HARDWARE</span><strong>RTX 3090<span>24 GB</span></strong><small class="hardware-spec">LM Studio · local inference</small></div>
-      <a class="telemetry telemetry-run glass" href="/episodes/01-karpathy-vs-bare/"><span class="tiny-label">LATEST EXPERIMENT <span>↗</span></span><strong>qwen3.8-27b</strong><small>Inspect the published outputs</small></a>
+      {{telemetry}}
       <div class="scene-bottom" role="group" aria-label="Scene controls"><button class="motion-toggle" type="button" aria-pressed="false" hidden><span aria-hidden="true">Ⅱ</span> Pause motion</button><button class="rotate-core" type="button" hidden>Rotate core <span aria-hidden="true">⤾</span></button></div>
     </div>
     <div class="hero-bottom"><a href="#episodes" class="scroll-cue"><span>↓</span> SCROLL TO EXPLORE</a><span>Same prompt. Same rig. One variable.</span><a class="coordinate" href="https://lab.pcmagik.pl/">lab.pcmagik.pl ↗</a></div>
@@ -59,10 +59,7 @@
     <section id="episodes" aria-labelledby="episodes-title">
       <div class="section-head reveal"><div><p class="eyebrow"><span class="section-number">01 /</span> LATEST RESULTS</p><h2 id="episodes-title">Less hype.<br><span>More evidence.</span></h2></div><a class="button" href="/episodes/">View all episodes ↗</a></div>
       <div class="episode-list">
-<article class="episode-card glass spotlight">
-<div class="ep-meta"><span class="chip">2 PUBLISHED OUTPUTS</span><time datetime="2026-09-19">Run date: 2026-09-19</time></div>
-<p class="eyebrow">qwen/qwen3.8-27b</p><h3><a href="/episodes/01-karpathy-vs-bare/">Karpathy skills on Qwen3.8 27B: what you gain, what you lose | PC Magik Lab <span aria-hidden="true">↗</span></a></h3>
-<p class="episode-thesis">Same model, same prompt, same rig.</p><p class="measurement-note">Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.</p></article>
+{{cards}}
       </div>
     </section>
 
@@ -72,7 +69,7 @@
 <div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">01</div><h3>One variable at a time</h3><p>Same prompt, same rig, one variable changed per test. The model is reloaded before every run. Repeated runs belong to each experiment; published examples are not a substitute for the full cohort.</p></div>
 <div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">{ }</div><h3>Metrics from the run</h3><p>Repeat the measurement before drawing a conclusion. One run does not establish a benefit. Effects counts code constructs; it does not judge appearance. Time and output tokens are not equivalent-work costs in this open-ended task.</p></div>
 <div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">⌘</div><h3>Real hardware</h3><p>Ryzen 5 PRO 3600, 32 GB DDR4 ECC and an RTX 3090 with 24 GB VRAM. Local models are served through LM Studio.</p></div>
-<div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">&gt;_</div><h3>The exact prompt</h3><p>The full input, byte for byte. <a href="/episodes/01-karpathy-vs-bare/#task-prompt">Read the task ↗</a> alongside the measurements. Each episode links its published outputs, prompts and measurements.</p></div>
+<div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">&gt;_</div><h3>The exact prompt</h3><p>The full input, byte for byte. <a href="{{prompt_link}}">Read the task ↗</a> alongside the measurements. Each episode links its published outputs, prompts and measurements.</p></div>
 </div></section>
 
     <section class="about glass" aria-labelledby="about-title"><div><p class="eyebrow">BEHIND THE LAB</p><h2 id="about-title">Mateusz Piekut <span>/ PC Magik</span></h2><p>Computer service and homelab operator from Poland. The person behind PC Magik Lab.</p></div><a class="button" href="https://lab.pcmagik.pl/">lab.pcmagik.pl ↗</a></section>

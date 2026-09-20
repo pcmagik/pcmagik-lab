@@ -1,178 +1,56 @@
 {
-  "model": "Qwen3.8 27B",
-  "effort": "medium",
-  "cohorts": {
-    "bare": {
-      "n": 5,
+  "generated": "2026-09-20",
+  "source": "seria/harness/publikuj.py",
+  "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
+  "episodes": [
+    {
+      "slug": "01-karpathy-vs-bare",
+      "title": "Karpathy skills on Qwen3.8 27B: what you gain, what you lose | PC Magik Lab",
+      "task": "easy",
+      "youtube": "",
+      "opis": "Same model, same prompt, same rig. Five runs with nothing added, five with one Karpathy rules file, all at reasoning effort medium. Model reloaded before each run; every number comes from the run logs. \"Effects\" = occurrences of @keyframes, animation, transition, :hover, gradients, box-shadow, backdrop-filter, transform, event listeners, IntersectionObserver and inline SVG in the page code. All ten pages, prompts and logs are in the repository. Harness: Pi 0.85.1 (it sends reasoning effort medium by default). Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.",
       "runs": [
         {
-          "id": "baremed-r1_qwen3.8-27b_bare_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/baremed-r1_qwen3.8-27b_bare_pi_emedium",
-          "seconds": 419.96,
-          "output_tokens": 22049,
-          "thinking_tokens": 1271,
-          "final_code_tokens": 20778,
-          "thinking_percent": 5.8,
-          "tok_s": 52.5,
-          "lines_of_code": 1084,
-          "effects": 152
-        },
-        {
-          "id": "baremed-r2_qwen3.8-27b_bare_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/baremed-r2_qwen3.8-27b_bare_pi_emedium",
-          "seconds": 349.16,
-          "output_tokens": 19321,
-          "thinking_tokens": 334,
-          "final_code_tokens": 18987,
-          "thinking_percent": 1.7,
+          "bieg": "2026-09-19_qwen3.8-27b_bare_pi_emedium",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 349.16,
+          "tokeny": 19321,
+          "myslenie_pct": 1,
           "tok_s": 55.33,
-          "lines_of_code": 1059,
-          "effects": 146
+          "linie": 1059,
+          "tokeny_myslenia": 334,
+          "efekty": 146,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "model_przeladowany": true,
+          "strona": "episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi_emedium/index.html",
+          "zrzut": "episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi_emedium/screenshot-1920.png",
+          "metrics": "episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi_emedium/metrics.json",
+          "prompt": "episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi_emedium/prompt.txt"
         },
         {
-          "id": "baremed-r3_qwen3.8-27b_bare_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/baremed-r3_qwen3.8-27b_bare_pi_emedium",
-          "seconds": 338.42,
-          "output_tokens": 19052,
-          "thinking_tokens": 612,
-          "final_code_tokens": 18440,
-          "thinking_percent": 3.2,
-          "tok_s": 56.3,
-          "lines_of_code": 1033,
-          "effects": 130
-        },
-        {
-          "id": "baremed-r4_qwen3.8-27b_bare_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/baremed-r4_qwen3.8-27b_bare_pi_emedium",
-          "seconds": 337.78,
-          "output_tokens": 18858,
-          "thinking_tokens": 293,
-          "final_code_tokens": 18565,
-          "thinking_percent": 1.6,
-          "tok_s": 55.83,
-          "lines_of_code": 1122,
-          "effects": 129
-        },
-        {
-          "id": "baremed-r5_qwen3.8-27b_bare_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/baremed-r5_qwen3.8-27b_bare_pi_emedium",
-          "seconds": 364.01,
-          "output_tokens": 20397,
-          "thinking_tokens": 466,
-          "final_code_tokens": 19931,
-          "thinking_percent": 2.3,
-          "tok_s": 56.03,
-          "lines_of_code": 978,
-          "effects": 155
-        }
-      ],
-      "representative": "baremed-r2_qwen3.8-27b_bare_pi_emedium",
-      "preview": "assets/film01-bare-preview.png"
-    },
-    "karpathy": {
-      "n": 5,
-      "runs": [
-        {
-          "id": "karpmed-r1_qwen3.8-27b_karpathy_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r1_qwen3.8-27b_karpathy_pi_emedium",
-          "seconds": 247.82,
-          "output_tokens": 14333,
-          "thinking_tokens": 256,
-          "final_code_tokens": 14077,
-          "thinking_percent": 1.8,
-          "tok_s": 57.84,
-          "lines_of_code": 920,
-          "effects": 101
-        },
-        {
-          "id": "karpmed-r2_qwen3.8-27b_karpathy_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r2_qwen3.8-27b_karpathy_pi_emedium",
-          "seconds": 478.73,
-          "output_tokens": 24268,
-          "thinking_tokens": 2723,
-          "final_code_tokens": 21545,
-          "thinking_percent": 11.2,
-          "tok_s": 50.69,
-          "lines_of_code": 1122,
-          "effects": 121
-        },
-        {
-          "id": "karpmed-r3_qwen3.8-27b_karpathy_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r3_qwen3.8-27b_karpathy_pi_emedium",
-          "seconds": 305.51,
-          "output_tokens": 15659,
-          "thinking_tokens": 394,
-          "final_code_tokens": 15265,
-          "thinking_percent": 2.5,
+          "bieg": "2026-09-19_qwen3.8-27b_karpathy_pi_emedium",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 305.51,
+          "tokeny": 15659,
+          "myslenie_pct": 2,
           "tok_s": 51.26,
-          "lines_of_code": 902,
-          "effects": 114
-        },
-        {
-          "id": "karpmed-r4_qwen3.8-27b_karpathy_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r4_qwen3.8-27b_karpathy_pi_emedium",
-          "seconds": 428.11,
-          "output_tokens": 23174,
-          "thinking_tokens": 1671,
-          "final_code_tokens": 21503,
-          "thinking_percent": 7.2,
-          "tok_s": 54.13,
-          "lines_of_code": 934,
-          "effects": 112
-        },
-        {
-          "id": "karpmed-r5_qwen3.8-27b_karpathy_pi_emedium",
-          "source": "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r5_qwen3.8-27b_karpathy_pi_emedium",
-          "seconds": 279.5,
-          "output_tokens": 15810,
-          "thinking_tokens": 453,
-          "final_code_tokens": 15357,
-          "thinking_percent": 2.9,
-          "tok_s": 56.57,
-          "lines_of_code": 973,
-          "effects": 110
+          "linie": 902,
+          "tokeny_myslenia": 394,
+          "efekty": 114,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "model_przeladowany": true,
+          "strona": "episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi_emedium/index.html",
+          "zrzut": "episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi_emedium/screenshot-1920.png",
+          "metrics": "episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi_emedium/metrics.json",
+          "prompt": "episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi_emedium/prompt.txt"
         }
-      ],
-      "representative": "karpmed-r3_qwen3.8-27b_karpathy_pi_emedium",
-      "preview": "assets/film01-karpathy-preview.png"
+      ]
     }
-  },
-  "effects_mean_reduction_percent": 22,
-  "series_context": {
-    "model_count": 11,
-    "overlapping_count": 11,
-    "as_of": "2026-09-20"
-  },
-  "provenance": {
-    "repository": "Local measurement repository: projekt-wiedza-z-yt",
-    "files_sha256": {
-      "seria/pomiary/LICZBY.md": "8820b5e6c0ad3d6618d03f1a318bae59fd4abc909f031179aae68f052b8c4971",
-      "seria/pomiary/biegi.jsonl": "646fab09855a67baa01cc981a48e4058fe37d7a34b3e745055238097326eb10d",
-      "seria/odcinki/01-karpathy-vs-bare/odcinek.json": "9f58fb86c21b900c7bcdad1610928a0aa31a580173e6a49d0936f7aa2d2a36bd",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r1_qwen3.8-27b_bare_pi_emedium/metrics.json": "8e342471d7afbccee3f17b60bb0fc1082a43522948b641213050933786f8d43f",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r1_qwen3.8-27b_bare_pi_emedium/efekty.json": "cb65678acdea52e62e5f3a1f79227a9e207d79d3afba4d9095ef052cc9dffff2",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r2_qwen3.8-27b_bare_pi_emedium/metrics.json": "6c28575acad1da23a267b4f9cf8f2bf5ea5459cf60a6386155b4606b69598510",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r2_qwen3.8-27b_bare_pi_emedium/efekty.json": "6a9501862a53e7997c3974911b0ffffb01684fb79014a8b96f5f432508e74025",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r3_qwen3.8-27b_bare_pi_emedium/metrics.json": "66fe93afbae126b0cf063247d355b0e5e679a4b7546ce3c3b2f0d264e5d567c9",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r3_qwen3.8-27b_bare_pi_emedium/efekty.json": "1cd9b07b86b277304a26a8e7b6453cda3dce0b16b27a264d9f32d2290df5fd66",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r4_qwen3.8-27b_bare_pi_emedium/metrics.json": "6e0f556bd376a7cbb7376ca1c27c06f0b66c0be1374ec0ebf013063f6a57c21c",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r4_qwen3.8-27b_bare_pi_emedium/efekty.json": "f984e1033c967d74773c5e105031e7fe5ee442ec57468dfcfce944254eb0bd76",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r5_qwen3.8-27b_bare_pi_emedium/metrics.json": "f8919302edc3367b02a4ce625d873103ca53fda27774ea458c34106c3e0b5b7a",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r5_qwen3.8-27b_bare_pi_emedium/efekty.json": "2b003989540f4e0b4c1c9d7b1b26893155dfe2c14037104f4e92d909abb2bb30",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r2_qwen3.8-27b_bare_pi_emedium/zrzut-pelny-1920.png": "ade7227ef766ccb3e02d563a7b64a4eda6db21e4b95a6b2e7f448dd688407ce9",
-      "seria/badania/03-rozrzut-i-effort/biegi/baremed-r2_qwen3.8-27b_bare_pi_emedium/prompt.txt": "746b24cc24e03bb544a761c6e0fce21fa592f9bb3fd834181f482e73bbe84c31",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r1_qwen3.8-27b_karpathy_pi_emedium/metrics.json": "130be45069a7d9ec7622dff06c4de1cb7221f551c9ee9532df44bf6ad8ec5e81",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r1_qwen3.8-27b_karpathy_pi_emedium/efekty.json": "5f39ee3fffd15f40e89283baaaa1021bc53febfd36211519331b4f59b49cacb7",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r2_qwen3.8-27b_karpathy_pi_emedium/metrics.json": "31ee9a2e67347edd15d7bf1dd0fe3d222086ee2abff03bc7bde0f5b9ee178ddb",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r2_qwen3.8-27b_karpathy_pi_emedium/efekty.json": "d26d0b1af78f117ea5c46fb82f9658b35c88037dfa7da67ca66681b35c32ed71",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r3_qwen3.8-27b_karpathy_pi_emedium/metrics.json": "328e1f3f3a954737fc08ca2ac237576fb52335395b70cfef44d4fad4373d23fd",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r3_qwen3.8-27b_karpathy_pi_emedium/efekty.json": "b5ab85311c29f95a419e4e6eb6d17aa4ba38d0e84424488f0c1287205dab002e",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r4_qwen3.8-27b_karpathy_pi_emedium/metrics.json": "61a823fe9c8d233f58ed8dbf67a169b938ffd3209ec2daf6458f1d91062c8840",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r4_qwen3.8-27b_karpathy_pi_emedium/efekty.json": "968ab12d316849954dbcfef015876f08aba6702e339f6cfe0d36c3106a75b009",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r5_qwen3.8-27b_karpathy_pi_emedium/metrics.json": "32e98f5f0bf9d53f970cf6a6dac7bc0a9d67994f96174118bdd03e9b1148af86",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r5_qwen3.8-27b_karpathy_pi_emedium/efekty.json": "9b7a104f2b39c4f29cfa9b4e6141796643ced3c4d4623bb2118a18f753ef5dd3",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r3_qwen3.8-27b_karpathy_pi_emedium/zrzut-pelny-1920.png": "512efcf1fd6f928b35270b10a904e6af8de8f8cab40efed7ab20d4c977b6d910",
-      "seria/badania/03-rozrzut-i-effort/biegi/karpmed-r3_qwen3.8-27b_karpathy_pi_emedium/prompt.txt": "746b24cc24e03bb544a761c6e0fce21fa592f9bb3fd834181f482e73bbe84c31"
-    }
-  }
+  ]
 }

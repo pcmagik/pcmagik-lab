@@ -149,7 +149,7 @@ h2 > span { color: #969caf; }
 .shot { display: block; aspect-ratio: 1.9; overflow: hidden; position: relative; background: #080d17; }
 .shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform .65s cubic-bezier(.2,.8,.2,1); }
 .shot:hover img { transform: scale(1.04); }
-.shot::after { content: "FULL-PAGE PREVIEW ↗"; position: absolute; bottom: 13px; right: 13px; padding: 8px 11px; background: #131b29c9; border: 1px solid #c2e3e942; backdrop-filter: blur(16px); border-radius: 6px; font: 11px ui-monospace, monospace; letter-spacing: .8px; color: #dcfff7; }
+.shot::after { content: "VIEW SCREENSHOT ↗"; position: absolute; bottom: 13px; right: 13px; padding: 8px 11px; background: #131b29c9; border: 1px solid #c2e3e942; backdrop-filter: blur(16px); border-radius: 6px; font: 11px ui-monospace, monospace; letter-spacing: .8px; color: #dcfff7; }
 .body { padding: 20px; }
 .name { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 19px; }
 .name b { font: 11px ui-monospace, monospace; letter-spacing: 1.6px; }
@@ -506,3 +506,12 @@ thead { background: #ffffff06; }thead th { font-size: 11px; font-weight: 500; }
   .research-teaser { padding: 20px; }
   .research-teaser a { margin-left: 0; }
 }
+
+/* Published output pages retain the same glass cards for any model. */
+.model-heading { font-size: clamp(22px, 3vw, 36px); overflow-wrap: anywhere; }
+.run-id { font: 11px/1.6 ui-monospace, monospace; color: var(--muted); overflow-wrap: anywhere; margin: 14px 0; }
+.telemetry-run strong { overflow-wrap: anywhere; }
+.episode-card .eyebrow { overflow-wrap: anywhere; }
+.v-other { color: var(--violet); }
+.other-bar { background: var(--violet); }
+.measurement-table-wrap th:first-child { overflow-wrap: anywhere; min-width: 160px; max-width: 280px; }

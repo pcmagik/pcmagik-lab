@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#080a10">
-  <title>All episodes | PC Magik Lab</title>
-  <meta name="description" content="Published experiments, prompts and model outputs.">
-  <link rel="canonical" href="https://lab.pcmagik.pl/episodes/">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <link rel="canonical" href="https://lab.pcmagik.pl{{path}}">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://lab.pcmagik.pl/episodes/">
-  <meta property="og:title" content="All episodes | PC Magik Lab">
-  <meta property="og:description" content="Published experiments, prompts and model outputs.">
+  <meta property="og:url" content="https://lab.pcmagik.pl{{path}}">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="{{description}}">
   <meta property="og:image" content="https://lab.pcmagik.pl/assets/avatar-400.png">
   <meta property="og:image:width" content="400">
   <meta property="og:image:height" content="400">
@@ -33,10 +33,7 @@
 </header>
 <!-- Generated from data/episodes.json; edit bin/templates instead. -->
 <main id="main" class="wrap content-wrap interior">
-<section><div class="section-head"><div><p class="eyebrow">THE EXPERIMENTS / ALL EPISODES</p><h1 class="page-title">The evidence.<br><span>One experiment at a time.</span></h1></div></div><p class="study-note">Newest run dates first. Each episode includes its published measurements, prompts and model outputs.</p><div class="episode-list"><article class="episode-card glass spotlight">
-<div class="ep-meta"><span class="chip">2 PUBLISHED OUTPUTS</span><time datetime="2026-09-19">Run date: 2026-09-19</time></div>
-<p class="eyebrow">qwen/qwen3.8-27b</p><h3><a href="/episodes/01-karpathy-vs-bare/">Karpathy skills on Qwen3.8 27B: what you gain, what you lose | PC Magik Lab <span aria-hidden="true">↗</span></a></h3>
-<p class="episode-thesis">Same model, same prompt, same rig.</p><p class="measurement-note">Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.</p></article></div></section>
+{{body}}
 </main>
 <footer><div class="wrap"><div><a class="footer-address" href="https://lab.pcmagik.pl/">lab.pcmagik.pl ↗</a><p class="copyright">© PC Magik · Mateusz Piekut. Demo pages are unmodified model outputs.</p></div><div class="socials"><a href="https://github.com/pcmagik/pcmagik-lab">GitHub ↗</a><a href="https://x.com/PcMagik">X ↗</a><a href="https://www.linkedin.com/in/mateusz-piekut/">LinkedIn ↗</a><a href="https://www.facebook.com/Pcmagik/">Facebook ↗</a><a href="https://github.com/pcmagik/pcmagik-lab/blob/main/LICENSE">MIT license</a></div></div></footer>
 

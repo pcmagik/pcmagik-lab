@@ -4,6 +4,8 @@ from pathlib import Path
 import subprocess
 import sys
 
+subprocess.run([sys.executable, str(Path(__file__).resolve().parents[2] / 'bin/test_publication.py'), '--browser-fixture'], check=True)
+
 result = subprocess.run(
     ['playwright-cli', '-s=interactive', '--raw', 'run-code',
      '--filename=.docs/design/check-interactive.js'],

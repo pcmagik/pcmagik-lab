@@ -1,5 +1,7 @@
 async page => {
-  const base = 'http://127.0.0.1:4175';
+  const base = 'http://127.0.0.1:4176';
+  const episode = base + '/episodes/01-karpathy-vs-bare/';
+  const series = base + '/series/04-seria-modeli-n3/';
   const report = [];
   const errors = [];
   const check = (value, message) => { if (!value) throw new Error(message); };
@@ -17,7 +19,6 @@ async page => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(base);
-  await page.getByRole('button', { name: 'output tokens', exact: true }).waitFor();
   await page.getByRole('button', { name: 'Rotate core' }).waitFor();
   await page.waitForFunction(() => window.__testDrawCalls > 0);
   const firstDraws = await page.evaluate(() => window.__testDrawCalls);
@@ -39,6 +40,8 @@ async page => {
   check(imageBefore !== imageAfter, 'Keyboard rotation changes rendered pixels while paused');
   report.push('PASS animated WebGL, pause, keyboard-controlled rotation');
 
+  await page.goto(episode);
+  await page.getByRole('button', { name: 'output tokens', exact: true }).waitFor();
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Horizontal overflow at ${width}`);
@@ -64,14 +67,13 @@ async page => {
     check(await button.evaluate(el => getComputedStyle(el).outlineStyle) !== 'none', 'Visible keyboard focus');
   }
   report.push('PASS all four measured ranges, units, interpretations and interval geometry');
-  check(await page.locator('.series-model').count() === 11, 'All 11 source models');
-  check(await page.locator('.series-model .overlap-label').allTextContents().then(values => values.every(value => value === 'Ranges overlap')), 'No universal effect claim');
+
   const colors = await page.locator('.bar-fill').evaluateAll(bars => bars.map(bar => getComputedStyle(bar).backgroundColor));
   check(colors.join('|') === 'rgb(255, 159, 69)|rgb(94, 200, 255)', 'Film variant colors');
   check(!await page.locator('body').innerText().then(text => /26.2%|20.6%|02 measured runs|Do better rules/.test(text)), 'Old single-run claims removed');
-  check(await page.locator('link[rel="canonical"]').getAttribute('href') === 'https://lab.pcmagik.pl/', 'Canonical URL');
+  check(await page.locator('link[rel="canonical"]').getAttribute('href') === 'https://lab.pcmagik.pl/episodes/01-karpathy-vs-bare/', 'Canonical URL');
   for (const property of ['og:title','og:description','og:image']) check(await page.locator(`meta[property="${property}"]`).getAttribute('content'), property);
-  report.push('PASS 11-model context, film colors, removed claims and social metadata');
+  report.push('PASS film colors, removed claims and social metadata');
 
   const urls = await page.locator('a[href], img[src], script[src], link[href]').evaluateAll(elements => [...new Set(elements.map(el => el.href || el.src).filter(url => typeof url === 'string' && url.startsWith(location.origin) && !url.includes('#')))]);
   for (const url of urls) check((await page.request.get(url)).ok(), `Broken local resource: ${url}`);
@@ -84,15 +86,15 @@ async page => {
     check(Number(values[1].replaceAll(',', '')) === run.output_tokens, 'Representative output tokens');
     check(values[2] === run.thinking_percent + '%', 'Representative thinking');
     check(Number(values[3].replaceAll(',', '')) === run.lines_of_code, 'Representative lines');
-    check(await card.locator('.shot img').getAttribute('src') === cohort.preview, 'Representative preview');
+    check(await card.locator('.shot img').getAttribute('src') === '/' + cohort.preview, 'Representative preview');
     await card.getByRole('link', {name:'Full-page preview'}).click();
-    check(await page.locator(`#preview-${variant}`).getAttribute('open') !== null, 'Preview opens on homepage');
+    check(await page.locator(`#preview-${variant}`).getAttribute('open') !== null, 'Preview opens on episode page');
     await page.locator(`#preview-${variant} summary`).click();
   }
   await page.getByRole('link',{name:'Test materials'}).click();
-  check(page.url().endsWith('#materials'), 'Materials stay on homepage');
+  check(page.url().endsWith('#materials'), 'Materials stay on episode page');
   await page.getByRole('link',{name:'Read the test prompt'}).click();
-  check(await page.locator('#task-prompt').getAttribute('open') !== null, 'Prompt opens on homepage');
+  check(await page.locator('#task-prompt').getAttribute('open') !== null, 'Prompt opens on episode page');
   check((await page.locator('.prompt-text').textContent()).includes('the model reloaded before every run'), 'Exact measured prompt');
   await page.locator('#task-prompt summary').click();
   for (const variant of ['bare','Karpathy']) {
@@ -102,6 +104,36 @@ async page => {
     await page.goBack();
   }
   report.push(`PASS ${urls.length} local resources, representative data, inline materials and both archived demos`);
+
+  for (const path of ['/', '/episodes/', '/episodes/01-karpathy-vs-bare/', '/series/04-seria-modeli-n3/']) {
+    await page.goto(base + path);
+    const local = await page.locator('a[href], img[src], script[src], link[href]').evaluateAll(elements => [...new Set(elements.map(el => el.href || el.src).filter(url => typeof url === 'string' && url.startsWith(location.origin)))]);
+    for (const url of local) {
+      const response = await page.request.get(url);
+      check(response.ok(), `Broken resource: ${url}`);
+      const hash = url.includes('#') ? url.slice(url.indexOf('#')) : '';
+      if (hash) check((await response.text()).includes(`id="${hash.slice(1)}"`), `Broken anchor: ${url}`);
+    }
+    check(await page.locator('html').getAttribute('lang') === 'en', `${path}: English`);
+    if (path === '/') {
+      check(await page.locator('.series-model, .comparison, #materials').count() === 0, 'Homepage contains no full research or episode archive');
+      check(await page.locator('.episode-card').count() === 1, 'Only the one real episode, within three-card limit');
+      check((await page.locator('#method').innerText()).includes('93%'), 'Homepage preserves repeatability context');
+      await page.getByRole('link', {name:'View all episodes'}).click();
+      check(page.url() === base + '/episodes/', 'Full archive navigation');
+    }
+    if (path === '/episodes/') {
+      check(await page.locator('.episode-card').count() === 1, 'Complete real catalog');
+      await page.locator('.episode-card h3 a').click();
+      check(page.url() === episode, 'Episode card opens full result');
+    }
+    if (path.startsWith('/series/')) {
+      check(await page.locator('.series-model').count() === 11, 'All 11 models on research page');
+      check(await page.locator('.series-model .overlap-label').allTextContents().then(values => values.every(value => value === 'Ranges overlap')), 'All measured ranges overlap');
+      check((await page.locator('main').innerText()).includes('63/66'), 'Research file completeness');
+    }
+  }
+  report.push('PASS homepage/episode/archive/research separation, real cards, links and fragment targets');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base);
@@ -154,14 +186,16 @@ async page => {
       fallbackPage.on('pageerror', error => fallbackErrors.push(error.message));
       await fallbackPage.goto(base);
       check(await fallbackPage.locator('h1').isVisible(), `${scenario}: heading remains visible`);
+      if (['no-javascript', 'no-webgl', 'no-three'].includes(scenario)) check(await fallbackPage.locator('.scene-fallback').isVisible(), `${scenario}: static sculpture visible`);
+      check(await fallbackPage.locator('.episode-card').count() === 1, `${scenario}: latest result available`);
+      await fallbackPage.locator('.episode-card h3 a').click();
       check(await fallbackPage.locator('.run').count() === 2, `${scenario}: both outputs available`);
       if (scenario !== 'no-javascript' && scenario !== 'no-data') {
         await fallbackPage.getByRole('button', { name: 'output tokens', exact: true }).click();
         check((await fallbackPage.locator('.compare-value').allTextContents()).join('|') === '18,858–22,049 output tokens|14,333–24,268 output tokens', `${scenario}: data interaction independent`);
       } else check(await fallbackPage.locator('.metric-switch').isVisible() === false, `${scenario}: unavailable controls hidden`);
-      if (['no-javascript', 'no-webgl', 'no-three'].includes(scenario)) {
-        check(await fallbackPage.locator('.scene-fallback').isVisible(), `${scenario}: static sculpture visible`);
-      }
+      await fallbackPage.getByRole('link', {name:'Read the test prompt'}).click();
+      if (scenario !== 'no-javascript') check(await fallbackPage.locator('#task-prompt').getAttribute('open') !== null, `${scenario}: prompt opens`);
       await fallbackPage.locator('.archive-details summary').click();
       await fallbackPage.getByRole('link', { name: 'Open archived bare demo' }).click();
       check(fallbackPage.url().includes('_bare_pi/index.html'), `${scenario}: live demo still opens`);
@@ -172,6 +206,8 @@ async page => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(base);
   await page.getByRole('button', { name: 'Rotate core' }).waitFor();
+  for (const route of [base, base+'/episodes/', episode, series]) {
+  await page.goto(route);
   for (const width of [320,390,768,1024,1440,1920]) {
     await page.setViewportSize({width,height:1000});
     if(width === 390) await page.locator('.material-details, .archive-details').evaluateAll(details => details.forEach(el => {el.open=true;}));
@@ -181,13 +217,14 @@ async page => {
       const targets = [...document.querySelectorAll('a,button,summary')].filter(el => visible(el) && !el.classList.contains('skip') && (el.getBoundingClientRect().width < 44 || el.getBoundingClientRect().height < 44));
       return {small:small.map(el=>el.className),targets:targets.map(el=>el.textContent.trim()),overflow:document.documentElement.scrollWidth > innerWidth};
     });
-    check(!failures.small.length && !failures.targets.length && !failures.overflow, `Readability at ${width}: ${JSON.stringify(failures)}`);
+    check(!failures.small.length && !failures.targets.length && !failures.overflow, `Readability at ${route} / ${width}: ${JSON.stringify(failures)}`);
     await page.locator('.material-details, .archive-details').evaluateAll(details => details.forEach(el => {el.open=false;}));
   }
-  report.push('PASS minimum 11px text and 44×44px targets at six widths, including open materials');
+  }
+  report.push('PASS four pages: minimum 11px text and 44×44px targets at six widths, including open materials');
   await page.setViewportSize({width:1440,height:1000});
   await page.goto(base);
-  await page.getByRole('button', {name:'Effects',exact:true}).waitFor();
+  await page.getByRole('button', {name:'Rotate core'}).waitFor();
   async function captureFullPage(path) {
     // Paint every glass layer and load lazy previews before full-page capture.
     const height = await page.evaluate(() => document.documentElement.scrollHeight);
@@ -202,6 +239,13 @@ async page => {
   await captureFullPage('.screenshots/homepage-corrected-desktop.png');
   await page.setViewportSize({ width: 390, height: 844 });
   await captureFullPage('.screenshots/homepage-corrected-mobile.png');
+  for (const [name, url] of [['episode',episode], ['series',series], ['episodes',base+'/episodes/']]) {
+    await page.goto(url);
+    await page.setViewportSize({width:1440,height:1000});
+    await captureFullPage(`.screenshots/${name}-desktop.png`);
+    await page.setViewportSize({width:390,height:844});
+    await captureFullPage(`.screenshots/${name}-mobile.png`);
+  }
   check(errors.length === 0, 'Uncaught browser errors: ' + errors.join(', '));
   report.push('PASS no uncaught JavaScript errors; desktop/mobile screenshots saved');
   return report;

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080a10">
+  <title>Eleven local models — Karpathy rules study | PC Magik Lab</title>
+  <meta name="description" content="Eleven local models, three runs per variant: all effect-count ranges overlap. Inspect the full model comparison and mechanical file completeness.">
+  <link rel="canonical" href="https://lab.pcmagik.pl/series/04-seria-modeli-n3/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lab.pcmagik.pl/series/04-seria-modeli-n3/">
+  <meta property="og:title" content="Eleven local models — Karpathy rules study | PC Magik Lab">
+  <meta property="og:description" content="Eleven local models, three runs per variant: all effect-count ranges overlap. Inspect the full model comparison and mechanical file completeness.">
+  <meta property="og:image" content="https://lab.pcmagik.pl/assets/avatar-400.png">
+  <meta property="og:image:width" content="400">
+  <meta property="og:image:height" content="400">
+  <meta property="og:image:alt" content="PC Magik Lab logo">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="/assets/avatar-400.png">
+  <link rel="stylesheet" href="/assets/lab.css">
+  <script defer src="/assets/lab.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="reading-progress" aria-hidden="true"></div>
+<header>
+  <div class="wrap header-inner glass">
+    <a class="brand" href="/" aria-label="PC Magik Lab — home"><img src="/assets/avatar-400.png" width="34" height="34" alt=""><span>PC MAGIK <span>/ LAB</span></span></a>
+    <nav aria-label="Main navigation"><a href="/episodes/">Benchmarks</a><a href="/#method">The process</a><a href="https://github.com/pcmagik/pcmagik-lab">Repository ↗</a></nav>
+    <div class="header-actions"><a class="header-youtube" href="https://www.youtube.com/@PCMagikLab" aria-label="PC Magik Lab on YouTube">▷</a></div>
+    <details class="mobile-nav"><summary aria-label="Open navigation menu">Menu <span aria-hidden="true">＋</span></summary><div class="mobile-links"><a href="/episodes/">Benchmarks</a><a href="/#method">The process</a><a href="https://github.com/pcmagik/pcmagik-lab">Repository ↗</a><a href="https://www.youtube.com/@PCMagikLab">YouTube ↗</a></div></details>
+  </div>
+</header>
+<main id="main" class="wrap content-wrap interior">
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Lab</a><span aria-hidden="true">/</span><span aria-current="page">Series 04</span></nav>
+    <section id="series" aria-labelledby="series-title">
+      <div class="section-head reveal"><div><p class="eyebrow">THE WIDER CHECK / SERIES 04</p><h1 class="page-title" id="series-title">One finding.<br><span>Not a universal rule.</span></h1></div><p class="section-aside">11 other local models · n=3 per variant · 66 runs.<br>Qwen3.8 27B is a separate study, not part of this cohort.</p></div>
+      <div class="series-summary glass"><strong>11 / 11</strong><p>Models have overlapping effect-count ranges. This series does not establish a consistent reduction or increase from Karpathy rules on any of these models.</p></div>
+      <p class="study-note">Effects is a count of CSS/JS constructs, not a rating of visual quality. Compare variants within each model; requested reasoning effort is not comparable across models.</p>
+      <div class="series-grid">
+        <article class="series-model glass"><h3>google/gemma-4-26b-a4b-qat</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>21–36</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>29–39</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+        <article class="series-model glass"><h3>google/gemma-4-31b-qat</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>29–39</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>31–44</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+        <article class="series-model glass"><h3>zai-org/glm-4.7-flash</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>54–73</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>56–73</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+        <article class="series-model glass"><h3>unsloth/muse-glimmer-30b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>28–42</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>35–49</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+        <article class="series-model glass"><h3>meta/muse-glimmer</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>34–42</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>38–41</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+        <article class="series-model glass"><h3>nvidia/nemotron-3-nano</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>5–8</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>6–12</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 4/6</p></article>
+        <article class="series-model glass"><h3>nvidia-nemotron-3.5-lightning-30b-a3b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>25–34</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>23–53</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 5/6</p></article>
+        <article class="series-model glass"><h3>ornith-1.0-35b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>65–91</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>63–98</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+        <article class="series-model glass"><h3>ornith-1.5-35b-a3b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>100–117</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>95–117</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+        <article class="series-model glass"><h3>qwen/qwen3.6-27b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>54–73</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>48–69</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+        <article class="series-model glass"><h3>qwen/qwen3.6-35b-a3b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>70–92</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>77–87</dd></div></dl><p class="overlap-label">Ranges overlap</p><p class="sample-size">File completeness: 6/6</p></article>
+      </div>
+      <div class="material-details glass"><div class="details-body"><h2>File completeness: 63/66</h2><p>A mechanical check of closing tags, div balance and CSS presence, not an assessment of appearance or functionality. Nemotron 3 Nano has two deficient bare outputs (minimal CSS in r1; truncated r3). Nemotron 3.5 Lightning has one Karpathy output with unbalanced div tags (r3).</p><a class="button" href="/assets/homepage-benchmarks.json" download>Download effect-count measurements ↓</a></div></div>
+    </section>
+</main>
+<footer><div class="wrap"><div><a class="footer-address" href="https://lab.pcmagik.pl/">lab.pcmagik.pl ↗</a><p class="copyright">© PC Magik · Mateusz Piekut. Demo pages are unmodified model outputs.</p></div><div class="socials"><a href="https://github.com/pcmagik/pcmagik-lab">GitHub ↗</a><a href="https://x.com/PcMagik">X ↗</a><a href="https://www.linkedin.com/in/mateusz-piekut/">LinkedIn ↗</a><a href="https://www.facebook.com/Pcmagik/">Facebook ↗</a><a href="https://github.com/pcmagik/pcmagik-lab/blob/main/LICENSE">MIT license</a></div></div></footer>
+
+</body>
+</html>

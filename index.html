@@ -39,7 +39,7 @@
     <div class="hero-copy">
       <h1 id="hero-title"><span class="title-line">Intelligence.</span><span class="title-line">Under the</span><span class="title-line"><em>microscope.</em></span></h1>
       <p class="lead">Real models. Real hardware. Repeated measurements.<br>Explore the measured ranges, read the test materials<br class="desktop-break"> and inspect what the models actually built.</p>
-      <div class="actions"><a class="button primary magnetic" href="#episodes">Enter the lab <span>↗</span></a><a class="text-link" href="https://www.youtube.com/@PCMagikLab"><span class="play-icon">▷</span> Watch the experiments</a></div>
+      <div class="actions"><a class="button primary magnetic" href="/episodes/">Explore the episodes <span>↗</span></a><a class="text-link" href="https://www.youtube.com/@PCMagikLab"><span class="play-icon">▷</span> Watch the experiments</a></div>
     </div>
     <div class="scene" role="group" aria-label="Interactive neon sculpture">
       <div class="scene-grid" aria-hidden="true"></div>
@@ -56,98 +56,30 @@
   <div class="lab-strip"><div class="wrap"><span>BUILT TO BE VERIFIED</span><span class="strip-item">OPEN PROMPTS <i>✳</i> RAW METRICS <i>✳</i> LIVE OUTPUTS <i>✳</i> REAL HARDWARE</span><span class="strip-end">PCML / RESEARCH ARCHIVE</span></div></div>
   <div class="wrap content-wrap">
     <section id="episodes" aria-labelledby="episodes-title">
-      <div class="section-head reveal"><div><p class="eyebrow"><span class="section-number">01 /</span> THE EXPERIMENTS</p><h2 id="episodes-title">Less hype.<br><span>More evidence.</span></h2></div><div class="section-aside"><p>Same task. Different approach.<br>Explore exactly what the models produced.</p><span class="archive-count">Film 01: n=5 per variant <span>·</span> Series standard: n=3</span></div></div>
-      <article class="ep glass reveal">
-        <div class="ep-h"><div><div class="ep-meta"><span class="chip">FILM 01 · n=5 PER VARIANT</span><time datetime="2026-09-19">SEP 19, 2026</time><span>EFFORT: MEDIUM</span></div><h3>What do Karpathy rules change<br>on Qwen3.8 27B?</h3><p class="ep-subtitle">Same model, prompt and rig. Five independent runs per variant.</p></div><div class="episode-links"><span class="soon">Video coming soon</span><a class="button" href="#materials">Test materials ↗</a></div></div>
-        <div class="comparison" aria-labelledby="compare-heading">
-          <div class="compare-top"><div><h4 id="compare-heading">Ranges, not a single run.</h4><p class="range-legend">Minimum–maximum · five runs per variant · shared scale starts at zero.</p></div><div class="metric-switch" role="group" aria-label="Compare a metric" hidden><button type="button" data-metric="effects" aria-pressed="true">Effects</button><button type="button" data-metric="time" aria-pressed="false">Time</button><button type="button" data-metric="tokens" aria-pressed="false">output tokens</button><button type="button" data-metric="throughput" aria-pressed="false">tok/s</button></div></div>
-          <div class="compare-rows">
-            <div class="compare-row"><span class="compare-label">BARE<small>NO RULES, NO EXTRAS</small></span><div class="bar-track" aria-hidden="true"><div class="bar-fill bare-bar" style="left:83.2258%;width:16.7742%"></div></div><strong class="compare-value">129–155 <small>effects</small></strong></div>
-            <div class="compare-row"><span class="compare-label">KARPATHY<small>ONE RULES FILE</small></span><div class="bar-track" aria-hidden="true"><div class="bar-fill karpathy-bar" style="left:65.1613%;width:12.9032%"></div></div><strong class="compare-value">101–121 <small>effects</small></strong></div>
-          </div>
-          <div class="compare-footer"><p class="compare-summary" aria-live="polite" aria-atomic="true">On Qwen3.8 27B, Karpathy has 22% fewer counted effects on average. Every Karpathy run is below every bare run; the ranges do not overlap.</p><p class="metric-caveat">Effects counts CSS/JS constructs in the code, not visual quality. You judge the appearance.</p></div>
-        </div>
-        <p class="study-note">Time and output-token ranges overlap: no clear difference in this study. In the separate Qwen3.8 repeatability study, time varied by up to 93% within one variant. A single-run gap is not evidence of a benefit.</p>
-        <div class="representative-heading"><h4>Inspect the representative pages</h4><p>The median-time run in each variant, checked for file completeness. Individual examples, not the comparison result.</p></div>
-        <div class="runs">
-          <div class="run spotlight">
-            <a class="shot" href="#preview-bare" aria-label="View the full bare representative preview"><img src="assets/film01-bare-preview.png" alt="Qwen3.8 27B bare, representative r2: full-page screenshot" loading="lazy"></a>
-            <div class="body"><div class="name"><div><b class="v-bare">BARE</b><small class="variant-description">NO RULES, NO EXTRAS</small></div><span class="tag">Representative r2</span></div>
-              <div class="kv"><div><b>5 min 49 s</b><small>time</small></div><div><b>19,321</b><small>output tokens</small></div><div><b>1.7%</b><small>thinking</small></div><div><b>1,059</b><small>lines of code</small></div></div>
-              <p class="measurement-note">output = thinking + final code</p><p class="measurement-note">Lines of code show the page size the model chose in an open-ended task, not the cost of equivalent work.</p>
-              <div class="foot"><a href="#preview-bare">Full-page preview ↗</a><a href="#measurements">Run measurements</a><a href="#task-prompt">Read prompt</a></div>
-            </div>
-          </div>
-          <div class="run spotlight">
-            <a class="shot" href="#preview-karpathy" aria-label="View the full karpathy representative preview"><img src="assets/film01-karpathy-preview.png" alt="Qwen3.8 27B karpathy, representative r3: full-page screenshot" loading="lazy"></a>
-            <div class="body"><div class="name"><div><b class="v-karpathy">KARPATHY</b><small class="variant-description">ONE RULES FILE</small></div><span class="tag">Representative r3</span></div>
-              <div class="kv"><div><b>5 min 06 s</b><small>time</small></div><div><b>15,659</b><small>output tokens</small></div><div><b>2.5%</b><small>thinking</small></div><div><b>902</b><small>lines of code</small></div></div>
-              <p class="measurement-note">output = thinking + final code</p><p class="measurement-note">Lines of code show the page size the model chose in an open-ended task, not the cost of equivalent work.</p>
-              <div class="foot"><a href="#preview-karpathy">Full-page preview ↗</a><a href="#measurements">Run measurements</a><a href="#task-prompt">Read prompt</a></div>
-            </div>
-          </div>
-        </div>
-      </article>
-      <details class="archive-details glass"><summary>Earlier published live demos — separate from the five-run study</summary><div class="details-body"><p>These archived outputs were published before the current study. They are not its representative runs and do not support the range comparison above. Their original files remain unchanged.</p><div class="archive-links"><a class="button variant-bare" href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/index.html">Open archived bare demo ↗</a><a class="button variant-karpathy" href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/index.html">Open archived Karpathy demo ↗</a></div></div></details>
-    </section>
-    <section id="series" aria-labelledby="series-title">
-      <div class="section-head reveal"><div><p class="eyebrow">THE WIDER CHECK / SERIES 04</p><h2 id="series-title">One finding.<br><span>Not a universal rule.</span></h2></div><p class="section-aside">11 other local models · n=3 per variant · 66 runs.<br>Qwen3.8 27B is a separate study, not part of this cohort.</p></div>
-      <div class="series-summary glass"><strong>11 / 11</strong><p>Models have overlapping effect-count ranges. This series does not establish a consistent reduction or increase from Karpathy rules on any of these models.</p></div>
-      <p class="study-note">Effects is a count of CSS/JS constructs, not a rating of visual quality. Compare variants within each model; requested reasoning effort is not comparable across models.</p>
-      <div class="series-grid">
-        <article class="series-model glass"><h3>google/gemma-4-26b-a4b-qat</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>21–36</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>29–39</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>google/gemma-4-31b-qat</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>29–39</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>31–44</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>zai-org/glm-4.7-flash</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>54–73</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>56–73</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>unsloth/muse-glimmer-30b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>28–42</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>35–49</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>meta/muse-glimmer</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>34–42</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>38–41</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>nvidia/nemotron-3-nano</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>5–8</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>6–12</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>nvidia-nemotron-3.5-lightning-30b-a3b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>25–34</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>23–53</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>ornith-1.0-35b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>65–91</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>63–98</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>ornith-1.5-35b-a3b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>100–117</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>95–117</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>qwen/qwen3.6-27b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>54–73</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>48–69</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
-        <article class="series-model glass"><h3>qwen/qwen3.6-35b-a3b</h3><p class="sample-size">n=3 per variant · effects</p><dl><div><dt class="variant-bare">BARE</dt><dd>70–92</dd></div><div><dt class="variant-karpathy">KARPATHY</dt><dd>77–87</dd></div></dl><p class="overlap-label">Ranges overlap</p></article>
+      <div class="section-head reveal"><div><p class="eyebrow"><span class="section-number">01 /</span> LATEST RESULTS</p><h2 id="episodes-title">Less hype.<br><span>More evidence.</span></h2></div><a class="button" href="/episodes/">View all episodes ↗</a></div>
+      <div class="episode-list">
+<!-- EPISODES:START -->
+<article class="episode-card glass spotlight">
+  <div class="ep-meta"><span class="chip">FILM 01 · n=5 PER VARIANT</span><time datetime="2026-09-19">2026-09-19</time></div>
+  <p class="eyebrow">Qwen3.8 27B</p><h3><a href="/episodes/01-karpathy-vs-bare/">What do Karpathy rules change on Qwen3.8 27B? <span aria-hidden="true">↗</span></a></h3>
+  <p class="episode-thesis">Karpathy rules produced 22% fewer counted effects on average across five runs per variant; time and output-token ranges overlap.</p><p class="measurement-note">Effects counts code constructs, not visual quality.</p>
+</article>
+<!-- EPISODES:END -->
       </div>
+      <p class="research-teaser glass">Across 11 other local models, all effect-count ranges overlap (n=3 per variant), so the study does not establish a consistent reduction from Karpathy rules. <a href="/series/04-seria-modeli-n3/">Read the full study ↗</a></p>
     </section>
-    <section id="materials" aria-labelledby="materials-title">
-      <div class="section-head"><div><p class="eyebrow">THE EVIDENCE</p><h2 id="materials-title">Check the measurements.</h2></div><p class="section-aside">The five-run measurements and test prompt, here on this page.<br>Download the snapshot to inspect the source references.</p></div>
-      <div class="material-links"><a class="button" href="assets/homepage-benchmarks.json" download>Download measurement data ↓</a><a class="button" href="#task-prompt">Read the test prompt ↓</a></div>
-      <details id="measurements" class="material-details glass"><summary>All ten Film 01 runs — measurements and definitions</summary><div class="details-body"><p>Time is shown to two decimal places below; the comparison rounds time to the nearest second. Output tokens include thinking and final code. Lines of code describe chosen output size, not equivalent-work cost. Effects counts code constructs, not appearance.</p><div class="measurement-table-wrap" tabindex="0" role="region" aria-label="All ten runs; scroll horizontally on small screens"><table><caption>Qwen3.8 27B · medium · model reloaded before every run</caption><thead><tr><th scope="col">Variant</th><th scope="col">Run</th><th scope="col">Time (s)</th><th scope="col">output tokens</th><th scope="col">thinking tokens</th><th scope="col">tok/s</th><th scope="col">lines of code</th><th scope="col">Effects</th></tr></thead><tbody>
-<tr><th scope="row" class="variant-bare">BARE</th><td>r1</td><td>419.96</td><td>22,049</td><td>1,271</td><td>52.50</td><td>1,084</td><td>152</td></tr>
-<tr><th scope="row" class="variant-bare">BARE</th><td>r2</td><td>349.16</td><td>19,321</td><td>334</td><td>55.33</td><td>1,059</td><td>146</td></tr>
-<tr><th scope="row" class="variant-bare">BARE</th><td>r3</td><td>338.42</td><td>19,052</td><td>612</td><td>56.30</td><td>1,033</td><td>130</td></tr>
-<tr><th scope="row" class="variant-bare">BARE</th><td>r4</td><td>337.78</td><td>18,858</td><td>293</td><td>55.83</td><td>1,122</td><td>129</td></tr>
-<tr><th scope="row" class="variant-bare">BARE</th><td>r5</td><td>364.01</td><td>20,397</td><td>466</td><td>56.03</td><td>978</td><td>155</td></tr>
-<tr><th scope="row" class="variant-karpathy">KARPATHY</th><td>r1</td><td>247.82</td><td>14,333</td><td>256</td><td>57.84</td><td>920</td><td>101</td></tr>
-<tr><th scope="row" class="variant-karpathy">KARPATHY</th><td>r2</td><td>478.73</td><td>24,268</td><td>2,723</td><td>50.69</td><td>1,122</td><td>121</td></tr>
-<tr><th scope="row" class="variant-karpathy">KARPATHY</th><td>r3</td><td>305.51</td><td>15,659</td><td>394</td><td>51.26</td><td>902</td><td>114</td></tr>
-<tr><th scope="row" class="variant-karpathy">KARPATHY</th><td>r4</td><td>428.11</td><td>23,174</td><td>1,671</td><td>54.13</td><td>934</td><td>112</td></tr>
-<tr><th scope="row" class="variant-karpathy">KARPATHY</th><td>r5</td><td>279.50</td><td>15,810</td><td>453</td><td>56.57</td><td>973</td><td>110</td></tr>
-</tbody></table></div></div></details>
-      <details id="task-prompt" class="material-details glass"><summary>The exact prompt used for Film 01</summary><div class="details-body"><p>Both variants received this task. Karpathy additionally received one rules file.</p><pre class="prompt-text">Create a single HTML file for the landing page of PC Magik Lab, a YouTube series about running AI models on real, local GPUs. Tagline, use verbatim: &quot;Local models, real GPUs.&quot;
 
-The site should include a polished hero section, a section on how the series measures things (same prompt, same rig, one variable changed per test, the model reloaded before every run, every prompt and result file published), a hardware section (one rig: NVIDIA RTX 3090 24 GB, LM Studio as the model server), an about section, links to the YouTube channel (https://www.youtube.com/@PCMagikLab) and to the repository with prompts and result files (https://github.com/pcmagik/pcmagik-lab), and a footer crediting the author PC Magik (Mateusz Piekut), computer service and homelab operator from Poland.
 
-Make it look like a real, modern tech series website with a dark glass-and-neon style, glowing accents, responsive layout, smooth scrolling, hover effects, and interactive cards. All visible text in English; code and identifiers in English.
-
-Use only the facts given in this prompt. Do not invent episodes, results, statistics or numbers.
-
-Keep everything in one HTML file with the CSS and JavaScript included, no external files, no network requests, no raster images (inline SVG and CSS-drawn graphics are fine). Name the file index.html and write it to the current working directory.
-
-Once finished, review your code, make sure everything works correctly, and fix anything broken or incomplete before giving the final answer.
-</pre><a class="button" href="assets/film01-bare-prompt.txt" download>Download prompt ↓</a></div></details>
-      <details id="preview-bare" class="material-details glass"><summary>BARE — full-page representative preview</summary><div class="details-body"><p>This screenshot is from the median-time run of the five-run cohort. It is a preview, not a live execution.</p><img class="full-preview" src="assets/film01-bare-preview.png" alt="Full-page bare representative output from Qwen3.8 27B" loading="lazy"></div></details>
-      <details id="preview-karpathy" class="material-details glass"><summary>KARPATHY — full-page representative preview</summary><div class="details-body"><p>This screenshot is from the median-time run of the five-run cohort. It is a preview, not a live execution.</p><img class="full-preview" src="assets/film01-karpathy-preview.png" alt="Full-page karpathy representative output from Qwen3.8 27B" loading="lazy"></div></details>
-    </section>
     <section id="method" aria-labelledby="method-title"><div class="section-head reveal"><div><p class="eyebrow"><span class="section-number">02 /</span> THE PROCESS</p><h2 id="method-title">No black box.<br><span>Just the whole picture.</span></h2></div><p class="section-aside">A benchmark is only useful if you can check it.<br>Here’s what goes into every experiment.</p></div>
 <div class="method">
 <div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">01</div><h3>One variable at a time</h3><p>Same prompt, same rig, one variable changed per test. The model is reloaded before every run. The series standard is n=3 per variant; Film 01 uses n=5.</p></div>
-<div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">{ }</div><h3>Metrics from the run</h3><p>Read ranges across repeated runs, not a single-run percentage. Effects counts code constructs; it does not judge appearance. Time and output tokens are not equivalent-work costs in this open-ended task.</p></div>
+<div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">{ }</div><h3>Metrics from the run</h3><p>Read ranges across repeated runs: in the separate Qwen3.8 repeatability study, time varied by up to 93% within one variant. Effects counts code constructs; it does not judge appearance. Time and output tokens are not equivalent-work costs in this open-ended task.</p></div>
 <div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">⌘</div><h3>Real hardware</h3><p>Ryzen 5 PRO 3600, 32 GB DDR4 ECC and an RTX 3090 with 24 GB VRAM. Local models are served through LM Studio.</p></div>
-<div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">&gt;_</div><h3>The exact prompt</h3><p>The full input, byte for byte. <a href="#task-prompt">Read the task ↗</a> alongside the measurements. The evidence snapshot records source files and checksums.</p></div>
+<div class="m glass reveal spotlight"><div class="method-icon" aria-hidden="true">&gt;_</div><h3>The exact prompt</h3><p>The full input, byte for byte. <a href="/episodes/01-karpathy-vs-bare/#task-prompt">Read the task ↗</a> alongside the measurements. The evidence snapshot records source files and checksums.</p></div>
 </div></section>
 
     <section class="about glass" aria-labelledby="about-title"><div><p class="eyebrow">BEHIND THE LAB</p><h2 id="about-title">Mateusz Piekut <span>/ PC Magik</span></h2><p>Computer service and homelab operator from Poland. The person behind PC Magik Lab.</p></div><a class="button" href="https://lab.pcmagik.pl/">lab.pcmagik.pl ↗</a></section>
-    <section class="closing glass reveal" aria-labelledby="closing-title"><p class="eyebrow">CURIOSITY IS THE STARTING POINT.</p><h2 id="closing-title">Don't take our word.<br><em>Take a look.</em></h2><div class="closing-bottom"><p>Explore the measured ranges. Read the test materials.<br>Judge the model outputs for yourself.</p><div class="actions"><a class="button primary magnetic" href="https://github.com/pcmagik/pcmagik-lab">Explore the repository ↗</a><a class="button" href="https://www.youtube.com/@PCMagikLab">YouTube ↗</a></div></div><span class="closing-asterisk" aria-hidden="true">✳</span></section>
+
   </div>
 </main>
 <footer><div class="wrap"><div><a class="footer-address" href="https://lab.pcmagik.pl/">lab.pcmagik.pl ↗</a><p class="copyright">© PC Magik · Mateusz Piekut. Demo pages are unmodified model outputs.</p></div><div class="socials"><a href="https://github.com/pcmagik/pcmagik-lab">GitHub ↗</a><a href="https://x.com/PcMagik">X ↗</a><a href="https://www.linkedin.com/in/mateusz-piekut/">LinkedIn ↗</a><a href="https://www.facebook.com/Pcmagik/">Facebook ↗</a><a href="https://github.com/pcmagik/pcmagik-lab/blob/main/LICENSE">MIT license</a></div></div></footer>

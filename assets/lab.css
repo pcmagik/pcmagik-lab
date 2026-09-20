@@ -481,3 +481,28 @@ thead { background: #ffffff06; }thead th { font-size: 11px; font-weight: 500; }
 }
 @media(max-width:360px) { .compare-value { font-size: 23px; } .scene-label { letter-spacing: 0; } }
 @media(max-width:760px) { .orbit-one { width: 70%; left: 14%; } }
+
+/* The homepage is a gateway; complete measurements live on interior pages. */
+.interior { padding-top: 35px; padding-bottom: 70px; }
+.breadcrumbs { display: flex; align-items: center; gap: 16px; margin-bottom: 36px; color: var(--muted); }
+.page-title { font-size: clamp(32px, 5vw, 64px); line-height: 1.12; letter-spacing: -.04em; margin: 0; max-width: 950px; }
+.page-title span { color: var(--muted); }
+.episode-list { display: grid; gap: 20px; }
+.episode-card { padding: clamp(24px, 4vw, 46px); border-radius: 24px; position: relative; overflow: hidden; }
+.episode-card .eyebrow { margin-top: 26px; }
+.episode-card h3 { font-size: clamp(26px, 3vw, 40px); line-height: 1.2; max-width: 850px; margin: 12px 0 20px; letter-spacing: -.03em; }
+.episode-card h3 a { gap: 24px; }
+.episode-card h3 a:hover { color: var(--cyan); }
+.episode-thesis { font-size: clamp(17px, 2vw, 21px); line-height: 1.6; max-width: 850px; }
+.episode-card .measurement-note { margin-top: 14px; }
+.research-teaser { padding: 22px 28px; border-radius: 18px; margin: 22px 0 0; font-size: 16px; line-height: 1.7; color: var(--muted); }
+.research-teaser a { color: var(--cyan); margin-left: 8px; }
+.interior > .button { margin-top: 24px; }
+@media (max-width: 600px) {
+  .interior { padding-top: 18px; }
+  .breadcrumbs { margin-bottom: 24px; }
+  .episode-card .ep-meta { flex-wrap: wrap; }
+  .episode-card h3 a { display: block; }
+  .research-teaser { padding: 20px; }
+  .research-teaser a { margin-left: 0; }
+}

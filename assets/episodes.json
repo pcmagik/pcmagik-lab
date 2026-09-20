@@ -1,0 +1,11 @@
+[
+  {
+    "slug": "01-karpathy-vs-bare",
+    "date": "2026-09-19",
+    "model": "Qwen3.8 27B",
+    "title": "What do Karpathy rules change on Qwen3.8 27B?",
+    "summary": "Karpathy rules produced 22% fewer counted effects on average across five runs per variant; time and output-token ranges overlap.",
+    "note": "Effects counts code constructs, not visual quality.",
+    "label": "FILM 01 \u00b7 n=5 PER VARIANT"
+  }
+]

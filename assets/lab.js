@@ -16,8 +16,9 @@
   // Animation failures must not affect the measured range explorer.
   async function initializeComparison() {
     const controls = document.querySelector('.metric-switch');
+    if (!controls) return;
     try {
-      const response = await fetch('assets/homepage-benchmarks.json');
+      const response = await fetch('/assets/homepage-benchmarks.json');
       if (!response.ok) return;
       const data = await response.json();
       const cohorts = ['bare', 'karpathy'].map(variant => data.cohorts?.[variant]);
@@ -73,7 +74,7 @@
   }
 
   function setupMotion() {
-    if (!gsap) return;
+    if (!gsap || !motionButton) return;
     motionContext?.revert();
     motionContext = undefined;
     ambientTweens = [];
@@ -104,6 +105,7 @@
   function updateMotion() {
     const enabled = motionEnabled();
     document.documentElement.dataset.motion = enabled ? 'active' : 'paused';
+    if (!motionButton) return;
     motionButton.setAttribute('aria-pressed', String(!enabled));
     motionButton.disabled = reducedMotion.matches;
     motionButton.innerHTML = reducedMotion.matches
@@ -112,13 +114,13 @@
     setupMotion();
     motionListeners.forEach(listener => listener(enabled));
   }
-  motionButton.hidden = false;
-  motionButton.addEventListener('click', () => { userPaused = !userPaused; updateMotion(); });
+  if (motionButton) motionButton.hidden = false;
+  motionButton?.addEventListener('click', () => { userPaused = !userPaused; updateMotion(); });
   reducedMotion.addEventListener('change', updateMotion);
   document.addEventListener('visibilitychange', () => {
     if (gsap) document.hidden ? gsap.globalTimeline.pause() : gsap.globalTimeline.resume();
   });
-  new IntersectionObserver(entries => {
+  if (document.querySelector('.hero')) new IntersectionObserver(entries => {
     heroVisible = entries[0].isIntersecting;
     ambientTweens.forEach(tween => tween.paused(!heroVisible));
   }).observe(document.querySelector('.hero'));
@@ -152,7 +154,8 @@
   }
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', () => {
-      document.querySelector('.mobile-nav').open = false;
+      const menu = document.querySelector('.mobile-nav');
+      if (menu) menu.open = false;
       openMaterial(link.hash);
     });
   });
@@ -176,7 +179,7 @@
   updateProgress();
 
   // Lazy loading keeps the benchmark controls usable if WebGL or Three.js fails.
-  import('./neural-scene.js').then(({ createNeuralScene }) => {
+  if (document.querySelector('.scene')) import('./neural-scene.js').then(({ createNeuralScene }) => {
     sceneController = createNeuralScene(document.querySelector('.scene'), motionEnabled);
     if (sceneController) motionListeners.add(sceneController.setMotion);
   }).catch(() => {

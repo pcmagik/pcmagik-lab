@@ -144,3 +144,46 @@ klasa wyniku, kompletność stron. Na głównej co najwyżej jedno zdanie z wyni
 3. Sekcję odcinków na głównej ograniczyć do trzech ostatnich, z linkiem do `/episodes/`.
 
 Kolejność pracy zostaje: najpierw główna (te trzy punkty), podstrony po niej.
+
+---
+
+# Aneks 2 — wyniki mieszkają pod odcinkiem, nie na własnej podstronie
+
+Poprzedni aneks kazał zrobić `/series/<slug>/` na całe badanie. **To był błąd w poleceniu.**
+Operator: „to jest z dupy, raczej wyniki powinny być pod odcinkiem a nie jakaś kolejna
+podstrona, po co te wyniki jak odcinka nie ma?".
+
+## Zasada
+
+**Nie publikujemy badania bez odcinka.** Pomiar czeka w repo pomiarowym, aż powstanie film,
+który go opowiada. Wtedy trafia na stronę tego odcinka — z filmem, tezą i pełnymi liczbami
+w jednym miejscu.
+
+Pomiar obejmujący kilka odcinków opisuje ten odcinek, który go wprowadza; pozostałe linkują
+do niego, zamiast powielać tabelę.
+
+## Co zrobić
+
+1. **Usuń `/series/04-seria-modeli-n3/`.** Seria jedenastu modeli nie ma jeszcze odcinka,
+   więc nie ma czego publikować. Widz trafia dziś na tabelę, do której nie istnieje film.
+2. Zdanie o wyniku serii zostaje na głównej i w odcinku 01 jako kontekst („na jedenastu innych
+   modelach lokalnych to samo porównanie nie dało różnicy"), **bez linku do osobnej podstrony**.
+3. Gdy powstanie odcinek o serii jedenastu modeli, komplet tabel trafi do
+   `/episodes/<slug-tego-odcinka>/` — tam, gdzie będzie film.
+
+Struktura docelowa, bez wyjątków:
+
+| Adres | Co tam jest |
+|---|---|
+| `/` | czym to jest, jak mierzymy, **trzy ostatnie wyniki**, autor, stopka z adresem |
+| `/episodes/` | lista wszystkich odcinków |
+| `/episodes/<slug>/` | film, teza, **pełne wyniki pomiaru, który go zrodził**, prompt, pliki |
+
+## Liczby
+
+Od teraz wszystkie liczby na stronie pochodzą z jednego generowanego pliku w repo pomiarowym:
+`seria/pomiary/LICZBY.md` (powstaje z `python3 seria/harness/liczby.py`). Nie przepisuj liczb
+z żadnego innego dokumentu ani z pamięci — dokumenty bywają nieaktualne, ten plik nie.
+
+Przykład, dlaczego: w regułach stało „66 z 70 biegów bez wad" przez cały dzień po tym, jak
+cztery biegi usunięto. Prawdziwa liczba to 63 z 66.

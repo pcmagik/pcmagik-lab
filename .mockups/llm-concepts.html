@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Dwa kierunki LLM — PC Magik Lab</title>
+<link rel="icon" href="../assets/avatar-400.png">
+<style>
+@font-face{font-family:Oswald;src:url('../assets/Oswald-Bold.ttf');font-weight:700;font-display:swap}
+:root{color-scheme:dark;--mint:#8bffe1;--violet:#b9a0ff;--muted:#8d9aa9;--line:#ffffff19}
+*{box-sizing:border-box}body{margin:0;color:#edf6f6;background:#070a0e;font:15px/1.5 system-ui,sans-serif}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid var(--mint);outline-offset:5px}a{color:inherit;text-decoration:none}button{min-height:44px}button:disabled{cursor:default}[hidden]{display:none!important}
+.shell{width:min(1600px,94%);margin:auto}.top{height:92px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);gap:16px}.brand{display:flex;gap:12px;align-items:center;letter-spacing:2px;font-size:13px;font-weight:750;min-height:44px}.brand img{width:35px;height:35px}.brand span{color:var(--muted)}.top-note,.micro{font:11px/1.5 ui-monospace,monospace;letter-spacing:1.8px;text-transform:uppercase}.top-note{color:var(--muted)}.domain{font:12px ui-monospace,monospace;min-height:44px;display:flex;align-items:center}.chooser{display:flex;justify-content:space-between;align-items:center;gap:20px;margin:26px 0 0}.tabs{display:flex;gap:8px;padding:5px;background:#ffffff04;border:1px solid var(--line);border-radius:100px}.tabs button{border:0;background:transparent;border-radius:100px;padding:10px 24px;color:var(--muted);font-size:13px}.tabs button[aria-selected=true]{background:#c7ffee;color:#062218;box-shadow:0 0 25px #7bffe014}.tabs small{font:11px ui-monospace,monospace;margin-right:10px;opacity:.65}.motion{background:transparent;border:1px solid var(--line);border-radius:100px;padding:10px 20px;font-size:12px;min-width:150px}.motion:hover{border-color:#8bffe177}.hero{position:relative;display:grid;grid-template-columns:36% 64%;min-height:660px;align-items:center;border-bottom:1px solid var(--line)}.copy{position:relative;z-index:2;padding:50px 0;pointer-events:none}.eyebrow{color:var(--mint);display:flex;align-items:center;gap:10px}.dot{width:5px;height:5px;border-radius:100%;background:var(--mint);box-shadow:0 0 12px var(--mint)}h1{font:700 clamp(56px,6.1vw,96px)/1.06 Oswald,system-ui;text-transform:uppercase;letter-spacing:-2px;margin:28px 0}.copy h1 span{color:var(--mint)}.copy p{color:#98a6b7;font-size:15px;line-height:1.8;max-width:325px}.cta{display:inline-flex;align-items:center;gap:40px;margin-top:24px;padding:14px 20px;border:1px solid #8bffe13b;border-radius:5px;font-size:13px;background:linear-gradient(125deg,#8bffe116,#8bffe104)}.art{height:660px;position:relative;min-width:0;isolation:isolate;overflow:hidden}.art:before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 55% 50%,#103c3833,transparent 60%);z-index:-1}.art:after{content:'';position:absolute;inset:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' opacity='.17' filter='url(%23n)' d='M0 0h160v160H0z'/%3E%3C/svg%3E");opacity:.12;mix-blend-mode:screen}.art-label{position:absolute;top:38px;left:30px;color:#8c9d9d}.art-label:before{content:'+';margin-right:12px;color:var(--mint)}.art-bottom{position:absolute;bottom:33px;left:30px;right:25px;display:flex;justify-content:space-between;gap:20px;color:#81948f;font:11px ui-monospace,monospace;letter-spacing:1px}.art-bottom b{font-weight:400;color:var(--mint)}
+/* The plates are sculpted layers, not an architectural diagram of a real model. */
+.space{position:absolute;inset:0;perspective:1000px;perspective-origin:50% 45%}.sculpture{position:absolute;left:49%;top:46%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-13deg) rotateY(-32deg) rotateZ(-13deg)}.plate{position:absolute;width:238px;height:300px;left:-119px;top:-150px;border:1px solid #9fffe866;border-radius:35px;transform-style:preserve-3d;background:linear-gradient(140deg,#c8fff82e 0%,#75dfcb08 25%,#030f1399 49%,#8062bd30 90%,#c4a8ff55);box-shadow:inset 2px 2px 2px #d7fff53d,inset -2px -2px 4px #ad8cff4d,0 0 28px #67ffda0a;backface-visibility:visible}.plate:before{content:'';position:absolute;inset:12px;border:1px solid #b0ffe019;border-radius:25px;background:repeating-linear-gradient(90deg,transparent 0 17px,#a8ffe516 18px,transparent 19px),repeating-linear-gradient(0deg,transparent 0 17px,#a8ffe514 18px,transparent 19px);mask-image:linear-gradient(150deg,#000,transparent 90%)}.plate:after{content:'';position:absolute;left:-2px;top:18%;height:55%;width:3px;background:#b7ffe9;border-radius:100%;box-shadow:0 0 12px #7bffe0,0 0 35px #7bffe099}.plate:nth-child(even):after{left:auto;right:-2px;background:#c6abff;box-shadow:0 0 14px #a78bfa,0 0 35px #a78bfa88}.plate .scan{position:absolute;inset:18px;border-radius:25px;background:linear-gradient(0deg,transparent 30%,#b9ffed44 48%,#e5fffdbb 50%,#b9ffed22 52%,transparent 70%);mix-blend-mode:screen;opacity:.4}.plate-label{position:absolute;bottom:22px;left:23px;color:#c6eee4;font:16px ui-monospace,monospace;letter-spacing:2px}.beam{position:absolute;left:8%;right:4%;top:47%;height:1px;transform:rotate(-10deg);background:linear-gradient(90deg,transparent,#9affe381,#dcfff5,#ac8cff,transparent);box-shadow:0 0 18px 2px #89ffe13b}.beam:before{content:'';position:absolute;inset:-20px 10%;background:linear-gradient(90deg,transparent,#9affe31a,#ac8cff1a,transparent);filter:blur(14px)}.orbit{position:absolute;left:13%;top:19%;width:76%;height:60%;border:1px solid #8bffe112;border-radius:50%;transform:rotate(-20deg)}.orbit.second{inset:27% 5%;width:90%;height:45%;border-color:#b9a0ff10;transform:rotate(20deg)}.flow-token{position:absolute;left:0;top:0;min-width:62px;padding:10px 14px;border-radius:9px;border:1px solid #a8ffe363;background:linear-gradient(130deg,#aaffdf1c,#163532b8 45%,#0d181acc);box-shadow:inset 0 1px #d4ffee36,0 12px 35px #0008,0 0 22px #87ffda10;backdrop-filter:blur(6px);font:17px ui-monospace,monospace;color:#c6ffe9;will-change:transform,opacity}.flow-token.output{color:#d8c7ff;border-color:#bba0ff70;background:linear-gradient(130deg,#bca0ff25,#211a32dc);box-shadow:inset 0 1px #e4d6ff33,0 12px 35px #0008}.prompt-note{position:absolute;left:5%;top:22%;transform:rotate(-9deg);color:#b4c8c0}.prompt-note .micro{color:#65877d;margin-bottom:10px}.prompt-note strong{font:500 20px/1.4 system-ui}.answer-note{position:absolute;right:6%;bottom:18%;font:15px ui-monospace,monospace;color:#d6caff;min-width:170px}.answer-note .micro{color:#9b86be;margin-bottom:12px}.answer-cursor{display:inline-block;width:7px;height:17px;background:#ccb1ff;vertical-align:middle;margin-left:5px;box-shadow:0 0 14px #bba0ff99}.point{position:absolute;width:2px;height:2px;border-radius:50%;background:#b5ffe7;box-shadow:0 0 7px #8bffe1}
+/* Typography carries the second concept; the candidate rail becomes the output. */
+.type-art:before{background:radial-gradient(ellipse at 62% 46%,#14433745,transparent 58%)}.type-field{position:absolute;left:8%;right:4%;top:15%;bottom:12%}.context-line{position:absolute;top:10%;left:0;color:#a7b5b0;font:500 clamp(22px,2.3vw,36px)/1.25 system-ui;letter-spacing:-1px}.context-line small{display:block;margin-bottom:20px;font:11px ui-monospace,monospace;letter-spacing:2px;color:#637c73}.prefix{color:#e0eee9}.junction{position:absolute;left:3%;top:39%;width:13px;height:13px;border:1px solid #b1ffe2;border-radius:50%;box-shadow:0 0 30px #7bffe088;background:#9fffe3}.branches{position:absolute;left:3%;top:25%;width:90%;height:60%;overflow:visible}.branches path{fill:none;stroke:#91ffd8;stroke-width:.65;opacity:.19}.branches .chosen-path{stroke-width:1.4;opacity:.75;filter:drop-shadow(0 0 5px #8bffe1)}.candidates{position:absolute;left:28%;right:0;top:29%;height:62%;perspective:700px}.candidate{position:absolute;left:0;right:0;top:0;font:700 clamp(48px,6.4vw,102px)/1.03 Oswald,system-ui;letter-spacing:-1px;text-transform:uppercase;transform-origin:left center;will-change:transform,opacity,filter;color:#627770}.candidate .ending{color:#7bffe1}.candidate.selected{color:#ccffea;text-shadow:0 0 36px #7bffe025}.selection-box{position:absolute;left:23%;right:-1%;top:46%;height:118px;border-top:1px solid #7bffe129;border-bottom:1px solid #7bffe129;background:linear-gradient(90deg,#7bffe10b,transparent);transform:skewY(-5deg);pointer-events:none}.selection-box:before,.selection-box:after{content:'+';position:absolute;left:-5px;top:-14px;color:#a6eacb;font:17px ui-monospace}.selection-box:after{top:auto;bottom:-13px}.step-note{position:absolute;left:28%;bottom:1%;font:11px ui-monospace,monospace;color:#8fa399;letter-spacing:1.5px}.commit-dot{display:inline-block;width:5px;height:5px;background:#acffd8;border-radius:50%;margin-right:8px;box-shadow:0 0 12px #8bffe1}.type-output{position:absolute;left:0;right:0;bottom:-1%;color:#d7ffec;font:500 18px system-ui;letter-spacing:-.2px}.type-output .micro{display:block;color:#658578;margin-bottom:10px}.progress-track{height:1px;background:#ffffff0e;position:absolute;bottom:0;left:30px;right:30px}.progress{height:100%;width:0;background:linear-gradient(90deg,#80ffd0,#b99eff);box-shadow:0 0 9px #8bffe1}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:8%;padding:27px 0 22px}.notes h2{font-size:17px;font-weight:550;margin:0 0 8px}.notes p{margin:0;color:var(--muted);font-size:13px;max-width:580px}.footer{display:flex;justify-content:space-between;gap:20px;padding:20px 0 30px;border-top:1px solid var(--line);color:#667881;font:11px/1.6 ui-monospace,monospace}.footer a{display:flex;align-items:center;min-height:44px}.key{border:1px solid #ffffff25;border-radius:4px;padding:3px 6px;color:#aeb9b6;margin-right:7px}
+@media(min-width:1650px){.hero,.art{min-height:740px;height:740px}.plate{width:270px;height:340px;left:-135px;top:-170px}}
+@media(max-width:1000px){.top-note{display:none}.hero{grid-template-columns:34% 66%;min-height:560px}.art{height:560px}.copy h1{font-size:58px;letter-spacing:-1px}.copy p{font-size:13px}.plate{width:185px;height:245px;left:-92px;top:-122px;border-radius:28px}.flow-token{font-size:14px;padding:8px 10px;min-width:50px}.prompt-note strong{font-size:16px}.answer-note{font-size:13px;right:2%;bottom:15%}.candidate{font-size:70px}.selection-box{height:95px}.art-bottom{font-size:11px;letter-spacing:0}}
+@media(max-width:650px){.shell{width:92%}.top{height:74px}.brand{font-size:11px;letter-spacing:1px;gap:8px}.brand img{width:29px;height:29px}.domain{font-size:11px}.chooser{margin-top:18px;gap:10px;align-items:stretch}.tabs{flex:1;border-radius:12px;padding:4px;gap:3px}.tabs button{padding:8px 10px;border-radius:8px;flex:1;font-size:12px}.tabs small{display:none}.motion{min-width:44px;width:44px;padding:0;border-radius:12px}.motion .motion-text{display:none}.hero{display:flex;flex-direction:column;align-items:stretch;min-height:0}.copy{padding:34px 0 0}.copy h1{font-size:58px;margin:17px 0 0;line-height:1.02}.copy h1 br:nth-child(2){display:none}.copy h1 span{display:block}.copy p{font-size:13px;margin:17px 0 0;max-width:290px;line-height:1.7}.cta{display:none}.micro{font-size:11px;letter-spacing:1px}.art{height:480px;margin:0 -4.35%;width:108.7%}.art-label{left:23px;top:30px}.art-bottom{left:23px;right:23px;bottom:20px;gap:10px;flex-wrap:wrap}.plate{width:146px;height:204px;left:-73px;top:-102px;border-radius:24px}.plate:before{border-radius:18px;inset:9px}.plate-label{font-size:14px;left:17px;bottom:17px;letter-spacing:1px}.sculpture{left:49%;top:49%}.prompt-note{left:6%;top:17%}.prompt-note strong{font-size:14px}.answer-note{bottom:16%;right:7%;font-size:13px;min-width:135px}.flow-token{font-size:13px;min-width:44px;padding:7px 9px}.type-art{height:550px}.type-field{left:9%;right:7%;top:13%;bottom:18%}.context-line{font-size:25px;top:11%}.candidates{left:24%;top:30%}.candidate{font-size:58px}.selection-box{left:19%;top:46%;height:89px}.step-note{left:0;top:-2%;bottom:auto;font-size:11px;letter-spacing:.5px}.type-output{font-size:16px;bottom:0}.notes{grid-template-columns:1fr;gap:20px;padding:24px 0}.notes p{font-size:13px}.footer{flex-direction:column;gap:8px}.footer .keys{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="top"><a class="brand" href="hero-graphics.html"><img src="../assets/avatar-400.png" alt="">PC MAGIK <span>/ LAB</span></a><span class="top-note">Pracownia wizualna / LLM</span><a class="domain" href="https://lab.pcmagik.pl">lab.pcmagik.pl ↗</a></header>
+<div class="chooser"><div class="tabs" role="tablist" aria-label="Kierunek grafiki"><button id="tab-a" role="tab" aria-selected="true" aria-controls="concept-a"><small>A /</small> Przepływ przez model</button><button id="tab-b" role="tab" aria-selected="false" aria-controls="concept-b" tabindex="-1"><small>B /</small> Następny token</button></div><button class="motion" id="motion" aria-label="Wstrzymaj ruch" aria-pressed="false"><span class="motion-icon" aria-hidden="true">Ⅱ</span><span class="motion-text"> Wstrzymaj ruch</span></button></div>
+<main>
+<section class="hero">
+<div class="copy"><div class="eyebrow micro"><span class="dot"></span> Niezależne eksperymenty z AI</div><h1>Inteligencja.<br>Pod<br><span>mikroskopem.</span></h1><p>Rzeczywiste modele. Własny sprzęt.<br>Powtarzane pomiary.</p><div class="cta" aria-hidden="true">Wejdź do labu <span>↗</span></div></div>
+<div id="concept-a" class="art" role="tabpanel" aria-labelledby="tab-a"><div class="art-label micro">Od promptu do odpowiedzi</div><div class="orbit"></div><div class="orbit second"></div><div class="beam"></div><div class="space" aria-hidden="true"><div class="sculpture" id="sculpture"></div></div><div class="prompt-note"><div class="micro">Prompt / wejście</div><strong>Dokończ zdanie:<br>„Przyszłość jest…”</strong></div><div id="flow-tokens" aria-hidden="true"></div><div class="answer-note"><div class="micro">Generowana odpowiedź</div><span id="answer">otwarta.</span><span class="answer-cursor" aria-hidden="true"></span></div><div class="art-bottom"><span>TEKST → WARSTWY → TEKST</span><b>Ilustracja przepływu</b></div></div>
+<div id="concept-b" class="art type-art" role="tabpanel" aria-labelledby="tab-b" hidden><div class="art-label micro">Jedna kontynuacja. Kolejny krok.</div><div class="type-field"><div class="context-line"><small>KONTEKST</small><span class="prefix">Przyszłość jest</span></div><div class="junction" aria-hidden="true"></div><svg class="branches" viewBox="0 0 600 340" preserveAspectRatio="none" aria-hidden="true"><path d="M0 88 C100 88 75 18 180 18 L590 18"/><path class="chosen-path" d="M0 88 C105 88 65 157 190 157 L590 157"/><path d="M0 88 C100 88 75 296 180 296 L590 296"/></svg><div class="selection-box" aria-hidden="true"></div><div class="candidates" aria-hidden="true"><div class="candidate">blisko</div><div class="candidate selected">otwarta<span class="ending">.</span></div><div class="candidate">nieznana</div></div><div class="step-note"><span class="commit-dot"></span><span id="step-state">ROZWAŻANE KONTYNUACJE</span></div><div class="type-output"><span class="micro">Powstający tekst</span><span id="type-output">Przyszłość jest</span><span class="answer-cursor" aria-hidden="true"></span></div></div><div class="art-bottom"><span>KONTEKST → WYBÓR → DALSZY TEKST</span><b>Ilustracja generowania</b></div><div class="progress-track" aria-hidden="true"><div class="progress" id="progress"></div></div></div>
+</section>
+<section class="notes"><div><h2 id="concept-title">A / Przepływ przez model</h2><p id="concept-description">Szklane warstwy zawieszone w przestrzeni. Fragmenty promptu przechodzą przez świetlny rdzeń, a po drugiej stronie powstaje odpowiedź.</p></div><div><h2>Przykład autorski</h2><p>Animacja poglądowa, bez odczytów z modelu. Podział tekstu jest umowny; nie odwzorowuje konkretnego tokenizera ani architektury LLM.</p></div></section>
+</main><footer class="footer"><a href="hero-graphics.html">← Poprzednie propozycje i torus</a><span class="keys"><span class="key">←</span><span class="key">→</span> zmień kierunek · <span class="key">spacja</span> zatrzymaj</span></footer>
+</div>
+<script>
+const panels=[document.querySelector('#concept-a'),document.querySelector('#concept-b')];
+const tabs=[document.querySelector('#tab-a'),document.querySelector('#tab-b')];
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+const motion=document.querySelector('#motion');
+let paused=reduced.matches,active=location.hash==='#b'?1:0,phase=2.1,last=0,raf=0,visible=true;
+const sculpture=document.querySelector('#sculpture');
+const plates=[];
+for(let i=0;i<5;i++){
+ const p=document.createElement('div');p.className='plate';
+ p.innerHTML='<div class="scan"></div><span class="plate-label">'+(i===4?'MODEL / LLM':'')+'</span>';
+ sculpture.append(p);plates.push(p);
+}
+const flow=document.querySelector('#flow-tokens');
+const tokens=[];
+for(let i=0;i<8;i++){
+ const token=document.createElement('span');token.className='flow-token'+(i>3?' output':'');
+ token.textContent=['Przy','szłość','jest','…','ot','war','ta','.'][i];flow.append(token);tokens.push(token);
+}
+for(let i=0;i<24;i++){
+ const p=document.createElement('i');p.className='point';p.style.left=(10+(i*37)%85)+'%';p.style.top=(20+(i*19)%60)+'%';p.style.opacity=.1+(i%5)*.07;panels[0].append(p);
+}
+const candidates=[...document.querySelectorAll('.candidate')];
+const sets=[['blisko','otwarta','nieznana'],['prosta','ciekawa','odległa'],['pewna','wspólna','inna']];
+let pointerX=0,pointerY=0,smoothX=0,smoothY=0;
+function render(){
+ const w=panels[active].clientWidth||600,mobile=w<500;
+ if(active===0){
+  const depth=mobile?43:58;
+  sculpture.style.transform=`rotateX(${-13+Math.sin(phase*.23)*3+smoothY*5}deg) rotateY(${-32+Math.sin(phase*.19)*7+smoothX*8}deg) rotateZ(-13deg)`;
+  plates.forEach((p,i)=>{
+   p.style.transform=`translateZ(${(i-2)*depth}px) translateY(${Math.sin(phase*.8-i*.6)*7}px)`;
+   p.querySelector('.scan').style.opacity=.12+.65*Math.pow((Math.sin(phase*1.7-i*.8)+1)/2,3);
+  });
+  tokens.forEach((token,i)=>{
+   const output=i>3, n=i%4, progress=(phase*.105+n*.25)%1;
+   const x=output?w*(.54+progress*.35):w*(.03+progress*.37);
+   const y=output?panels[0].clientHeight*(.49-progress*.04):panels[0].clientHeight*(.5-progress*.045);
+   const spread=Math.sin(progress*Math.PI)*(output?-18:22);
+   token.style.transform=`translate3d(${x}px,${y+spread+(n%2?22:-22)}px,0) rotate(${output?-8:-13}deg) scale(${.83+Math.sin(progress*Math.PI)*.18})`;
+   token.style.opacity=Math.min(1,progress*5,(1-progress)*5)*.95;
+  });
+  const count=Math.floor((phase%8)/1.4);
+  document.querySelector('#answer').textContent=['','ot','otwar','otwarta','otwarta.','otwarta.'][Math.min(5,count)];
+ }else{
+  const cycle=phase%8,round=Math.floor(phase/8)%sets.length,words=sets[round],select=Math.max(0,Math.min(1,(cycle-3)/1.2)),commit=Math.max(0,Math.min(1,(cycle-5.6)/.8));
+  candidates.forEach((c,i)=>{
+   const isChosen=i===1,spacing=mobile?70:99;
+   c.textContent=words[i]+(isChosen?'.':'');
+   const y=i*spacing+(isChosen?0:(i===0?-1:1)*select*18);
+   c.style.transform=`translate3d(${isChosen?select*8:select*22}px,${y}px,${isChosen?select*24:0}px) rotateY(${-9+select*(isChosen?9:-6)}deg)`;
+   c.style.opacity=isChosen?.65+.35*select:.42*(1-select*.9);
+   c.style.filter=`blur(${isChosen?0:select*4}px)`;
+  });
+  document.querySelector('#step-state').textContent=cycle<3?'MOŻLIWE KONTYNUACJE':cycle<5.6?'WYBÓR KONTYNUACJI':'DOPISANIE DO KONTEKSTU';
+  document.querySelector('#type-output').textContent='Przyszłość jest'+(commit>.5?' '+words[1]+'.':'');
+  document.querySelector('#progress').style.width=(cycle/8*100)+'%';
+  document.querySelector('.chosen-path').style.opacity=.25+select*.7;
+ }
+ document.querySelectorAll('.answer-cursor').forEach(c=>c.style.opacity=paused?1:.45+.55*(Math.sin(phase*4)+1)/2);
+}
+function frame(now){
+ phase+=last?Math.min((now-last)/1000,.06):0;last=now;
+ smoothX+=(pointerX-smoothX)*.04;smoothY+=(pointerY-smoothY)*.04;
+ render();raf=requestAnimationFrame(frame);
+}
+function sync(){
+ cancelAnimationFrame(raf);last=0;
+ motion.setAttribute('aria-pressed',String(paused));motion.setAttribute('aria-label',paused?'Wznów ruch':'Wstrzymaj ruch');
+ motion.querySelector('.motion-icon').textContent=paused?'▷':'Ⅱ';motion.querySelector('.motion-text').textContent=paused?' Wznów ruch':' Wstrzymaj ruch';
+ render();if(!paused&&!document.hidden&&visible)raf=requestAnimationFrame(frame);
+}
+function select(index,focus=false){
+ active=index;panels.forEach((p,i)=>p.hidden=i!==active);
+ tabs.forEach((t,i)=>{t.setAttribute('aria-selected',String(i===active));t.tabIndex=i===active?0:-1;});
+ document.querySelector('#concept-title').textContent=active?'B / Następny token':'A / Przepływ przez model';
+ document.querySelector('#concept-description').textContent=active?'Tekst staje się grafiką. Możliwe kontynuacje wyłaniają się z ciemności, jedna zostaje wybrana i dołącza do kontekstu.':'Szklane warstwy zawieszone w przestrzeni. Fragmenty promptu przechodzą przez świetlny rdzeń, a po drugiej stronie powstaje odpowiedź.';
+ history.replaceState(null,'',active?'#b':'#a');phase=2.1;sync();if(focus)tabs[active].focus();
+}
+for(const[i,t]of tabs.entries())t.addEventListener('click',()=>select(i));
+motion.addEventListener('click',()=>{paused=!paused;sync();});
+document.addEventListener('keydown',e=>{
+ if(e.altKey||e.ctrlKey||e.metaKey)return;
+ if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();select(1-active,true);}
+ if(e.code==='Space'&&e.target===document.body){e.preventDefault();paused=!paused;sync();}
+});
+reduced.addEventListener('change',e=>{paused=e.matches;sync();});
+document.addEventListener('visibilitychange',sync);
+new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();}).observe(document.querySelector('.hero'));
+new ResizeObserver(()=>render()).observe(document.querySelector('.hero'));
+panels[0].addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const r=panels[0].getBoundingClientRect();pointerX=(e.clientX-r.left)/r.width-.5;pointerY=(e.clientY-r.top)/r.height-.5;});
+panels[0].addEventListener('pointerleave',()=>{pointerX=pointerY=0;});
+select(active);
+</script>
+</body></html>

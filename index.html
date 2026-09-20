@@ -3,131 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PC Magik Lab</title>
-<meta name="description" content="AI & LLMs on real hardware. Same prompt, same rig, check for yourself. Prompts and results from the PC Magik Lab YouTube channel.">
+<meta name="theme-color" content="#090b13">
+<title>PC Magik Lab — AI benchmarks, real results</title>
+<meta name="description" content="AI benchmarks on real hardware. Compare measured runs, explore live model outputs, and inspect the original prompts, metrics and source files.">
 <link rel="icon" href="assets/avatar-400.png">
 <style>
-@font-face{font-family:"Oswald";src:url("assets/Oswald-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
-:root{--bg:#0b1020;--bg2:#0d1526;--panel:rgba(12,18,40,.55);--line:rgba(255,255,255,.1);--text:#eef2f8;--muted:#93a3b8;--dim:#7286a0;--cyan:#22d3ee;--violet:#8b5cf6;--amber:#ff9f45;--blue:#5ec8ff}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
-body::before{content:"";position:fixed;inset:0;z-index:-2;background:
- radial-gradient(900px 600px at 85% -10%,rgba(34,211,238,.22),transparent 60%),
- radial-gradient(800px 600px at -10% 40%,rgba(139,92,246,.22),transparent 60%),
- radial-gradient(600px 400px at 60% 110%,rgba(94,200,255,.12),transparent 60%),var(--bg)}
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 75%)}
-a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
-h1,h2,h3,.brand{font-family:"Oswald",Impact,"Arial Narrow",sans-serif;font-weight:700;letter-spacing:.01em;margin:0}
-/* header */
-header{position:sticky;top:0;z-index:10;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(11,16,32,.65);border-bottom:1px solid var(--line)}
-header .wrap{display:flex;align-items:center;gap:14px;height:66px}
-.logo{width:40px;height:40px;border-radius:10px;box-shadow:0 0 0 1px rgba(34,211,238,.5),0 0 18px rgba(34,211,238,.35)}
-.brand{font-size:26px}
-nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
-nav a{padding:7px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:14px;transition:.2s}
-nav a:hover{color:var(--text);border-color:rgba(34,211,238,.6);text-decoration:none;box-shadow:0 0 14px rgba(34,211,238,.25)}
-/* hero */
-.hero{padding:72px 0 40px;display:grid;grid-template-columns:1.2fr .8fr;gap:36px;align-items:center}
-.hero h1{font-size:clamp(44px,7vw,84px);line-height:.98}
-.hero h1 span{background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{font-size:20px;color:var(--muted);margin:18px 0 26px;max-width:560px}
-.cta{display:inline-flex;gap:10px;align-items:center;padding:13px 22px;border-radius:12px;font-weight:600;color:#061018;background:linear-gradient(90deg,var(--cyan),#7dd3fc);box-shadow:0 0 24px rgba(34,211,238,.45);transition:.2s}
-.cta:hover{transform:translateY(-1px);box-shadow:0 0 34px rgba(34,211,238,.65);text-decoration:none}
-.cta.ghost{background:transparent;color:var(--text);border:1px solid var(--line);box-shadow:none;margin-left:10px}
-.cta.ghost:hover{border-color:rgba(139,92,246,.7);box-shadow:0 0 22px rgba(139,92,246,.35)}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.stat{position:relative;padding:18px 20px;border-radius:16px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.stat b{display:block;font-family:"Oswald",sans-serif;font-size:38px;line-height:1;color:var(--cyan)}
-.stat small{color:var(--dim);font-size:13px;text-transform:uppercase;letter-spacing:.12em}
-/* sections */
-section{padding:34px 0}
-.sec-h{display:flex;align-items:baseline;gap:16px;margin-bottom:18px}
-.sec-h h2{font-size:34px}.sec-h p{color:var(--dim);margin:0}
-/* episode card with comet border on hover */
-@property --angle{syntax:"<angle>";initial-value:0deg;inherits:false}
-.ep{position:relative;border-radius:22px;padding:24px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,.4);margin-bottom:22px;overflow:hidden}
-.ep::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--angle),transparent 0 70%,var(--cyan) 85%,var(--violet) 93%,transparent 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;animation:spin 3.5s linear infinite;pointer-events:none}
-.ep:hover::before{opacity:1}
-@keyframes spin{to{--angle:360deg}}
-.ep-h{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:16px}
-.ep-h h3{font-size:26px}
-.tag{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
-.tag.yt{color:#fff;background:#e11d48;border-color:transparent}
-.ep-h .links{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
-.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--line);color:var(--text);font-size:14px;transition:.2s;background:rgba(255,255,255,.03)}
-.btn:hover{border-color:rgba(34,211,238,.6);text-decoration:none;box-shadow:0 0 14px rgba(34,211,238,.25)}
-.runs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-.run{border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03);overflow:hidden;display:flex;flex-direction:column}
-.run .shot{display:block;aspect-ratio:16/9;overflow:hidden;background:#000;position:relative}
-.run .shot img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;transition:transform .5s}
-.run:hover .shot img{transform:scale(1.04)}
-.run .shot::after{content:"Open page ↗";position:absolute;right:10px;bottom:10px;font-size:12px;padding:5px 9px;border-radius:8px;background:rgba(11,16,32,.75);border:1px solid var(--line);color:var(--text)}
-.run .body{padding:14px 16px 16px}
-.run .name{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}
-.run .name b{font-family:"Oswald",sans-serif;font-size:20px;letter-spacing:.02em}
-.v-bare{color:var(--amber)}.v-karpathy{color:var(--blue)}
-.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.kv div{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center}
-.kv b{display:block;font-family:"Oswald",sans-serif;font-size:19px;line-height:1.1}
-.kv small{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-.run .foot{display:flex;gap:8px;margin-top:12px;font-size:13px}
-.run .foot a{color:var(--muted)}.run .foot a:hover{color:var(--text)}
-/* method */
-.method{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-.m{padding:20px;border-radius:16px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-.m h3{font-size:20px;margin-bottom:6px;color:var(--cyan)}.m p{margin:0;color:var(--muted);font-size:15px}
-code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;color:var(--blue)}
-footer{padding:34px 0 46px;color:var(--dim);font-size:14px;border-top:1px solid var(--line);margin-top:20px}
-footer .wrap{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center}
-@media (max-width:820px){.hero{grid-template-columns:1fr;padding-top:44px}.stats{grid-template-columns:repeat(2,1fr)}.kv{grid-template-columns:repeat(2,1fr)}nav{display:none}}
-@media (prefers-reduced-motion:reduce){.ep::before{animation:none}}
+:root{color-scheme:dark;--bg:#090b13;--text:#f3f4fa;--muted:#a1a7bd;--cyan:#70f6db;--purple:#b8a0ff;--line:rgba(202,216,255,.14);--glass:linear-gradient(130deg,rgba(255,255,255,.075),rgba(255,255,255,.025))}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:110px}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 "Segoe UI",Arial,sans-serif}body::before{content:"";position:absolute;inset:0 0 auto;height:1250px;z-index:-1;background:radial-gradient(ellipse at 78% 26%,#5633a132,transparent 42%),radial-gradient(ellipse at 12% 50%,#097e7430,transparent 45%);pointer-events:none}a{color:inherit;text-decoration:none}a,button{touch-action:manipulation}a:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline-offset:5px}a:hover{color:var(--cyan)}.wrap{width:min(1200px,calc(100% - 80px));margin:auto}.skip{position:fixed;top:-80px;left:20px;z-index:30;background:var(--cyan);color:#092019;padding:12px}.skip:focus{top:12px}.glass{background:var(--glass);border:1px solid var(--line);box-shadow:inset 0 1px 0 #ffffff0c,0 24px 60px #00000025;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+header{position:sticky;top:18px;z-index:10;margin-top:18px}header .wrap{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;border-radius:18px;background:rgba(19,22,35,.84)}.brand{display:flex;align-items:center;gap:11px;font-size:16px;font-weight:750;letter-spacing:-.4px}.brand img{border-radius:9px}.brand span span{font-weight:400;color:var(--muted)}nav{display:flex;align-items:center;gap:30px;font-size:13px;color:#c6c9d9}.nav-social{border-left:1px solid var(--line);padding-left:26px}.nav-social span{color:var(--cyan);margin-left:8px}.mobile-nav{display:none}h1,h2,h3,p{margin:0}h1{font-size:clamp(46px,5.4vw,76px);font-weight:650;line-height:1.07;letter-spacing:-4px}h1 em{font-style:normal;background:linear-gradient(110deg,#74f8dc 10%,#94d6ff 60%,#c2a3ff);color:transparent;background-clip:text;-webkit-background-clip:text}.eyebrow{font:11px/1.5 ui-monospace,Consolas,monospace;text-transform:uppercase;letter-spacing:2px;color:var(--cyan);display:flex;align-items:center;gap:9px}.dot{height:6px;width:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);display:inline-block;flex-shrink:0}.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:65px;align-items:center;padding:94px 0 74px}.hero .eyebrow{margin-bottom:23px}.lead{color:var(--muted);font-size:16px;max-width:465px;margin:25px 0 30px;line-height:1.85}.actions{display:flex;gap:12px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;gap:18px;border-radius:10px;padding:12px 19px;font-size:13px;font-weight:600;border:1px solid var(--line);background:#ffffff05;transition:transform .2s,box-shadow .2s}.button:hover{transform:translateY(-2px);box-shadow:0 0 25px #71f4da18}.button.primary{background:var(--cyan);color:#07261f;border-color:var(--cyan);box-shadow:0 0 28px #70f6db1f}.hero-note{margin-top:22px;font:11px/1.5 ui-monospace,monospace;color:#9ba3b7;display:flex;gap:8px;align-items:center}.hero-note span{color:var(--cyan)}
+.lab{position:relative;min-width:0}.lab::before{content:"";position:absolute;width:75%;height:70%;top:15%;left:15%;background:linear-gradient(135deg,#4bd7d638,#854bda44);filter:blur(60px);border-radius:50%;z-index:-1}.lab-panel{border-radius:24px;padding:23px;transform:rotate(-3deg);background:linear-gradient(135deg,#a6dded12,#8883cb0b 50%,#be9cfa15);position:relative}.panel-top{display:flex;align-items:center;justify-content:space-between;color:#c6cadc;font:10px ui-monospace,monospace;letter-spacing:1px}.lights{display:flex;gap:5px}.lights i{width:5px;height:5px;background:#777d92;border-radius:50%}.lights i:first-child{background:var(--cyan)}.orbital{overflow:hidden;height:263px;position:relative;display:grid;place-items:center;isolation:isolate}.orbit{position:absolute;width:230px;height:230px;border:1px solid #8fa0d42e;border-radius:50%;transform:rotateX(60deg) rotate(-25deg);box-shadow:0 0 15px #83f7ea08}.orbit.two{transform:rotate(-45deg) rotateX(54deg);border-color:#ad8cff6b;width:260px;height:260px}.orbit.three{transform:rotate(50deg) rotateX(54deg);border-color:#78fce457;width:260px;height:260px}.core{height:112px;width:112px;border:1px solid #aaf8ec70;border-radius:28px;display:grid;place-content:center;text-align:center;transform:rotate(3deg);background:linear-gradient(135deg,#72efd629,#8760d535);box-shadow:0 0 55px #6ceada25,inset 0 0 25px #93f8e514;backdrop-filter:blur(14px)}.core b{font-size:39px;font-weight:500;letter-spacing:-2px}.core small{color:var(--cyan);font:9px ui-monospace,monospace;letter-spacing:2px}.orbit-dot{position:absolute;top:70px;right:90px;width:9px;height:9px;background:var(--cyan);border-radius:50%;box-shadow:0 0 20px #70f6db}.hardware{border-top:1px solid var(--line);padding-top:18px;display:flex;align-items:center;justify-content:space-between}.hardware strong{font-size:20px;letter-spacing:-.6px}.hardware small{display:block;color:var(--muted);font-size:11px}.chip{font:10px ui-monospace,monospace;color:var(--cyan);background:#70f6db0b;border:1px solid #70f6db30;border-radius:6px;padding:5px 8px}.floating{position:absolute;right:-20px;bottom:85px;transform:rotate(3deg);padding:13px 18px;border-radius:12px;background:#202034d9;border-color:#b8a0ff44;box-shadow:0 15px 35px #0005}.floating small{color:var(--muted);font:9px ui-monospace,monospace;display:block;margin-bottom:3px;letter-spacing:1px}.floating b{font-size:13px;font-weight:500}.floating b span{color:var(--purple)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-radius:17px;margin-bottom:78px;padding:25px 0}.stat{padding:0 30px;border-right:1px solid var(--line);display:flex;align-items:center;gap:16px}.stat:last-child{border:0}.stat b{font-size:31px;font-weight:500;letter-spacing:-1px;white-space:nowrap}.stat small{color:var(--muted);font-size:11px;line-height:1.6}.stat b span{font-size:17px;color:var(--muted)}section{scroll-margin-top:15px}.section-head{display:flex;justify-content:space-between;gap:25px;align-items:flex-end;margin-bottom:25px}.section-head h2{font-size:31px;line-height:1.3;letter-spacing:-1px;font-weight:550;margin-top:10px}.section-head p{font-size:12px;color:var(--muted);max-width:280px}.section-number{font:11px ui-monospace,monospace;color:#8a91ab;margin-right:12px}.ep{border-radius:22px;padding:27px;margin-bottom:75px}.ep-h{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:25px}.ep-meta{display:flex;align-items:center;gap:12px;margin-bottom:9px;color:var(--muted);font:10px ui-monospace,monospace}.ep-meta .chip{color:var(--purple);border-color:#b8a0ff30;background:#b8a0ff0a}.ep-h h3{font-weight:550;font-size:23px;letter-spacing:-.7px}.ep-h h3 span{color:#878ca3;font-size:17px;margin:0 5px}.episode-links{display:flex;align-items:center;gap:16px;flex-shrink:0}.soon{font-size:10px;color:var(--muted)}.runs{display:grid;grid-template-columns:1fr 1fr;gap:22px}.run{background:#090c165c;border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0}.shot{display:block;aspect-ratio:2.05;overflow:hidden;position:relative;background:#111725}.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .35s}.shot:hover img{transform:scale(1.025)}.shot::after{content:"Live demo ↗";position:absolute;bottom:12px;right:12px;padding:6px 10px;background:#101424dc;border:1px solid #ffffff30;backdrop-filter:blur(12px);border-radius:7px;font-size:10px;color:#fff}.body{padding:19px}.name{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}.name b{font:12px ui-monospace,monospace;letter-spacing:1.6px}.v-bare{color:var(--cyan)}.v-karpathy{color:var(--purple)}.tag{font:9px ui-monospace,monospace;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:4px 7px}.kv{display:grid;grid-template-columns:1.4fr 1fr 1fr .8fr;gap:10px}.kv b{font-size:17px;font-weight:500;white-space:nowrap}.kv small{display:block;font:9px ui-monospace,monospace;color:var(--muted);margin-top:4px}.foot{display:flex;flex-wrap:wrap;gap:16px;border-top:1px solid var(--line);margin-top:19px;padding-top:15px;font-size:10px;color:var(--muted)}.foot a:first-child{color:#e1e6f5;margin-right:auto}.method{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.m{padding:24px 20px;border-radius:15px}.method-icon{height:33px;width:33px;border:1px solid #70f6db2e;background:#70f6db09;color:var(--cyan);border-radius:9px;display:grid;place-items:center;font:13px ui-monospace,monospace;margin-bottom:25px}.m:nth-child(even) .method-icon{color:var(--purple);background:#b8a0ff09;border-color:#b8a0ff2e}.m h3{font-size:14px;font-weight:600;margin-bottom:9px}.m p{font-size:12px;line-height:1.8;color:var(--muted)}code{font-size:11px;color:#c9cfdf}.m a{color:var(--cyan)}.closing{display:flex;justify-content:space-between;align-items:center;gap:25px;border-top:1px solid var(--line);margin-top:65px;padding:35px 0}.closing h2{font-size:22px;font-weight:500;letter-spacing:-.6px}.closing p{font-size:12px;color:var(--muted);margin-top:5px}footer{border-top:1px solid var(--line);padding:26px 0 30px;font-size:11px;color:var(--muted)}footer .wrap{display:flex;justify-content:space-between;gap:25px}footer .socials{display:flex;gap:20px;flex-wrap:wrap}.copyright{margin-top:7px;font-size:10px;color:#969db1}
+@media(min-width:1500px){.hero{padding-top:110px;padding-bottom:90px}}@media(max-width:1050px){.hero{gap:30px}h1{letter-spacing:-2.5px}.floating{right:-8px}.stat{padding:0 20px;gap:12px}.ep-h{align-items:flex-start}.episode-links{flex-direction:column;gap:8px}.kv{grid-template-columns:1fr 1fr;gap:14px}.method{grid-template-columns:1fr 1fr}nav{gap:18px}.nav-social{padding-left:18px}}
+@media(max-width:760px){.wrap{width:calc(100% - 36px)}header{top:10px;margin-top:10px}header .wrap{padding:12px 15px;border-radius:14px}.brand{font-size:15px}nav{display:none}.mobile-nav{display:block;position:relative}.mobile-nav summary{cursor:pointer;font-size:12px;padding:7px;list-style:none}.mobile-nav summary::-webkit-details-marker{display:none}.mobile-nav[open] summary{color:var(--cyan)}.mobile-links{position:absolute;right:-8px;top:45px;width:190px;display:grid;background:#161b2bef;border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 20px 40px #0009}.mobile-links a{padding:11px 12px;font-size:13px}.hero{grid-template-columns:1fr;padding:55px 0 38px;gap:45px}.hero h1{font-size:clamp(43px,10vw,66px);letter-spacing:-2.5px}.hero .eyebrow{font-size:9px;letter-spacing:1.5px}.lead{font-size:14px;margin:22px 0}.button{font-size:12px;padding:12px 15px;gap:12px}.hero-note{font-size:10px}.lab{width:min(420px,calc(100% - 18px));margin:auto}.lab-panel{padding:20px}.orbital{height:230px}.floating{bottom:74px;right:-12px}.stats{grid-template-columns:1fr 1fr;padding:0;margin-bottom:48px}.stat{padding:20px;gap:14px}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}.stat b{font-size:26px}.stat small{font-size:10px}.section-head{display:block}.section-head h2{font-size:28px}.section-head p{margin-top:12px;max-width:none}.ep{padding:16px;border-radius:17px;margin-bottom:48px}.ep-h{display:block;padding:5px 0 21px}.ep-h h3{font-size:21px}.ep-meta{gap:8px;font-size:9px}.episode-links{flex-direction:row;justify-content:space-between;margin-top:17px}.episode-links .button{padding:8px 12px}.runs{grid-template-columns:1fr;gap:20px}.body{padding:17px}.kv{grid-template-columns:1fr 1fr}.kv b{font-size:19px}.foot{gap:12px}.method{gap:12px}.m{padding:18px 15px}.m h3{font-size:13px}.m p{font-size:11px}.method-icon{margin-bottom:18px}.closing{display:block;margin-top:42px;padding:27px 0}.closing .button{margin-top:18px}footer .wrap{flex-direction:column;gap:18px}footer .socials{gap:17px}.eyebrow{font-size:10px}.section-number{font-size:10px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<header><div class="wrap">
-  <img class="logo" src="assets/avatar-400.png" alt="PC Magik Lab logo" width="40" height="40">
-  <span class="brand">PC Magik Lab</span>
-  <nav>
-    <a href="https://www.youtube.com/@PCMagikLab">YouTube</a><a href="https://github.com/pcmagik/pcmagik-lab">GitHub</a><a href="https://x.com/PcMagik">X</a>
-    <a href="https://www.linkedin.com/in/mateusz-piekut/">LinkedIn</a><a href="https://www.facebook.com/Pcmagik/">Facebook</a>
-  </nav>
+<a class="skip" href="#main">Skip to content</a>
+<header><div class="wrap glass">
+<a class="brand" href="./" aria-label="PC Magik Lab — home"><img src="assets/avatar-400.png" width="34" height="34" alt=""><span>PC MAGIK <span>/ LAB</span></span></a>
+<nav aria-label="Main navigation"><a href="#episodes">Benchmarks</a><a href="#method">Methodology</a><a href="https://github.com/pcmagik/pcmagik-lab">GitHub ↗</a><a class="nav-social" href="https://www.youtube.com/@PCMagikLab">YouTube <span>↗</span></a></nav>
+<details class="mobile-nav"><summary aria-label="Open navigation menu">Menu ☰</summary><div class="mobile-links"><a href="#episodes">Benchmarks</a><a href="#method">Methodology</a><a href="https://github.com/pcmagik/pcmagik-lab">GitHub ↗</a><a href="https://www.youtube.com/@PCMagikLab">YouTube ↗</a></div></details>
 </div></header>
-
-<main class="wrap">
-  <section class="hero">
-    <div>
-      <h1>AI &amp; LLMs on <span>real hardware.</span><br>Measured, not assumed.</h1>
-      <p class="lead">Local and cloud models get the same task on the same rig. One variable changes per test. Every prompt, every output file and every number is here, so you can check for yourself.</p>
-      <a class="cta" href="#episodes">Browse episodes</a><a class="cta ghost" href="https://www.youtube.com/@PCMagikLab">Watch on YouTube</a>
-    </div>
-    <div class="stats">
-      <div class="stat"><b>1</b><small>episodes</small></div>
-      <div class="stat"><b>2</b><small>measured runs</small></div>
-      <div class="stat"><b>0.8 h</b><small>GPU time</small></div>
-      <div class="stat"><b>3090</b><small>RTX · 24 GB</small></div>
-    </div>
-  </section>
-
-  <section id="episodes">
-    <div class="sec-h"><h2>Episodes</h2><p>newest first · every page below is the model's untouched output</p></div>
-    <article class="ep"><div class="ep-h"><h3>Qwen3.8 27B: Karpathy skills vs bare | PC Magik Lab</h3><span class="tag">2026-09-19</span><span class="tag">task: easy</span><div class="links"><span class="tag">video soon</span><a class="btn" href="episodes/01-karpathy-vs-bare/README.md">Details</a></div></div><div class="runs"><div class="run"><a class="shot" href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/index.html"><img src="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/screenshot-1920.png" alt="qwen/qwen3.8-27b bare output page" loading="lazy"></a><div class="body"><div class="name"><b class="v-bare">BARE</b><span class="tag">qwen3.8-27b · pi</span></div><div class="kv"><div><b>26 min 34 s</b><small>time</small></div><div><b>60,318</b><small>tokens</small></div><div><b>60%</b><small>thinking</small></div><div><b>965</b><small>lines</small></div></div><div class="foot"><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/index.html">page</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/screenshot-1920.png">screenshot</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/metrics.json">metrics.json</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/prompt.txt">prompt</a></div></div></div><div class="run"><a class="shot" href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/index.html"><img src="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/screenshot-1920.png" alt="qwen/qwen3.8-27b karpathy output page" loading="lazy"></a><div class="body"><div class="name"><b class="v-karpathy">KARPATHY</b><span class="tag">qwen3.8-27b · pi</span></div><div class="kv"><div><b>19 min 37 s</b><small>time</small></div><div><b>47,903</b><small>tokens</small></div><div><b>53%</b><small>thinking</small></div><div><b>780</b><small>lines</small></div></div><div class="foot"><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/index.html">page</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/screenshot-1920.png">screenshot</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/metrics.json">metrics.json</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/prompt.txt">prompt</a></div></div></div></div></article>
-  </section>
-
-  <section id="method">
-    <div class="sec-h"><h2>How it's measured</h2></div>
-    <div class="method">
-      <div class="m"><h3>One variable</h3><p>Same model, same prompt, same rig. Only the thing under test changes: a rules file, a harness, a model.</p></div>
-      <div class="m"><h3>Numbers from the run</h3><p>Time, tokens, thinking share and lines of code come straight from each run's <code>metrics.json</code>. No rounding by hand.</p></div>
-      <div class="m"><h3>The rig</h3><p>Ryzen 5 PRO 3600 · 32 GB DDR4 ECC · RTX 3090 24 GB · LM Studio as the model server.</p></div>
-      <div class="m"><h3>The prompt, byte for byte</h3><p>What the model received is in <a href="tasks/">tasks/</a> and next to every run as <code>prompt.txt</code>.</p></div>
-    </div>
-  </section>
+<main id="main" class="wrap">
+<section class="hero" aria-labelledby="hero-title">
+<div><p class="eyebrow"><span class="dot"></span> Independent AI benchmark lab</p><h1 id="hero-title">Real models.<br>Real hardware.<br><em>Open results.</em></h1><p class="lead">Same prompt. Same rig. One variable at a time.<br>Explore our AI benchmarks, try the live model outputs,<br>and dig into every prompt, metric and source file.</p><div class="actions"><a class="button primary" href="#episodes">Explore benchmarks <span>↗</span></a><a class="button" href="https://www.youtube.com/@PCMagikLab"><span>▷</span> Watch on YouTube</a></div><p class="hero-note"><span>✓</span> Open prompts. Raw metrics. Live demos.</p></div>
+<div class="lab"><div class="lab-panel glass"><div class="panel-top"><span>PC MAGIK / HARDWARE LAB</span><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span></div><div class="orbital" aria-hidden="true"><div class="orbit"></div><div class="orbit two"></div><div class="orbit three"></div><div class="core"><b>AI</b><small>LOCAL / CLOUD</small></div><span class="orbit-dot"></span></div><div class="hardware"><div><small>BENCHMARK HARDWARE</small><strong>NVIDIA RTX 3090</strong></div><span class="chip">24 GB VRAM</span></div></div><div class="floating glass"><small>LATEST BENCHMARK</small><b><span>↳</span> Qwen3.8 27B <span>/ 02 runs</span></b></div></div>
+</section>
+<div class="stats glass" aria-label="The lab in numbers"><div class="stat"><b>01</b><small>published<br>benchmark</small></div><div class="stat"><b>02</b><small>measured<br>runs</small></div><div class="stat"><b>0.8 <span>h</span></b><small>total run<br>time</small></div><div class="stat"><b>24 <span>GB</span></b><small>GPU memory<br>RTX 3090</small></div></div>
+<section id="episodes" aria-labelledby="episodes-title"><div class="section-head"><div><p class="eyebrow"><span class="section-number">01 /</span> From the lab</p><h2 id="episodes-title">Inside the benchmarks</h2></div><p>Real outputs, exactly as the models made them.<br>Open a live demo. Compare the evidence.</p></div>
+<article class="ep glass"><div class="ep-h"><div><div class="ep-meta"><span class="chip">BENCHMARK 01</span><time datetime="2026-09-19">SEP 19, 2026</time><span>Task: easy</span></div><h3>Qwen3.8 27B <span>/</span> Karpathy skills vs bare</h3></div><div class="episode-links"><span class="soon">Video coming soon</span><a class="button" href="episodes/01-karpathy-vs-bare/README.md">Test materials ↗</a></div></div>
+<div class="runs"><div class="run"><a class="shot" href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/index.html"><img src="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/screenshot-1920.png" alt="qwen/qwen3.8-27b bare live output" loading="lazy"></a><div class="body"><div class="name"><b class="v-bare">BARE</b><span class="tag">qwen3.8-27b · pi</span></div><div class="kv"><div><b>26 min 34 s</b><small>time</small></div><div><b>60,318</b><small>tokens</small></div><div><b>60%</b><small>thinking</small></div><div><b>965</b><small>code lines</small></div></div><div class="foot"><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/index.html">Open live demo ↗</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/screenshot-1920.png">Screenshot</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/metrics.json">metrics.json</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_bare_pi/prompt.txt">Prompt</a></div></div></div><div class="run"><a class="shot" href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/index.html"><img src="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/screenshot-1920.png" alt="qwen/qwen3.8-27b karpathy live output" loading="lazy"></a><div class="body"><div class="name"><b class="v-karpathy">KARPATHY</b><span class="tag">qwen3.8-27b · pi</span></div><div class="kv"><div><b>19 min 37 s</b><small>time</small></div><div><b>47,903</b><small>tokens</small></div><div><b>53%</b><small>thinking</small></div><div><b>780</b><small>code lines</small></div></div><div class="foot"><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/index.html">Open live demo ↗</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/screenshot-1920.png">Screenshot</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/metrics.json">metrics.json</a><a href="episodes/01-karpathy-vs-bare/2026-09-19_qwen3.8-27b_karpathy_pi/prompt.txt">Prompt</a></div></div></div></div></article></section>
+<section id="method" aria-labelledby="method-title"><div class="section-head"><div><p class="eyebrow"><span class="section-number">02 /</span> Behind the numbers</p><h2 id="method-title">Built to be checked.</h2></div><p>Repeatable conditions. Transparent data.<br>Everything you need to verify the results.</p></div><div class="method">
+<div class="m glass"><div class="method-icon" aria-hidden="true">01</div><h3>One variable at a time</h3><p>Each comparison keeps the other conditions fixed. Only the subject of the test changes: a rules file, a harness or a model.</p></div>
+<div class="m glass"><div class="method-icon" aria-hidden="true">{ }</div><h3>Metrics from the run</h3><p>Time, tokens, thinking share and code lines. Inspect the original <code>metrics.json</code> alongside every model output.</p></div>
+<div class="m glass"><div class="method-icon" aria-hidden="true">⌘</div><h3>Real hardware</h3><p>Ryzen 5 PRO 3600, 32 GB DDR4 ECC and an RTX 3090 with 24 GB VRAM. Local models are served through LM Studio.</p></div>
+<div class="m glass"><div class="method-icon" aria-hidden="true">&gt;_</div><h3>The exact prompt</h3><p>The full input, byte for byte. <a href="tasks/easy.txt">Read the task ↗</a> or open <code>prompt.txt</code> next to each run to reproduce the test.</p></div>
+</div></section>
+<section class="closing" aria-label="Explore the benchmark repository"><div><h2>Go beyond the numbers.</h2><p>Explore the test materials, original outputs and full benchmark history on GitHub.</p></div><a class="button" href="https://github.com/pcmagik/pcmagik-lab">Explore the repository ↗</a></section>
 </main>
-
-<footer><div class="wrap">
-  <span>© PC Magik · Mateusz Piekut</span><a href="https://github.com/pcmagik/pcmagik-lab">Source on GitHub</a><a href="https://github.com/pcmagik/pcmagik-lab/blob/main/LICENSE">MIT license</a><span>Generated pages are model output.</span>
-</div></footer>
+<footer><div class="wrap"><div><strong>PC MAGIK / LAB</strong><p class="copyright">© PC Magik · Mateusz Piekut. Demo pages are unmodified model outputs.</p></div><div class="socials"><a href="https://github.com/pcmagik/pcmagik-lab">GitHub ↗</a><a href="https://x.com/PcMagik">X ↗</a><a href="https://www.linkedin.com/in/mateusz-piekut/">LinkedIn ↗</a><a href="https://www.facebook.com/Pcmagik/">Facebook ↗</a><a href="https://github.com/pcmagik/pcmagik-lab/blob/main/LICENSE">MIT license</a></div></div></footer>
 </body>
 </html>

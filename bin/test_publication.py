@@ -51,13 +51,46 @@ class PublicationTest(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stderr)
         home=(self.root/'index.html').read_text()
         listing=(self.root/'episodes/index.html').read_text()
-        self.assertEqual(home.count('class="episode-card '),3)
+        self.assertEqual(home.count('data-episode='),3)
         self.assertEqual(listing.count('class="episode-card '),4)
         self.assertNotIn('href="/episodes/episode-10/"',home)
         self.assertLess(home.index('Test &lt;episode&gt; episode-19'),home.index('Test &lt;episode&gt; episode-15'))
         self.assertIn('https://www.youtube.com/watch?v=abc123',(self.root/'episodes/episode-19/index.html').read_text())
         before=self.generated()
         self.assertEqual(self.publish().returncode,0)
+        self.assertEqual(before,self.generated())
+
+    def test_preserved_cohort_and_feed_previews_survive_republication(self):
+        ep=self.episode('first',19)
+        second=self.episode('first',20)['runs'][0]
+        second['wariant']='karpathy'
+        ep['runs'].append(second)
+        self.feed['episodes']=[ep]
+        cohorts={}
+        for r in ep['runs']:
+            samples=[{'id':str(i),'seconds':r['sekundy']+i,'output_tokens':r['tokeny']+i,
+                      'tok_s':r['tok_s'],'effects':r['efekty']+i,'lines_of_code':r['linie']} for i in range(3)]
+            cohorts[r['wariant']]={'n':3,'runs':samples,'representative':'0'}
+        studies=self.root/'data/studies'
+        studies.mkdir()
+        (studies/'first.json').write_text(json.dumps({'model':'test/model','cohorts':cohorts,
+            'series_context':{'overlapping_count':11,'model_count':11,'as_of':'2026-09-20'}}))
+        self.assertEqual(self.publish().returncode,0)
+        home=(self.root/'index.html').read_text()
+        self.assertIn('321–323',home)
+        self.assertIn('ranges overlap; no demonstrated difference',home)
+        self.assertEqual(home.count('class="shot"'),2)
+        self.assertIn('src="/'+second['zrzut']+'"',home)
+        self.assertIn('data-metric="effects"',home)
+        self.assertIn('output = thinking + final code',home)
+        self.assertNotIn('less time in this run',home)
+        before=self.generated()
+        self.assertEqual(self.publish().returncode,0)
+        self.assertEqual(before,self.generated())
+        ep['runs'][0]['tokeny']=999
+        result=self.publish()
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn('feed representatives differ',result.stderr)
         self.assertEqual(before,self.generated())
 
     def generated(self):

@@ -4,10 +4,18 @@ from pathlib import Path
 import subprocess
 import sys
 
-subprocess.run([sys.executable, str(Path(__file__).resolve().parents[2] / 'bin/test_publication.py'), '--browser-fixture'], check=True)
+root = Path(__file__).resolve().parents[2]
+reference = root / '.tmp/visual-reference'
+(reference / 'assets').mkdir(parents=True, exist_ok=True)
+for name in ['index.html', 'assets/lab.css', 'assets/lab.js', 'assets/neural-scene.js']:
+    (reference / name).write_bytes(subprocess.check_output(['git', 'show', f'a3f1687:{name}'], cwd=root))
+for name, target in [('assets/vendor', '../../../assets/vendor'), ('assets/avatar-400.png', '../../../assets/avatar-400.png'), ('episodes', '../../episodes'), ('tasks', '../../tasks')]:
+    link = reference / name
+    if not link.exists():
+        link.symlink_to(target)
 
 result = subprocess.run(
-    ['playwright-cli', '-s=interactive', '--raw', 'run-code',
+    ['playwright-cli', '-s=restore', '--raw', 'run-code',
      '--filename=.docs/design/check-interactive.js'],
     cwd=Path(__file__).resolve().parents[2],
     capture_output=True,

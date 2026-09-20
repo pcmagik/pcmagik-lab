@@ -21,7 +21,15 @@
         const button = event.target.closest('button[data-metric]');
         if (!button) return;
         controls.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-        comparison.querySelectorAll('[data-metric-panel]').forEach(panel => { panel.hidden = panel.dataset.metricPanel !== button.dataset.metric; });
+        const previous = [...comparison.querySelectorAll('[data-metric-panel]:not([hidden]) .bar-fill')].map(bar => bar.style.width);
+        comparison.querySelectorAll('[data-metric-panel]').forEach(panel => {
+          panel.hidden = panel.dataset.metricPanel !== button.dataset.metric;
+          if (!panel.hidden && gsap && motionEnabled()) panel.querySelectorAll('.bar-fill').forEach((bar, i) => {
+            const width = bar.dataset.targetWidth || bar.style.width;
+            bar.dataset.targetWidth = width;
+            gsap.fromTo(bar, { width: previous[i] || '0%' }, { width, duration: .55, ease: 'power3.out', overwrite: true });
+          });
+        });
       });
       controls.hidden = false;
     });

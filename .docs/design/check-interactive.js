@@ -1,7 +1,6 @@
 async page => {
-  const base = 'http://127.0.0.1:4176';
+  const base = 'http://127.0.0.1:4177';
   const episode = base + '/episodes/01-karpathy-vs-bare/';
-  const series = base + '/series/04-seria-modeli-n3/';
   const report = [];
   const errors = [];
   const check = (value, message) => { if (!value) throw new Error(message); };
@@ -105,8 +104,10 @@ async page => {
   }
   report.push(`PASS ${urls.length} local resources, representative data, inline materials and both archived demos`);
 
-  for (const path of ['/', '/episodes/', '/episodes/01-karpathy-vs-bare/', '/series/04-seria-modeli-n3/']) {
+  for (const path of ['/', '/episodes/', '/episodes/01-karpathy-vs-bare/']) {
     await page.goto(base + path);
+    check(await page.locator('a[href*="/series/"]').count() === 0, 'No standalone research links');
+    if (path === '/' || path === '/episodes/01-karpathy-vs-bare/') check((await page.locator('.research-teaser, .series-context').innerText()).includes('11 other local models'), 'Research context preserved without separate page');
     const local = await page.locator('a[href], img[src], script[src], link[href]').evaluateAll(elements => [...new Set(elements.map(el => el.href || el.src).filter(url => typeof url === 'string' && url.startsWith(location.origin)))]);
     for (const url of local) {
       const response = await page.request.get(url);
@@ -127,13 +128,12 @@ async page => {
       await page.locator('.episode-card h3 a').click();
       check(page.url() === episode, 'Episode card opens full result');
     }
-    if (path.startsWith('/series/')) {
-      check(await page.locator('.series-model').count() === 11, 'All 11 models on research page');
-      check(await page.locator('.series-model .overlap-label').allTextContents().then(values => values.every(value => value === 'Ranges overlap')), 'All measured ranges overlap');
-      check((await page.locator('main').innerText()).includes('63/66'), 'Research file completeness');
-    }
+
   }
-  report.push('PASS homepage/episode/archive/research separation, real cards, links and fragment targets');
+  check((await page.request.get(base + '/series/04-seria-modeli-n3/')).status() === 404, 'Unpublished series route removed');
+  check((await page.request.get(base + '/series/04-seria-modeli-n3/index.html')).status() === 404, 'Unpublished series file removed');
+  check(!data.series04 && data.series_context.model_count === 11, 'Public data contains context only, no unpublished model table');
+  report.push('PASS homepage/episode/archive separation, real cards, links and fragment targets');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base);
@@ -206,7 +206,7 @@ async page => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(base);
   await page.getByRole('button', { name: 'Rotate core' }).waitFor();
-  for (const route of [base, base+'/episodes/', episode, series]) {
+  for (const route of [base, base+'/episodes/', episode]) {
   await page.goto(route);
   for (const width of [320,390,768,1024,1440,1920]) {
     await page.setViewportSize({width,height:1000});
@@ -221,7 +221,7 @@ async page => {
     await page.locator('.material-details, .archive-details').evaluateAll(details => details.forEach(el => {el.open=false;}));
   }
   }
-  report.push('PASS four pages: minimum 11px text and 44×44px targets at six widths, including open materials');
+  report.push('PASS three pages: minimum 11px text and 44×44px targets at six widths, including open materials');
   await page.setViewportSize({width:1440,height:1000});
   await page.goto(base);
   await page.getByRole('button', {name:'Rotate core'}).waitFor();
@@ -239,7 +239,7 @@ async page => {
   await captureFullPage('.screenshots/homepage-corrected-desktop.png');
   await page.setViewportSize({ width: 390, height: 844 });
   await captureFullPage('.screenshots/homepage-corrected-mobile.png');
-  for (const [name, url] of [['episode',episode], ['series',series], ['episodes',base+'/episodes/']]) {
+  for (const [name, url] of [['episode',episode], ['episodes',base+'/episodes/']]) {
     await page.goto(url);
     await page.setViewportSize({width:1440,height:1000});
     await captureFullPage(`.screenshots/${name}-desktop.png`);

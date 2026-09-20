@@ -2,6 +2,9 @@
 import argparse
 import hashlib
 import json
+import re
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -16,9 +19,16 @@ def export(check=False):
         evidence[relative] = hashlib.sha256(content).hexdigest()
         return content
 
+    subprocess.run([sys.executable, str(SOURCE / 'seria/harness/liczby.py'), '--sprawdz'], check=True, cwd=SOURCE)
+    numbers = read('seria/pomiary/LICZBY.md').decode()
+    state = re.search(r'^# LICZBY — stan na (\d{4}-\d{2}-\d{2})', numbers).group(1)
+    overlapping, models = map(int, re.search(r'zakresy sie nakladaja: \*\*(\d+) z (\d+)\*\*', numbers).groups())
+    film = numbers.split('## Film 01', 1)[1]
+    expected_counts = list(map(int, re.search(r'biegów: \*\*(\d+) bare \+ (\d+) karpathy', film).groups()))
+    expected_effects = list(map(int, re.search(r'efekty bare: \*\*(\d+)–(\d+)\*\*, karpathy: \*\*(\d+)–(\d+)', film).groups()))
+    reduction = int(re.search(r'spadek średniej: \*\*(\d+) %', film).group(1))
     registry = [json.loads(line) for line in read('seria/pomiary/biegi.jsonl').splitlines() if line.strip()]
     episode = json.loads(read('seria/odcinki/01-karpathy-vs-bare/odcinek.json'))
-    read('seria/badania/04-seria-modeli-n3/OCENA.md')
     cohorts = {}
     copies = {}
     for variant, code in [('bare', 'D01-BAREMED'), ('karpathy', 'D01-KARPMED')]:
@@ -51,27 +61,17 @@ def export(check=False):
         prompt = read(representative['source'] + '/prompt.txt')
         copies[f'assets/film01-{variant}-prompt.txt'] = prompt
         cohorts[variant] = {'n': len(runs), 'runs': runs, 'representative': representative['id'], 'preview': image_path}
-    series = {}
-    for file in sorted((SOURCE / 'seria/badania/04-seria-modeli-n3/biegi').glob('*/metrics.json')):
-        relative = file.relative_to(SOURCE).as_posix()
-        metrics = json.loads(read(relative))
-        effects = json.loads(read(relative.replace('metrics.json', 'efekty.json')))
-        series.setdefault(metrics['model'], {'bare': [], 'karpathy': []})[metrics['variant']].append({
-            'id': file.parent.name, 'effects': effects['razem']
-        })
-    assert len(series) == 11
-    for model, variants in series.items():
-        assert all(len(runs) == 3 for runs in variants.values()), model
-        bare = [r['effects'] for r in variants['bare']]
-        karpathy = [r['effects'] for r in variants['karpathy']]
-        assert max(min(bare), min(karpathy)) <= min(max(bare), max(karpathy)), model
+    for i, variant in enumerate(['bare', 'karpathy']):
+        runs = cohorts[variant]['runs']
+        assert len(runs) == expected_counts[i], 'LICZBY.md run count mismatch'
+        values = [r['effects'] for r in runs]
+        assert [min(values), max(values)] == expected_effects[i * 2:i * 2 + 2], 'LICZBY.md effects mismatch'
     mean = lambda variant: sum(r['effects'] for r in cohorts[variant]['runs']) / cohorts[variant]['n']
-    reduction = round((1 - mean('karpathy') / mean('bare')) * 100)
-    assert reduction == 22
+    assert round((1 - mean('karpathy') / mean('bare')) * 100) == reduction
     data = {
         'model': 'Qwen3.8 27B', 'effort': 'medium',
         'cohorts': cohorts, 'effects_mean_reduction_percent': reduction,
-        'series04': {'models': series, 'runs_per_variant': 3, 'total_runs': sum(len(runs) for variants in series.values() for runs in variants.values())},
+        'series_context': {'model_count': models, 'overlapping_count': overlapping, 'as_of': state},
         'provenance': {'repository': 'Local measurement repository: projekt-wiedza-z-yt', 'files_sha256': evidence}
     }
     copies['assets/homepage-benchmarks.json'] = (json.dumps(data, ensure_ascii=False, indent=2) + '\n').encode()
@@ -81,7 +81,7 @@ def export(check=False):
             assert target.read_bytes() == content, f'Export differs from source: {relative}'
         else:
             target.write_bytes(content)
-    print('PASS source export: 10 film runs, 66 series runs, 11 overlapping model ranges, representative previews and prompts')
+    print('PASS source export: Film 01 and LICZBY.md summaries verified; unpublished series details excluded')
 
 
 if __name__ == '__main__':

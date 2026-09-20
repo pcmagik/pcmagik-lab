@@ -21,6 +21,18 @@ uogólnić poza to, co zmierzono.
 Jeśli czegoś nie ma w tych plikach — **nie ma tego na stronie**. Brak danych opisuje się
 słowem „not measured yet", nigdy liczbą z oszacowania.
 
+## Aktualne polecenia do wykonania
+
+Bieżąca lista poprawek: **`.claude/POPRAWKI-STRONA-GLOWNA-2026-09-20.md`** — czytaj cały plik,
+razem z **aneksem na końcu** („Architektura informacji"). Aneks jest ważniejszy niż pierwsza
+część tam, gdzie się rozchodzą: powstał po pierwszej rundzie poprawek i prostuje polecenie,
+które kazało wrzucić wszystkie wyniki na stronę główną.
+
+Skrót zasady, żeby nie było wątpliwości: **strona główna jest witryną, nie archiwum.**
+Odpowiada na cztery pytania — czym to jest, jak mierzymy, co wyszło ostatnio, gdzie jest reszta.
+Trzy ostatnie wyniki na głównej, komplet na podstronach (`/episodes/`, `/episodes/<slug>/`,
+`/series/<slug>/`).
+
 ## Fakty, które wolno podawać
 
 - Autor: Mateusz Piekut (PC Magik), serwis komputerowy i homelab z Polski.

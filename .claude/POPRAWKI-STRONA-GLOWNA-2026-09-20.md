@@ -98,3 +98,49 @@ też zostają — `skip to content`, `aria-live`, `aria-pressed`, `prefers-reduc
 
 Najpierw punkty 1–4 z treści (to nieprawdy, nie kosmetyka) i 1–3 z designu (to czytelność).
 Reszta potem. Zakres: strona główna. Podstrony i porządki w opublikowanych wynikach — osobno.
+
+---
+
+# Aneks — architektura informacji (2026-09-20, po pierwszej rundzie poprawek)
+
+Poprzednia wersja tego pliku mówiła „brakuje serii 11 modeli", ale nie mówiła, **gdzie** ma ona
+mieszkać. W efekcie jedenaście kart modeli trafiło na stronę główną i zapchało ją. To błąd
+w poleceniu, nie w wykonaniu — poniżej jest brakujące rozstrzygnięcie.
+
+## Zasada
+
+**Strona główna jest witryną, nie archiwum.** Pokazuje, czym jest kanał, jak mierzymy i co
+wyszło **ostatnio**. Komplet wyników mieszka na podstronach.
+
+## Podział
+
+**`/` (główna)**
+- hero z tym, czym jest PC Magik Lab, plus CTA do YouTube i do listy odcinków,
+- **najwyżej trzy ostatnie wyniki** jako karty, każda linkuje do swojego odcinka,
+- link „zobacz wszystkie odcinki" prowadzący do `/episodes/`,
+- sekcja o metodzie (jedna zmienna, przeładowanie modelu przed każdym biegiem, n=3 i n=5, rozrzut 93 %),
+- sprzęt,
+- sekcja o autorze,
+- stopka z widocznym `lab.pcmagik.pl`.
+
+Nic więcej. Jeśli sekcja nie odpowiada na pytanie „czym to jest, jak mierzycie, co wyszło
+ostatnio, gdzie jest reszta" — jej miejsce jest na podstronie.
+
+**`/episodes/`** — lista wszystkich odcinków, od najnowszego. Krótka karta na odcinek: tytuł,
+model, teza w jednym zdaniu, data, link.
+
+**`/episodes/<slug>/`** — jeden odcinek. Film, teza, pełne liczby z biegów, porównanie wariantów
+z przełącznikami, strony do obejrzenia, linki do `prompt.txt`, `metrics.json` i zrzutów.
+
+**`/series/<slug>/`** (albo `/research/<slug>/`) — całe badanie, np. seria 11 modeli n=3. Tu
+mieszka tabela wszystkich modeli, którą teraz widać na głównej: zakresy efektów per model,
+klasa wyniku, kompletność stron. Na głównej co najwyżej jedno zdanie z wynikiem i link tutaj.
+
+## Co zrobić teraz
+
+1. **Zdjąć jedenaście kart modeli ze strony głównej.** Przenieść je na podstronę serii.
+2. Na głównej zostawić z tego **jedno zdanie**: reguły Karpathy'ego nie tną efektów na modelach
+   lokalnych — 11 z 11 modeli ma nakładające się zakresy — plus link do pełnego badania.
+3. Sekcję odcinków na głównej ograniczyć do trzech ostatnich, z linkiem do `/episodes/`.
+
+Kolejność pracy zostaje: najpierw główna (te trzy punkty), podstrony po niej.

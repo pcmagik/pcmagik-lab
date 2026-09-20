@@ -18,6 +18,14 @@ async page => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(base);
+  const playAlignment = await page.locator('.header-youtube').evaluate(el => {
+    const button = el.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const icon = range.getBoundingClientRect();
+    return { offset: Math.abs((button.left + button.right - icon.left - icon.right) / 2), width: button.width, height: button.height };
+  });
+  check(playAlignment.offset <= 1 && playAlignment.width >= 44 && playAlignment.height >= 44, 'Navbar play icon is centered in its accessible target');
   await page.getByRole('button', { name: 'Rotate core' }).waitFor();
   await page.waitForFunction(() => window.__testDrawCalls > 0);
   const firstDraws = await page.evaluate(() => window.__testDrawCalls);

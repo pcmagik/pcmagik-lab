@@ -187,3 +187,65 @@ z żadnego innego dokumentu ani z pamięci — dokumenty bywają nieaktualne, te
 
 Przykład, dlaczego: w regułach stało „66 z 70 biegów bez wad" przez cały dzień po tym, jak
 cztery biegi usunięto. Prawdziwa liczba to 63 z 66.
+
+---
+
+# Aneks 3 — jeden łańcuch danych, strona buduje się sama
+
+Cel operatora, wprost: **„żeby ja nie musiał pilnować; zaakceptujemy wygląd, a nowe publikacje
+będą się robiły same"**. Wygląd jest Twój i zostaje; treść ma dochodzić bez ręcznej roboty.
+
+## Skąd brać dane — zmiana
+
+Masz dziś `export-homepage-data.py`, który czyta pomiary wprost z repo pomiarowego. **To się
+zmienia.** Repo pomiarowe ma teraz jeden skrypt publikujący (`seria/harness/publikuj.py`),
+który przy każdej publikacji odcinka zapisuje do tego repo:
+
+`data/episodes.json` — jedyne źródło danych dla strony. Kształt:
+
+```json
+{ "generated": "2026-09-20",
+  "source": "seria/harness/publikuj.py",
+  "note": "Effects count CSS/JS constructs in the code, not visual quality.",
+  "episodes": [ { "slug": "01-karpathy-vs-bare", "title": "...", "task": "easy",
+    "youtube": "", "opis": "...",
+    "runs": [ { "bieg": "...", "model": "qwen/qwen3.8-27b", "wariant": "bare",
+      "harness": "pi", "sekundy": 349.16, "tokeny": 19321, "tokeny_myslenia": 8912,
+      "myslenie_pct": 46, "tok_s": 55.3, "linie": 1059, "efekty": 146,
+      "effort_zadany": "medium", "effort_otrzymany": null, "model_przeladowany": true,
+      "strona": "episodes/<slug>/<bieg>/index.html",
+      "zrzut":  "episodes/<slug>/<bieg>/screenshot-1920.png",
+      "metrics":"episodes/<slug>/<bieg>/metrics.json",
+      "prompt": "episodes/<slug>/<bieg>/prompt.txt" } ] } ] }
+```
+
+**Nie sięgaj już do repo pomiarowego po dane odcinków.** Dwa źródła tej samej prawdy już nas
+kosztowały: w regułach stało „66 z 70 biegów bez wad" przez cały dzień, a prawdziwe jest 63 z 66.
+
+Liczby zbiorcze (zakresy per model, kompletność całych serii) mają osobne, też generowane
+źródło w repo pomiarowym: `seria/pomiary/LICZBY.md` z `seria/harness/liczby.py`.
+
+## Czego brakuje — do zrobienia
+
+Utwórz **`bin/po-publikacji.sh`** w tym repo. `publikuj.py` uruchomi go automatycznie zaraz po
+wgraniu danych odcinka, z katalogu tego repo. Skrypt ma:
+
+1. przebudować HTML z `data/episodes.json` (Twoje `build-episode-list.py`, po przestawieniu go
+   na ten plik zamiast na repo pomiarowe),
+2. odświeżyć `assets/homepage-benchmarks.json` z tego samego feedu,
+3. zakończyć się kodem 0; niezerowy kod przerwie publikację, więc niech sprawdza, co robi.
+
+Po tym publikacja wygląda tak i nie ma w niej kroku ręcznego:
+
+```
+bieg → publikuj.py → data/episodes.json → bin/po-publikacji.sh → HTML → commit
+```
+
+Push do GitHuba robi operator, świadomie — to jedyny krok, który zostaje po jego stronie.
+
+## Co z wyglądem
+
+Wygląd, CSS i układ należą do Ciebie i `publikuj.py` ich nie dotyka. Gdy operator zechce zmienić
+wygląd, zmieniasz szablony tutaj — dane płyną bez zmian. Jedyny warunek: **karty odcinków i liczby
+muszą powstawać z feedu**, nie być wpisane w HTML. Wpisana ręcznie liczba przestanie być prawdziwa
+przy pierwszym nowym pomiarze i nikt tego nie zauważy.

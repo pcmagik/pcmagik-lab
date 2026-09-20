@@ -164,7 +164,6 @@ export function createNeuralScene(host, motionEnabled) {
   resize();
   host.classList.add('is-ready');
   rotateButton.hidden = false;
-  host.querySelector('.scene-hint').textContent = 'MOVE TO EXPLORE';
   syncLoop();
 
   return {

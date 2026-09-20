@@ -11,7 +11,15 @@ async page => {
  await page.evaluate(()=>scrollTo(0,0));
  await page.screenshot({path:'.screenshots/reference-neon-1920.png',fullPage:true});
  await page.goto(base);
- check(JSON.stringify(original)===JSON.stringify(await page.evaluate(styleProbe)),'Original typography/spacing/layout styles differ');
+ const updated=await page.evaluate(styleProbe);
+ for(const [selector,styles] of Object.entries(original)){
+  const current=updated[selector];
+  for(const [property,value] of Object.entries(styles)){
+   if(property==='fontSize')check(parseFloat(current[property])===Math.max(11,parseFloat(value)),`Font floor: ${selector}`);
+   else if(property==='lineHeight'&&parseFloat(styles.fontSize)<11)check(Math.abs(parseFloat(current[property])-parseFloat(value)*11/parseFloat(styles.fontSize))<.1,`Line height: ${selector}`);
+   else check(current[property]===value,`Original style changed: ${selector} ${property}`);
+  }
+ }
  check(await page.locator('.runs .shot img').count()===2,'Two previews');
  check(await page.locator('.runs img').evaluateAll(es=>es.every(e=>e.complete&&e.naturalWidth>0)),'Previews loaded');
  for(const [key,expected] of [['tokens','18,858–22,049'],['throughput','52.50–56.30'],['effects','129–155'],['time','5:38–7:00']]){

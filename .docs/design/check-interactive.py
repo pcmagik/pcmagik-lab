@@ -16,7 +16,7 @@ for name, target in [('assets/vendor', '../../../assets/vendor'), ('assets/avata
 
 result = subprocess.run(
     ['playwright-cli', '-s=restore', '--raw', 'run-code',
-     '--filename=.docs/design/check-interactive.js'],
+     '--filename=.docs/design/check-readability.js' if '--readability' in sys.argv else '--filename=.docs/design/check-interactive.js'],
     cwd=Path(__file__).resolve().parents[2],
     capture_output=True,
     text=True,

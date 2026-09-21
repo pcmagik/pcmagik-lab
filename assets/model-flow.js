@@ -78,6 +78,11 @@ export function createModelFlow(host, motionEnabled) {
     if (disposed || !width || !height) return;
     const compact = width < 440;
     const depth = compact ? 28 : 43;
+    // Both sides follow the same three straight lanes through the glass.
+    const laneOrigin = compact ? (height < 380 ? .12 : .23) : .365;
+    const flowY = (x, lane) => height * (laneOrigin + lane * (compact ? .085 : .073))
+      - (x - width * .46) * Math.tan(Math.PI / 18);
+    art.querySelector('.mf-beam').style.top = `${flowY(width * .505, 1) + 15}px`;
     stack.style.transform = `rotateX(${-13 + Math.sin(phase * .23) * 3 + pointerY * 5}deg) rotateY(${-30 + orientation + Math.sin(phase * .19) * 5 + pointerX * 9}deg) rotateZ(-13deg)`;
     plates.forEach(({ plate, scan }, i) => {
       plate.style.transform = `translateZ(${(i - 2) * depth}px) translateY(${Math.sin(phase * .7 - i * .6) * 5}px)`;
@@ -87,7 +92,7 @@ export function createModelFlow(host, motionEnabled) {
       const lane = i % 3;
       const progress = (phase / 6 + Math.floor(i / 3) / 3 + lane * .13) % 1;
       const x = width * (.025 + progress * .405);
-      const y = height * (.365 + lane * .073) - Math.sin(progress * Math.PI) * 7;
+      const y = flowY(x, lane);
       token.style.transform = `translate3d(${x}px,${y}px,0) rotate(-10deg)`;
       token.style.opacity = Math.min(1, progress * 5, (1 - progress) * 5) * .85;
     });
@@ -103,8 +108,8 @@ export function createModelFlow(host, motionEnabled) {
       const end = Math.max(0, width - output.width - 8);
       const start = Math.min(width * (compact ? .58 : .48), end);
       const x = start + (end - start) * progress;
-      const y = height * (.535 + i * .078);
-      output.word.style.transform = `translate3d(${x}px,${y}px,0) rotate(-8deg)`;
+      const y = flowY(x, i);
+      output.word.style.transform = `translate3d(${x}px,${y}px,0) rotate(-10deg)`;
       output.word.style.opacity = Math.min(1, progress * 5, (1 - progress) * 5);
     });
   }

@@ -329,6 +329,7 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
 /* The replacement occupies only the existing scene, underneath its telemetry. */
 .model-flow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .has-model-flow #neural-canvas { display: none; }
+.has-model-flow .telemetry-run { top: auto; bottom: 76px; }
 .mf-space { position: absolute; inset: 0; perspective: 900px; perspective-origin: 47% 43%; }
 .mf-stack { position: absolute; left: 46%; top: 45%; width: 0; height: 0; transform-style: preserve-3d; }
 .mf-plate { position: absolute; width: 190px; height: 255px; left: -95px; top: -127px; border: 1px solid #a5ffe566; border-radius: 29px; transform-style: preserve-3d; background: linear-gradient(140deg, #c8fff82e, #75dfcb08 25%, #030f1399 49%, #8062bd30 90%, #c4a8ff55); box-shadow: inset 2px 2px 2px #d7fff53d, inset -2px -2px 4px #ad8cff4d, 0 0 28px #67ffda0a; }
@@ -337,7 +338,7 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
 .mf-plate:nth-child(even)::after { left: auto; right: -2px; background: #c6abff; box-shadow: 0 0 14px #a78bfa, 0 0 35px #a78bfa88; }
 .mf-scan { position: absolute; inset: 18px; border-radius: 20px; background: linear-gradient(0deg, transparent 30%, #b9ffed44 48%, #e5fffdbb 50%, #b9ffed22 52%, transparent 70%); mix-blend-mode: screen; }
 .mf-label { position: absolute; bottom: 18px; left: 20px; color: #b9d4ce; font: 16px ui-monospace, monospace; letter-spacing: 2px; }
-.mf-beam { position: absolute; left: 5%; right: 4%; top: 49%; height: 1px; transform: rotate(11deg); background: linear-gradient(90deg, transparent, #9affe361, #dcfff599, #ac8cff66, transparent); box-shadow: 0 0 18px 2px #89ffe126; }
+.mf-beam { position: absolute; left: 5%; right: 4%; top: 44%; height: 1px; transform: rotate(-10deg); background: linear-gradient(90deg, transparent, #9affe361, #dcfff599, #ac8cff66, transparent); box-shadow: 0 0 18px 2px #89ffe126; }
 .mf-binary, .mf-word { position: absolute; left: 0; top: 0; white-space: nowrap; will-change: transform, opacity; font: 14px/1.4 ui-monospace, monospace; border-radius: 7px; }
 .mf-binary { padding: 6px 8px; color: #bbffe7; border: 1px solid #a8ffe32b; background: linear-gradient(130deg, #aaffdf12, #102a26c9); box-shadow: inset 0 1px #d4ffee18; }
 .mf-word { padding: 8px 11px; color: #e5d7ff; border: 1px solid #bba0ff66; background: linear-gradient(130deg, #bca0ff26, #211a32ed); box-shadow: inset 0 1px #e4d6ff33, 0 10px 25px #0006, 0 0 17px #bba0ff0d; }
@@ -347,6 +348,7 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
   .mf-word { padding: 7px 9px; }
 }
 @media (max-width: 600px) {
+  .has-model-flow .telemetry-run { bottom: 64px; }
   .mf-plate { width: 126px; height: 185px; left: -63px; top: -92px; border-radius: 24px; }
   .mf-plate::before { inset: 8px; border-radius: 17px; }
   .mf-binary { padding: 5px; }

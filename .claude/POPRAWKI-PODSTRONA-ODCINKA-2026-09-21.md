@@ -63,3 +63,24 @@ Dowody uruchomione w tej sesji:
 - **T4:** potwierdzone w `rozglos.py`: zapis URL następuje po parsowaniu odpowiedzi. Brak trwałego stanu wysyłki przed webhookiem. Sam stan „w toku” musi zatrzymywać automatyczne ponowienie przy nieznanym wyniku i pozwalać uzgodnić stan z usługą; nie wolno deklarować idempotencji samego uploadu.
 - **T5:** nie dodano sprzątania dawnych katalogów ani normalizacji nazw w eksportującym repo. Strona używa wyłącznie biegów z aktualnego feedu, co nie usuwa starych plików z eksportu.
 - **Punkt 3 / materiały:** eksport `133ad07` ustawia `strona` i `zrzut` na null dla pozostałych biegów. W aktualnym odcinku 01 to 8 z 10 biegów bez eksportowanej strony/zrzutu. Renderer jest gotowy obsłużyć wszystkie, ale pełne wykonanie żądania operatora wymaga rozszerzenia eksportera i skopiowania istniejących materiałów. Nie wygenerowano fikcyjnych linków ani nie zmieniono ręcznie feedu. Publiczny link GitHuba używa `main`; nowe materiały będą tam dopiero po uzgodnionym wdrożeniu.
+
+## Runda 2 — ocena operatora 2026-09-21 wieczorem
+Operator: „o niebo lepiej”, ale nadal są błędy. Zrzuty uwag: `projekt-wiedza-z-yt/seria/strona-lab-ocena/astra-publikacja-2026-09-21/uwaga-operatora-karta-{01,02}.png`.
+
+Słowa operatora: „ta karta powinna być taka sama, jeśli chodzi o wielkość. Podstrony mają inny navbar niż główna, trzeba zadbać o spójność każdej strony i każdej podstrony, a nie za każdym razem coś będzie inaczej wyglądało; wypadałoby wziąć rdzeń z głównej i zmienić tylko zawartość tam, gdzie zmienia się treść, a nie pisać każdej podstrony od nowa”.
+
+1. **Karta wyniku ma tę samą wielkość na każdym odcinku**, niezależnie od treści (01: „−22%” z dwiema liniami opisu jest wyższa niż 02: „Ranges overlap”).
+2. **Jeden rdzeń dla wszystkich stron:** navbar, stopka, tło, typografia i komponenty pochodzą z jednego szablonu głównej; podstrona wymienia tylko treść. Navbar podstron ma być identyczny z główną. Dowód: test, który porównuje obliczone style navbaru i stopki na głównej, liście i dwóch odcinkach → ten sam wynik; zrzuty 1920 i 390.
+3. **Nagłówek bez sieroty:** tytuł 01 łamie się tak, że „lose” zostaje samo w drugiej linii. Łamanie tytułów ustawia autor (jawny podział tam, gdzie kończy się myśl), nie przeglądarka.
+
+### Wykonane — runda 2
+
+- Plan z niezależną recenzją: `287214e`; implementacja i osiem zrzutów: `ee03585`.
+- Jeden `bin/templates/layout.html`, wyciągnięty z zaakceptowanej głównej, generuje wspólny head, navbar, stopkę i skrypty. `home.html` oraz `page.html` zawierają już tylko zawartość głównego obszaru. Podstrony mają również licznik odcinków i przycisk pauzy z głównej. Linki i zasoby uwzględniają zagnieżdżony adres. Animacje hero w `lab.js` nie są uruchamiane na stronach bez hero.
+- HTML głównej **bajt w bajt identyczny przed/po** (`cmp` → 0), zarówno z produkcyjnym feedem jednego odcinka, jak i izolowanym feedem dwunastu. `assets/lab.css` bez zmian.
+- Karty 01 i 02 mają identyczny rozmiar: 1320×340 px przy szerokości 1920 oraz 354×390 px przy szerokości 390. Test sprawdza też, że treść nie jest obcięta i karta mieści się na pierwszym ekranie.
+- Tytuł 01 ma jawne `<br>` po dwukropku; krótkie frazy po przecinkach i końcówka z nazwą modelu pozostają razem. Treść nadal pochodzi z feedu, bez tytułu wpisanego ręcznie do generatora dla odcinka 01. Test pozycji słów potwierdza, że „you lose” jest w jednej linii na obu szerokościach.
+- `bash bin/po-publikacji.sh` → PASS. `python3 -m unittest discover -s bin -p 'test_*.py'` → **15 testów OK**, w tym porównanie wygenerowanego navbaru i stopki oraz ścieżek zasobów.
+- `playwright-cli -s=publication --raw run-code --filename=bin/check_shared_layout.js` → **PASS**: główna, lista, odcinki 01/02 przy 1920 i 390. Porównanie obliczonych stylów wszystkich elementów navbaru i stopki oraz stylów body, kontrola wymiarów kart, linków menu, zasobów, menu mobilnego, przepełnienia i łamania tytułu. Dodatkowo pauza/wznowienie animacji na podstronach przy standardowych ustawieniach ruchu. Przed poprawką ten sam scenariusz odtworzył różne wysokości kart, navbar/stopkę i samotne słowo w tytule.
+- Zrzuty pełnostronicowe: `.screenshots/shared-layout-{home,list,01-karpathy-vs-bare,02-qwen3.6-27b}-{1920,390}.png` — osiem plików.
+- Podglądy 8765/8766 odświeżone. Bez merge, wdrożenia i edycji repo pomiarowego. Ograniczenia eksportera z poprzedniej rundy pozostają aktualne.

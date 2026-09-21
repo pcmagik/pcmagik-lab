@@ -15,19 +15,39 @@ class PublicationTest(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         shutil.copytree(ROOT / 'bin', self.root / 'bin')
-        self.feed = {'generated':'2026-09-20','source':'fixture','note':'Effects count code, not visual quality.', 'episodes':[]}
+        self.feed = {'schema_version':2,'generated':'2026-09-20','source':'fixture','note':'Effects count code, not visual quality.', 'episodes':[]}
         (self.root / 'data').mkdir()
 
     def episode(self, slug, day):
         name=f'2026-09-{day:02}_test_bare'
         prefix=f'episodes/{slug}/{name}'
-        run={'bieg':name,'model':'test/model','wariant':'bare','harness':'pi','sekundy':12.5,'tokeny':321,'tokeny_myslenia':21,'myslenie_pct':6,'tok_s':25.68,'linie':42,'efekty':7,'effort_zadany':'medium','effort_otrzymany':None,'model_przeladowany':True}
+        run={'bieg':name,'model':'test/model','wariant':'bare','harness':'pi','sekundy':12.5,'tokeny':321,'tokeny_myslenia':21,'myslenie_pct':6.54,'tok_s':25.68,'linie':42,'efekty':7,'effort_zadany':'medium','effort_otrzymany':None,'model_przeladowany':True}
         for key, filename in [('strona','index.html'),('zrzut','screenshot.png'),('metrics','metrics.json'),('prompt','prompt.txt')]:
             run[key]=prefix+'/'+filename
             file=self.root/run[key];file.parent.mkdir(parents=True,exist_ok=True);file.write_text('Test artifact')
-        return {'slug':slug,'title':'Test <episode> '+slug,'task':'easy','youtube':'','opis':'Measured test description.', 'runs':[run]}
+        self.evidence(run)
+        return {'measurements':[run], 'slug':slug,'title':'Test <episode> '+slug,'task':'easy','youtube':'','opis':'Measured test description.', 'runs':[run]}
+
+    def evidence(self, run):
+        raw = {'model':run['model'], 'variant':run['wariant'], 'harness':run['harness'],
+               'seconds':run['sekundy'], 'usage':{'completion_tokens':run['tokeny'],
+               'completion_tokens_details':{'reasoning_tokens':run['tokeny_myslenia']}},
+               'tokens_per_second':run['tok_s'], 'html_lines':run['linie'],
+               'effort':run['effort_zadany'], 'effort_otrzymany':run['effort_otrzymany'],
+               'model_reloaded':run['model_przeladowany']}
+        (self.root/run['metrics']).write_text(json.dumps(raw))
+        run['efekty_plik'] = str(Path(run['metrics']).with_name('efekty.json'))
+        (self.root/run['efekty_plik']).write_text(json.dumps({'razem':run['efekty']}))
+        run['myslenie_pct'] = round(run['tokeny_myslenia']/run['tokeny']*100,2) if run['tokeny'] and run['tokeny_myslenia'] is not None else None
 
     def publish(self):
+        for ep in self.feed['episodes']:
+            if 'cohorts' not in ep:
+                groups = {}
+                for run in ep['measurements']:
+                    key = (run['model'],run['wariant'])
+                    groups[key] = groups.get(key,0)+1
+                ep['cohorts'] = [{'model':m,'wariant':v,'n':n} for (m,v),n in groups.items()]
         (self.root/'data/episodes.json').write_text(json.dumps(self.feed))
         return subprocess.run(['bash', str(self.root/'bin/po-publikacji.sh')],cwd=self.root/'data',capture_output=True,text=True)
 
@@ -39,6 +59,7 @@ class PublicationTest(unittest.TestCase):
         self.assertIn('321',output.read_text())
         self.assertIn('Test &lt;episode&gt;',output.read_text())
         self.feed['episodes'][0]['runs'][0]['tokeny']=987
+        self.evidence(self.feed['episodes'][0]['runs'][0])
         self.assertEqual(self.publish().returncode,0)
         self.assertIn('987',output.read_text())
         data=json.loads((self.root/'assets/homepage-benchmarks.json').read_text())
@@ -60,37 +81,33 @@ class PublicationTest(unittest.TestCase):
         self.assertEqual(self.publish().returncode,0)
         self.assertEqual(before,self.generated())
 
-    def test_preserved_cohort_and_feed_previews_survive_republication(self):
-        ep=self.episode('first',19)
-        second=self.episode('first',20)['runs'][0]
-        second['wariant']='karpathy'
-        ep['runs'].append(second)
-        self.feed['episodes']=[ep]
-        cohorts={}
-        for r in ep['runs']:
-            samples=[{'id':str(i),'seconds':r['sekundy']+i,'output_tokens':r['tokeny']+i,
-                      'tok_s':r['tok_s'],'effects':r['efekty']+i,'lines_of_code':r['linie']} for i in range(3)]
-            cohorts[r['wariant']]={'n':3,'runs':samples,'representative':'0'}
-        studies=self.root/'data/studies'
-        studies.mkdir()
-        (studies/'first.json').write_text(json.dumps({'model':'test/model','cohorts':cohorts,
-            'series_context':{'overlapping_count':11,'model_count':11,'as_of':'2026-09-20'}}))
-        self.assertEqual(self.publish().returncode,0)
-        home=(self.root/'index.html').read_text()
-        self.assertIn('321–323',home)
-        self.assertIn('ranges overlap; no demonstrated difference',home)
-        self.assertEqual(home.count('class="shot"'),2)
-        self.assertIn('src="/'+second['zrzut']+'"',home)
-        self.assertIn('data-metric="effects"',home)
-        self.assertIn('output = thinking + final code',home)
-        self.assertNotIn('less time in this run',home)
-        before=self.generated()
-        self.assertEqual(self.publish().returncode,0)
-        self.assertEqual(before,self.generated())
-        ep['runs'][0]['tokeny']=999
-        result=self.publish()
-        self.assertNotEqual(result.returncode,0)
-        self.assertIn('feed representatives differ',result.stderr)
+    def test_full_cohort_is_exported_on_episode_and_home(self):
+        ep = self.episode('first', 10)
+        ep['measurements'] = []
+        ep['runs'] = []
+        for day, variant in [(10,'bare'),(11,'bare'),(12,'bare'),(13,'karpathy'),(14,'karpathy'),(15,'karpathy')]:
+            run = self.episode('first',day)['runs'][0]
+            run['wariant'] = variant
+            run['tokeny'] = 100 + day
+            self.evidence(run)
+            ep['measurements'].append(run)
+            if day in [11,14]:
+                ep['runs'].append(run)
+        self.feed['episodes'] = [ep]
+        result = self.publish()
+        self.assertEqual(result.returncode,0,result.stderr)
+        for path in ['index.html','episodes/first/index.html']:
+            html = (self.root/path).read_text()
+            self.assertIn('bare: n=3',html)
+            self.assertIn('karpathy: n=3',html)
+            self.assertIn('110–112',html)
+            self.assertIn('113–115',html)
+            self.assertEqual(html.count('class="shot"'),2)
+        for run in ep['measurements']:
+            self.assertIn(run['metrics'],(self.root/'episodes/first/index.html').read_text())
+        before = self.generated()
+        ep['runs'][0]['tokeny'] = 999
+        self.assertNotEqual(self.publish().returncode,0)
         self.assertEqual(before,self.generated())
 
     def generated(self):
@@ -136,33 +153,34 @@ class PublicationTest(unittest.TestCase):
         ep=self.episode('first',19)
         second=self.episode('first',20)['runs'][0]
         second['wariant']='karpathy'
+        self.evidence(second)
         ep['runs'].append(second)
+        ep['measurements'].append(second)
         self.feed['episodes']=[ep]
         self.assertEqual(self.publish().returncode,0)
         output=(self.root/'episodes/first/index.html').read_text()
         self.assertNotIn('data-comparison',output)
         self.assertNotIn('22%',output)
-        self.assertIn('no range-based conclusion',output)
+        self.assertIn('repeated ranges not measured yet',output)
         ep['runs'][0]['tokeny']=None
+        self.evidence(ep['runs'][0])
         self.assertEqual(self.publish().returncode,0)
         self.assertIn('not measured yet',(self.root/'episodes/first/index.html').read_text())
 
-    def test_multiple_models_and_repeated_run_panels(self):
-        ep=self.episode('first',10)
-        for day,variant in [(11,'bare'),(12,'karpathy'),(13,'karpathy')]:
-            r=self.episode('first',day)['runs'][0]
-            r['wariant']=variant;r['tokeny']=100+day
-            ep['runs'].append(r)
-        other=self.episode('first',14)['runs'][0];other['model']='another/model'
+    def test_multiple_models_do_not_mix_representatives(self):
+        ep = self.episode('first',10)
+        other = self.episode('first',11)['runs'][0]
+        other['model'] = 'another/model'
+        self.evidence(other)
         ep['runs'].append(other)
-        self.feed['episodes']=[ep]
-        self.assertEqual(self.publish().returncode,0)
-        output=(self.root/'episodes/first/index.html').read_text()
-        self.assertEqual(output.count('data-comparison'),1)
-        self.assertIn('another/model',output)
-        self.assertIn('111–321',output)
-        self.assertIn('112–113',output)
-        self.assertNotIn('fewer counted effects',output)
+        ep['measurements'].append(other)
+        self.feed['episodes'] = [ep]
+        result = self.publish()
+        self.assertEqual(result.returncode,0,result.stderr)
+        home = (self.root/'index.html').read_text()
+        self.assertNotIn('class="shot"',home)
+        self.assertIn('comparisons within each model',home)
+        self.assertIn('another/model',(self.root/'episodes/first/index.html').read_text())
 
 def browser_fixture():
     case = PublicationTest()
@@ -173,7 +191,9 @@ def browser_fixture():
             run = case.episode('first', day)['runs'][0]
             run['wariant'] = variant
             run['tokeny'] = 100 + day
+            case.evidence(run)
             ep['runs'].append(run)
+            ep['measurements'].append(run)
         case.feed['episodes'] = [ep]
         result = case.publish()
         if result.returncode:

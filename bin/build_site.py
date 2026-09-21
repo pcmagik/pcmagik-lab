@@ -13,10 +13,8 @@ import tempfile
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
-METRICS = [('effects', 'efekty', 'Effects', 'effects'), ('time', 'sekundy', 'Time', 's'),
-           ('tokens', 'tokeny', 'output tokens', 'output tokens'), ('throughput', 'tok_s', 'tok/s', 'tok/s')]
 NUMBERS = ['sekundy', 'tokeny', 'tokeny_myslenia', 'myslenie_pct', 'tok_s', 'linie', 'efekty']
-ARTIFACTS = ['strona', 'zrzut', 'metrics', 'prompt']
+ARTIFACTS = ['metrics', 'prompt']
 
 
 def text(value):
@@ -48,6 +46,8 @@ def load():
     feed = json.loads((ROOT / 'data/episodes.json').read_text())
     if not isinstance(feed, dict) or not isinstance(feed.get('episodes'), list):
         raise ValueError('data/episodes.json must contain an episodes array')
+    if feed.get('schema_version') != 2:
+        raise ValueError('Re-export measurements with publication schema_version 2')
     date.fromisoformat(feed['generated'])
     if not isinstance(feed.get('note', ''), str):
         raise ValueError('Feed note must be text')
@@ -56,7 +56,7 @@ def load():
         if not isinstance(episode, dict):
             raise ValueError('Each episode must be an object')
         slug = episode.get('slug', '')
-        if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug) or slug in seen:
+        if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9]+(?:[.-][a-z0-9]+)*', slug) or slug in seen:
             raise ValueError(f'Invalid or duplicate episode slug: {slug!r}')
         seen.add(slug)
         for key in ['title', 'opis', 'task', 'youtube']:
@@ -69,8 +69,10 @@ def load():
             raise ValueError(f'{slug}: expected an HTTPS YouTube URL')
         if not isinstance(episode.get('runs'), list):
             raise ValueError(f'{slug}: runs must be an array')
+        if not isinstance(episode.get('measurements'), list) or not episode['measurements']:
+            raise ValueError(f'{slug}: full measurements are required')
         runs = set()
-        for run in episode['runs']:
+        for run in episode['measurements']:
             if not isinstance(run, dict):
                 raise ValueError(f'{slug}: each run must be an object')
             for key in ['bieg', 'model', 'wariant', 'harness']:
@@ -90,11 +92,57 @@ def load():
                 raise ValueError(f'{slug}: model_przeladowany must be boolean or null')
             for key in ARTIFACTS:
                 artifact(run.get(key), slug)
+            validate_evidence(run, slug)
+        if not isinstance(episode.get('cohorts'), list) or not episode['cohorts']:
+            raise ValueError(f'{slug}: declared cohorts are required')
+        if 'cohorts' in episode:
+            declared = {(g['model'], g['wariant']): g['n'] for g in episode['cohorts']}
+            actual = defaultdict(int)
+            for run in episode['measurements']:
+                actual[(run['model'], run['wariant'])] += 1
+            if len(declared) != len(episode['cohorts']) or declared != dict(actual):
+                raise ValueError(f'{slug}: incomplete declared cohort')
+        for run in episode['runs']:
+            if run not in episode['measurements']:
+                raise ValueError(f'{slug}: representative differs from full measurements')
+            for key in ['strona', 'zrzut']:
+                artifact(run.get(key), slug)
+        if len({r['bieg'] for r in episode['runs']}) != len(episode['runs']):
+            raise ValueError(f'{slug}: duplicate representative')
     return feed
 
 
+def validate_evidence(run, slug):
+    raw = json.loads(artifact(run['metrics'], slug).read_text())
+    usage = raw.get('usage') or {}
+    expected = {
+        'model': raw.get('model'), 'wariant': raw.get('variant'), 'harness': raw.get('harness'),
+        'sekundy': raw.get('seconds'), 'tokeny': usage.get('completion_tokens'),
+        'tokeny_myslenia': (usage.get('completion_tokens_details') or {}).get('reasoning_tokens'),
+        'tok_s': raw.get('tokens_per_second'), 'linie': raw.get('html_lines'),
+        'effort_zadany': raw.get('effort_zadany') or raw.get('effort'),
+        'effort_otrzymany': raw.get('effort_otrzymany'), 'model_przeladowany': raw.get('model_reloaded'),
+    }
+    for key, value in expected.items():
+        if run.get(key) != value:
+            raise ValueError(f'{slug}/{run["bieg"]}: {key} differs from metrics.json')
+    total, thinking = run.get('tokeny'), run.get('tokeny_myslenia')
+    if total is not None and thinking is not None and thinking > total:
+        raise ValueError(f'{slug}: thinking exceeds output tokens')
+    percent = round(thinking / total * 100, 2) if total and thinking is not None else None
+    if run.get('myslenie_pct') != percent:
+        raise ValueError(f'{slug}: thinking percentage differs from measured tokens')
+    effects_path = run.get('efekty_plik')
+    effects = json.loads(artifact(effects_path, slug).read_text()) if effects_path else {}
+    if run.get('efekty') != effects.get('razem', effects.get('suma')):
+        raise ValueError(f'{slug}: effects differ from evidence')
+
+
 def episode_date(episode, generated):
-    # The publisher supplies run dates in identifiers, not a publication timestamp.
+    if episode.get('date'):
+        date.fromisoformat(episode['date'])
+        return episode['date'], 'Run date'
+    # Legacy run identifiers may contain a measurement date.
     dates = [run['bieg'][:10] for run in episode['runs'] if re.match(r'^\d{4}-\d{2}-\d{2}_', run['bieg'])]
     for value in dates:
         date.fromisoformat(value)
@@ -114,83 +162,52 @@ def cards(episodes, feed):
     return '\n'.join(result) or '<p class="study-note">No episodes published yet.</p>'
 
 
-def comparison(model, runs, ident):
-    variants = defaultdict(list)
-    for run in runs:
-        variants[run['wariant']].append(run)
-    if len(variants) < 2 or any(len(group) < 2 for group in variants.values()):
-        return '<p class="study-note">Published examples are shown below. The feed does not include repeated runs for each variant of this model, so no range-based conclusion is calculated from these examples.</p>'
-    panels = []
-    buttons = []
-    for key, field, label, unit in METRICS:
-        if any(run.get(field) is None for run in runs):
-            continue
-        ranges = {variant: (min(r[field] for r in group), max(r[field] for r in group)) for variant, group in variants.items()}
-        maximum = max(hi for lo, hi in ranges.values()) or 1
-        selected = not panels
-        rows = []
-        for variant, (lo, hi) in ranges.items():
-            color = variant if variant in ['bare', 'karpathy'] else 'other'
-            rows.append(f'<div class="compare-row"><span class="compare-label">{text(variant.upper())}<small>{len(variants[variant])} published runs</small></span><div class="bar-track" aria-hidden="true"><div class="bar-fill {color}-bar" style="left:{lo/maximum*100:.4f}%;width:{(hi-lo)/maximum*100:.4f}%"></div></div><strong class="compare-value">{number(lo)}–{number(hi)} <small>{unit}</small></strong></div>')
-        panels.append(f'<div id="{ident}-{key}" data-metric-panel="{key}"{ "" if selected else " hidden" }><div class="compare-rows">'+''.join(rows)+'</div></div>')
-        buttons.append(f'<button type="button" data-metric="{key}" aria-controls="{ident}-{key}" aria-pressed="{str(selected).lower()}">{label}</button>')
-    if not panels:
-        return ''
-    return f'''<div class="comparison" data-comparison><div class="compare-top"><div><h3>Published run ranges</h3><p class="range-legend">{text(model)} · min–max of the supplied outputs only; no claim about a complete study cohort.</p></div><div class="metric-switch" role="group" aria-label="Compare a metric" hidden>{''.join(buttons)}</div></div><div aria-live="polite">{''.join(panels)}</div><p class="metric-caveat">Effects count code constructs, not visual quality. Time and output tokens do not measure the cost of equivalent work in an open-ended task.</p></div>'''
-
-
 def episode_body(ep, feed):
     slug = ep['slug']
     video = f'<a class="button primary" href="{text(ep["youtube"])}">Watch episode ↗</a>' if ep['youtube'] else '<span class="soon">Video link not published yet</span>'
     body = [f'''<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Lab</a><span>/</span><a href="/episodes/">Episodes</a></nav>
 <section><div class="section-head"><div><p class="eyebrow">THE EXPERIMENT</p><h1 class="page-title">{text(ep['title'])}</h1></div></div><p class="episode-thesis">{text(ep['opis'])}</p><div class="material-links">{video}<a class="button" href="#materials">Test materials ↓</a></div><p class="study-note">{text(feed.get('note', ''))}</p>''']
     grouped = defaultdict(list)
-    for i, run in enumerate(ep['runs']):
+    for i, run in enumerate(ep['measurements']):
         grouped[run['model']].append((i, run))
     prompts, rows = [], []
     for group_id, (model, indexed) in enumerate(grouped.items()):
         body.append(f'<article class="ep glass"><div class="ep-h"><h2 class="model-heading">{text(model)}</h2></div>')
-        body.append(comparison(model, [r for _, r in indexed], f'comparison-{group_id}'))
+        group_ep = dict(ep, measurements=[r for _, r in indexed])
+        body.append(home_comparison(group_ep, study_for(group_ep), f'comparison-{group_id}'))
         body.append('<div class="runs">')
         for i, r in indexed:
             variant = r['wariant']
             color = variant if variant in ['bare', 'karpathy'] else 'other'
             explanation = {'bare':'NO RULES, NO EXTRAS', 'karpathy':'ONE RULES FILE'}.get(variant, '')
             reload = {True:'Yes', False:'No', None:'not measured yet'}[r.get('model_przeladowany')]
-            prompts.append(f'<details id="prompt-{i}" class="material-details glass"><summary>{text(model)} / {text(variant)} — prompt</summary><div class="details-body"><pre class="prompt-text">{text(artifact(r["prompt"], slug).read_text())}</pre><a class="button" href="/{text(r["prompt"])}" download>Download prompt ↓</a></div></details>')
+            prompts.append(f'<details id="prompt-{i}" class="material-details glass"><summary>{text(model)} / {text(variant)} — {text(r["bieg"])} — prompt</summary><div class="details-body"><pre class="prompt-text">{text(artifact(r["prompt"], slug).read_text())}</pre><a class="button" href="/{text(r["prompt"])}" download>Download prompt ↓</a></div></details>')
             cells = ''.join(f'<td>{number(r.get(key))}</td>' for key in ['sekundy','tokeny','tokeny_myslenia','tok_s','linie','efekty'])
-            rows.append(f'<tr><th scope="row">{text(r["bieg"])}</th><td>{text(model)}</td><td>{text(variant)}</td>{cells}</tr>')
+            rows.append(f'<tr><th scope="row"><a href="/{text(r["metrics"])}">{text(r["bieg"])}</a></th><td>{text(model)}</td><td>{text(variant)}</td>{cells}</tr>')
+            if r not in ep['runs']:
+                continue
             body.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['zrzut'])}" aria-label="View {text(model)} {text(variant)} screenshot"><img src="/{text(r['zrzut'])}" alt="{text(model)} / {text(variant)} published output" loading="lazy"></a><div class="body"><div class="name"><div><b class="v-{color}">{text(variant.upper())}</b><small class="variant-description">{explanation}</small></div><span class="tag">Published output</span></div>
 <p class="run-id">{text(r['bieg'])}</p><div class="kv"><div><b>{number(r.get('sekundy'))} s</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{number(r.get('myslenie_pct'))}{'%' if r.get('myslenie_pct') is not None else ''}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div></div>
 <p class="measurement-note">output = thinking + final code</p><p class="measurement-note">Lines of code show the page size the model chose, not the cost of equivalent work.</p><p class="measurement-note">Effects: {number(r.get('efekty'))} · tok/s: {number(r.get('tok_s'))}</p><p class="measurement-note">Requested effort: {text(r.get('effort_zadany') or 'not measured yet')} · received effort: {text(r.get('effort_otrzymany') or 'not measured yet')} · model reloaded: {reload}</p>
 <div class="foot"><a href="/{text(r['strona'])}">Open live output ↗</a><a href="/{text(r['zrzut'])}">Screenshot</a><a href="/{text(r['metrics'])}">metrics.json</a><a href="#prompt-{i}">Read prompt</a></div></div></div>''')
         body.append('</div></article>')
     body.append('</section><section id="materials"><div class="section-head"><h2>Check the measurements.</h2></div><div class="material-links"><a class="button" href="/assets/homepage-benchmarks.json" download>Download published data ↓</a><a class="button" href="#task-prompt">Read the test prompts ↓</a></div>')
-    body.append('<details id="measurements" class="material-details glass"><summary>All published run measurements</summary><div class="details-body"><p>These are the outputs supplied with this episode, not an assertion that all study runs were published. Output tokens include thinking and final code. Effects do not rate appearance.</p><div class="measurement-table-wrap" tabindex="0" role="region" aria-label="Run measurements; scroll horizontally"><table><thead><tr><th>Run</th><th>Model</th><th>Variant</th><th>Time (s)</th><th>output tokens</th><th>thinking tokens</th><th>tok/s</th><th>lines of code</th><th>Effects</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div></div></details><div id="task-prompt">'+''.join(prompts)+'</div></section>')
+    body.append('<details id="measurements" class="material-details glass"><summary>All published run measurements</summary><div class="details-body"><p>All measurements in this episode’s registered cohorts are shown here. Live pages are selected representatives. Output tokens include thinking and final code. Effects do not rate appearance.</p><div class="measurement-table-wrap" tabindex="0" role="region" aria-label="Run measurements; scroll horizontally"><table><thead><tr><th>Run</th><th>Model</th><th>Variant</th><th>Time (s)</th><th>output tokens</th><th>thinking tokens</th><th>tok/s</th><th>lines of code</th><th>Effects</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div></div></details><div id="task-prompt">'+''.join(prompts)+'</div></section>')
     return '\n'.join(body)
 
 
 def study_for(ep):
-    # Preserved full cohort; the publisher feed contains representative artifacts only.
-    path = ROOT / 'data/studies' / f'{ep["slug"]}.json'
-    if not path.is_file():
+    runs = ep['measurements']
+    models = {r['model'] for r in runs}
+    if len(models) != 1:
         return None
-    study = json.loads(path.read_text())
-    for variant, cohort in study['cohorts'].items():
-        if cohort['n'] != len(cohort['runs']) or cohort['n'] < 3:
-            raise ValueError(f'{ep["slug"]}: incomplete study cohort')
-        for run in cohort['runs']:
-            for key in ['seconds', 'output_tokens', 'tok_s', 'effects']:
-                if type(run.get(key)) not in (int, float) or not math.isfinite(run[key]) or run[key] < 0:
-                    raise ValueError(f'{ep["slug"]}: invalid study measurement')
-        representative = next((r for r in cohort['runs'] if r['id'] == cohort['representative']), None)
-        supplied = [r for r in ep['runs'] if r['wariant'] == variant]
-        if representative is None or not supplied:
-            raise ValueError(f'{ep["slug"]}: missing study representative')
-        fields = [('sekundy', 'seconds'), ('tokeny', 'output_tokens'), ('linie', 'lines_of_code'), ('efekty', 'effects')]
-        if not any(all(r.get(a) == representative[b] for a, b in fields) for r in supplied):
-            raise ValueError(f'{ep["slug"]}: feed representatives differ from preserved study; update study data')
-    return study
+    cohorts = defaultdict(lambda: {'runs': []})
+    for r in runs:
+        cohorts[r['wariant']]['runs'].append({
+            'id': r['bieg'], 'seconds': r.get('sekundy'), 'output_tokens': r.get('tokeny'),
+            'tok_s': r.get('tok_s'), 'effects': r.get('efekty'),
+        })
+    return {'model': next(iter(models)), 'cohorts': dict(cohorts)}
 
 
 def duration(value):
@@ -208,11 +225,11 @@ def home_comparison(ep, study, ident):
         fields = ['seconds', 'output_tokens', 'tok_s', 'effects']
     else:
         groups = defaultdict(list)
-        models = {r['model'] for r in ep['runs']}
+        models = {r['model'] for r in ep['measurements']}
         if len(models) != 1:
             return '<p class="ep-subtitle">See the episode for comparisons within each model.</p>'
         model = next(iter(models))
-        for run in ep['runs']:
+        for run in ep['measurements']:
             groups[run['wariant']].append(run)
         fields = ['sekundy', 'tokeny', 'tok_s', 'efekty']
     if set(groups) != {'bare', 'karpathy'} or any(len(g) < 3 for g in groups.values()):
@@ -232,7 +249,7 @@ def home_comparison(ep, study, ident):
                 value = f'{lo:.2f}–{hi:.2f} tok/s'
             else:
                 value = f'{number(lo)}–{number(hi)}'
-            rows.append(f'<div class="compare-row"><span class="compare-label">{variant.upper()}</span><div class="bar-track" aria-hidden="true"><div class="bar-fill {variant}-bar" style="width:{hi/maximum*100:.4f}%"></div></div><strong class="compare-value">{value}</strong></div>')
+            rows.append(f'<div class="compare-row"><span class="compare-label">{variant.upper()}</span><div class="bar-track" aria-hidden="true"><div class="bar-fill {variant}-bar" style="left:{lo/maximum*100:.4f}%;width:{(hi-lo)/maximum*100:.4f}%"></div></div><strong class="compare-value">{value}</strong></div>')
         overlap = max(lo for lo, hi in ranges.values()) <= min(hi for lo, hi in ranges.values())
         summary = f'On {model}: ranges overlap; no demonstrated difference.' if overlap else f'On {model}: ranges do not overlap.'
         if key == 'effects' and ranges['karpathy'][1] < ranges['bare'][0]:
@@ -257,15 +274,10 @@ def home_cards(episodes, feed):
         day, date_label = episode_date(ep, feed['generated'])
         slug = ep['slug']
         models = ', '.join(dict.fromkeys(r['model'] for r in ep['runs']))
-        title = f'What do rules change on {study["model"]}?' if study else ep['title'].split(' | ')[0]
+        title = ep['title'].split(' | ')[0]
         video = f'<a class="soon" href="{text(ep["youtube"])}">Watch episode ↗</a>' if ep['youtube'] else '<span class="soon"><span class="dot"></span>Video coming soon</span>'
         header = f'<article class="ep glass reveal" data-episode="{slug}"><div class="ep-h"><div><div class="ep-meta"><span class="chip">{text(slug.split("-")[0].upper())} / EXPERIMENT</span><time datetime="{day}">{date_label}: {day}</time><span>TASK: {text(ep["task"].upper())}</span></div><h3><a href="/episodes/{slug}/">{text(title)}</a></h3><p class="ep-subtitle">{text(models)} <span>/</span> Published model outputs</p></div><div class="episode-links">{video}<a class="button" href="/episodes/{slug}/">Test materials ↗</a></div></div>'
-        representatives = []
-        # The feed owns the public artifacts and their card measurements.
-        for variant in dict.fromkeys(r['wariant'] for r in ep['runs']):
-            candidates = [r for r in ep['runs'] if r['wariant'] == variant]
-            candidates.sort(key=lambda r: r.get('sekundy') or 0)
-            representatives.append(candidates[len(candidates)//2])
+        representatives = ep['runs'] if len({r['model'] for r in ep['runs']}) == 1 else []
         previews = []
         for r in representatives[:2]:
             variant = r['wariant']
@@ -273,9 +285,6 @@ def home_cards(episodes, feed):
             description = {'bare':'NO RULES, NO EXTRAS','karpathy':'ONE RULES FILE'}.get(variant,'PUBLISHED OUTPUT')
             previews.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}"><img src="/{text(r['zrzut'])}" alt="{text(r['model'])} {text(variant)} live output" loading="lazy"></a><div class="body"><div class="name"><b class="v-{color}">{text(variant.upper())}</b><span class="tag">{description}</span></div><div class="kv"><div><b>{duration(r.get('sekundy'))}</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{number(r.get('myslenie_pct'))}{'%' if r.get('myslenie_pct') is not None else ''}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div></div><div class="foot"><a href="/{text(r['strona'])}">Open live demo ↗</a><a href="/{text(r['zrzut'])}">Screenshot</a><a href="/{text(r['metrics'])}">metrics.json</a><a href="/episodes/{slug}/#task-prompt">Prompt</a></div></div></div>''')
         notes = '<p class="ep-subtitle">Representative outputs only · output = thinking + final code.<br>Lines of code show the page size the model chose, not the cost of equivalent work. Effects count code constructs, not visual quality.</p>'
-        if study:
-            context = study['series_context']
-            notes += f'<p class="ep-subtitle"><a href="/data/studies/{slug}.json">Full cohort data ↗</a> · On {context["overlapping_count"]} of {context["model_count"]} other local models, effects ranges overlap (n=3; {context["as_of"]}).</p>'
         result.append(header+home_comparison(ep,study,'home-'+slug)+'<div class="runs">'+''.join(previews)+'</div>'+notes+'</article>')
     return '\n'.join(result) or '<p class="ep-subtitle">No episodes published yet.</p>'
 
@@ -336,7 +345,7 @@ def build(check=False):
                     else:
                         target.write_bytes(content)
                 raise
-    print(f'PASS feed build: {len(episodes)} episodes, {sum(len(ep["runs"]) for ep in episodes)} published outputs; HTML and snapshot {"verified" if check else "rebuilt"}')
+    print(f'PASS feed build: {len(episodes)} episodes, {sum(len(ep["measurements"]) for ep in episodes)} measurements, {sum(len(ep["runs"]) for ep in episodes)} published outputs; HTML and snapshot {"verified" if check else "rebuilt"}')
 
 
 if __name__ == '__main__':

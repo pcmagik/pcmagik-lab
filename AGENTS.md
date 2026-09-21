@@ -30,8 +30,7 @@ które kazało wrzucić wszystkie wyniki na stronę główną.
 
 Skrót zasady, żeby nie było wątpliwości: **strona główna jest witryną, nie archiwum.**
 Odpowiada na cztery pytania — czym to jest, jak mierzymy, co wyszło ostatnio, gdzie jest reszta.
-Trzy ostatnie wyniki na głównej, komplet na podstronach (`/episodes/`, `/episodes/<slug>/`,
-`/series/<slug>/`).
+Trzy ostatnie wyniki na głównej, komplet na podstronach (`/episodes/`, `/episodes/<slug>/`). Badania bez filmu czekają w repo pomiarowym.
 
 ## Fakty, które wolno podawać
 
@@ -59,19 +58,17 @@ Trzy ostatnie wyniki na głównej, komplet na podstronach (`/episodes/`, `/episo
 7. **Licznik efektów CSS to liczba, nie ocena wyglądu.** Zawsze z zastrzeżeniem.
 8. **Estetykę ocenia operator, nie strona i nie agent.** Widz ocenia sam na opublikowanych stronach.
 
-## Stan pomiarów (aktualizuj przy każdej zmianie)
+## Dane publikacji
 
-- **Film 01 — Qwen3.8 27B**, 5 biegów bare + 5 karpathy, effort medium. Wynik: z regułami
-  **22 % mniej efektów wizualnych, w 5 biegach na 5** (bare 129–155, karpathy 101–121 — zakresy
-  rozłączne). Czas i tokeny: zakresy się nakładają, czyli **bez różnicy**.
-- **Seria 04 — 11 modeli lokalnych, n=3**, bare kontra karpathy. Wynik: **11 z 11 modeli ma
-  nakładające się zakresy efektów**. Reguły Karpathy'ego **nie tną efektów na modelach lokalnych
-  w ogóle** — Qwen3.8 27B jest jedynym wyjątkiem z dwunastu zmierzonych.
-- Kompletność stron: **66 z 70 biegów bez wad**, wady skupione w `nemotron-3-nano`. To jedyna
-  miara porównująca modele wprost, bo nie zależy od zakresu, który model sam sobie ustalił.
-
-Wniosek dla strony: nie wolno sugerować, że reguły poprawiają albo psują kod „w ogóle".
-Mówimy tylko o konkretnym modelu i pokazujemy, że na dziesięciu innych nie dało to nic.
+- `data/episodes.json` (schema_version 2) to jeden eksport z repo pomiarowego: `measurements`
+  zawiera pełne kohorty, `runs` wskazuje reprezentantów. Liczb nie przepisujemy do reguł.
+- `bin/build_site.py` weryfikuje każdą metrykę z publicznym `metrics.json` i `efekty.json`;
+  błędny procent myślenia lub brak części zadeklarowanej kohorty przerywa budowanie.
+- Procent thinking to `100 × reasoning_tokens / completion_tokens`, zaokrąglony do dwóch
+  miejsc. Brak licznika oznacza „not measured yet”, nigdy zero. To udział tokenów, nie czasu.
+- Zakresy nakładające się nie wykazują różnicy; nie są dowodem równoważności modeli.
+- Pełny stan wszystkich badań: generowany `seria/pomiary/LICZBY.md` w repo pomiarowym.
+  Historyczne liczby w starszych poleceniach mogą być nieaktualne.
 
 ## Spójność z filmami — obowiązuje na stronie tak samo
 
@@ -86,6 +83,8 @@ Mówimy tylko o konkretnym modelu i pokazujemy, że na dziesięciu innych nie da
 Opisy wariantów: `NO RULES, NO EXTRAS` i `ONE RULES FILE`.
 
 ## Wygląd
+
+Aktualna decyzja operatora: `.claude/DECISIONS.md`, **D1**.
 
 - **Ciemny motyw jest domyślny.** Beż, krem, écru i ciepłe palety papierowe są zakazane wprost.
   Jasny wariant, jeśli powstanie, buduj na chłodnej bieli z niebieskim podkładem.

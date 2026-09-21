@@ -41,7 +41,7 @@
     motionContext = undefined;
     ambientTweens = [];
     gsap.getTweensOf('.bar-fill').forEach(tween => tween.progress(1).kill());
-    if (!motionEnabled()) return;
+    if (!motionEnabled() || !document.querySelector('.hero')) return;
     if (ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
     motionContext = gsap.context(() => {
       if (!entrancePlayed) {

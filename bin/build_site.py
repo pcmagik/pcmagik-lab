@@ -10,13 +10,11 @@ from pathlib import Path
 import re
 import sys
 import tempfile
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 ROOT = Path(__file__).resolve().parents[1]
-METRICS = [('effects', 'efekty', 'Effects', 'effects'), ('time', 'sekundy', 'Time', 's'),
-           ('tokens', 'tokeny', 'output tokens', 'output tokens'), ('throughput', 'tok_s', 'tok/s', 'tok/s')]
 NUMBERS = ['sekundy', 'tokeny', 'tokeny_myslenia', 'myslenie_pct', 'tok_s', 'linie', 'efekty']
-ARTIFACTS = ['strona', 'zrzut', 'metrics', 'prompt']
+ARTIFACTS = ['metrics', 'prompt']
 
 
 def text(value):
@@ -28,8 +26,21 @@ def number(value):
 
 
 def template(name, **values):
-    source = (ROOT / 'bin/templates' / name).read_text()
-    return re.sub(r'\{\{(\w+)\}\}', lambda m: values[m[1]], source)
+    def render(filename, context):
+        source = (ROOT / 'bin/templates' / filename).read_text()
+        return re.sub(r'\{\{(\w+)\}\}', lambda m: context[m[1]], source)
+    home = name == 'home.html'
+    content = render(name, values)
+    context = dict(values, body=content, asset_prefix='' if home else '/',
+                   home_url='./' if home else '/', nav_prefix='' if home else '/',
+                   extra_styles='' if home else '  <link rel="stylesheet" href="/assets/interior.css">\n')
+    if home:
+        context.update(title='PC Magik Lab — Intelligence, under the microscope.',
+                       og_title='PC Magik Lab — AI benchmarks, measured across repeated runs',
+                       description='Independent AI experiments on real hardware. Inspect published model outputs, prompts and measurements.', path='/')
+    else:
+        context['og_title'] = context['title']
+    return render('layout.html', context)
 
 
 def artifact(path, slug):
@@ -48,6 +59,8 @@ def load():
     feed = json.loads((ROOT / 'data/episodes.json').read_text())
     if not isinstance(feed, dict) or not isinstance(feed.get('episodes'), list):
         raise ValueError('data/episodes.json must contain an episodes array')
+    if feed.get('schema_version') != 2:
+        raise ValueError('Re-export measurements with publication schema_version 2')
     date.fromisoformat(feed['generated'])
     if not isinstance(feed.get('note', ''), str):
         raise ValueError('Feed note must be text')
@@ -56,7 +69,7 @@ def load():
         if not isinstance(episode, dict):
             raise ValueError('Each episode must be an object')
         slug = episode.get('slug', '')
-        if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug) or slug in seen:
+        if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9]+(?:[.-][a-z0-9]+)*', slug) or slug in seen:
             raise ValueError(f'Invalid or duplicate episode slug: {slug!r}')
         seen.add(slug)
         for key in ['title', 'opis', 'task', 'youtube']:
@@ -69,8 +82,10 @@ def load():
             raise ValueError(f'{slug}: expected an HTTPS YouTube URL')
         if not isinstance(episode.get('runs'), list):
             raise ValueError(f'{slug}: runs must be an array')
+        if not isinstance(episode.get('measurements'), list) or not episode['measurements']:
+            raise ValueError(f'{slug}: full measurements are required')
         runs = set()
-        for run in episode['runs']:
+        for run in episode['measurements']:
             if not isinstance(run, dict):
                 raise ValueError(f'{slug}: each run must be an object')
             for key in ['bieg', 'model', 'wariant', 'harness']:
@@ -90,11 +105,60 @@ def load():
                 raise ValueError(f'{slug}: model_przeladowany must be boolean or null')
             for key in ARTIFACTS:
                 artifact(run.get(key), slug)
+            for key in ['strona', 'zrzut']:
+                if run.get(key):
+                    artifact(run[key], slug)
+            validate_evidence(run, slug)
+        if not isinstance(episode.get('cohorts'), list) or not episode['cohorts']:
+            raise ValueError(f'{slug}: declared cohorts are required')
+        if 'cohorts' in episode:
+            declared = {(g['model'], g['wariant']): g['n'] for g in episode['cohorts']}
+            actual = defaultdict(int)
+            for run in episode['measurements']:
+                actual[(run['model'], run['wariant'])] += 1
+            if len(declared) != len(episode['cohorts']) or declared != dict(actual):
+                raise ValueError(f'{slug}: incomplete declared cohort')
+        for run in episode['runs']:
+            if run not in episode['measurements']:
+                raise ValueError(f'{slug}: representative differs from full measurements')
+            for key in ['strona', 'zrzut']:
+                artifact(run.get(key), slug)
+        if len({r['bieg'] for r in episode['runs']}) != len(episode['runs']):
+            raise ValueError(f'{slug}: duplicate representative')
     return feed
 
 
+def validate_evidence(run, slug):
+    raw = json.loads(artifact(run['metrics'], slug).read_text())
+    usage = raw.get('usage') or {}
+    expected = {
+        'model': raw.get('model'), 'wariant': raw.get('variant'), 'harness': raw.get('harness'),
+        'sekundy': raw.get('seconds'), 'tokeny': usage.get('completion_tokens'),
+        'tokeny_myslenia': (usage.get('completion_tokens_details') or {}).get('reasoning_tokens'),
+        'tok_s': raw.get('tokens_per_second'), 'linie': raw.get('html_lines'),
+        'effort_zadany': raw.get('effort_zadany') or raw.get('effort'),
+        'effort_otrzymany': raw.get('effort_otrzymany'), 'model_przeladowany': raw.get('model_reloaded'),
+    }
+    for key, value in expected.items():
+        if run.get(key) != value:
+            raise ValueError(f'{slug}/{run["bieg"]}: {key} differs from metrics.json')
+    total, thinking = run.get('tokeny'), run.get('tokeny_myslenia')
+    if total is not None and thinking is not None and thinking > total:
+        raise ValueError(f'{slug}: thinking exceeds output tokens')
+    percent = round(thinking / total * 100, 2) if total and thinking is not None else None
+    if run.get('myslenie_pct') != percent:
+        raise ValueError(f'{slug}: thinking percentage differs from measured tokens')
+    effects_path = run.get('efekty_plik')
+    effects = json.loads(artifact(effects_path, slug).read_text()) if effects_path else {}
+    if run.get('efekty') != effects.get('razem', effects.get('suma')):
+        raise ValueError(f'{slug}: effects differ from evidence')
+
+
 def episode_date(episode, generated):
-    # The publisher supplies run dates in identifiers, not a publication timestamp.
+    if episode.get('date'):
+        date.fromisoformat(episode['date'])
+        return episode['date'], 'Run date'
+    # Legacy run identifiers may contain a measurement date.
     dates = [run['bieg'][:10] for run in episode['runs'] if re.match(r'^\d{4}-\d{2}-\d{2}_', run['bieg'])]
     for value in dates:
         date.fromisoformat(value)
@@ -114,83 +178,90 @@ def cards(episodes, feed):
     return '\n'.join(result) or '<p class="study-note">No episodes published yet.</p>'
 
 
-def comparison(model, runs, ident):
-    variants = defaultdict(list)
-    for run in runs:
-        variants[run['wariant']].append(run)
-    if len(variants) < 2 or any(len(group) < 2 for group in variants.values()):
-        return '<p class="study-note">Published examples are shown below. The feed does not include repeated runs for each variant of this model, so no range-based conclusion is calculated from these examples.</p>'
-    panels = []
-    buttons = []
-    for key, field, label, unit in METRICS:
-        if any(run.get(field) is None for run in runs):
-            continue
-        ranges = {variant: (min(r[field] for r in group), max(r[field] for r in group)) for variant, group in variants.items()}
-        maximum = max(hi for lo, hi in ranges.values()) or 1
-        selected = not panels
-        rows = []
-        for variant, (lo, hi) in ranges.items():
-            color = variant if variant in ['bare', 'karpathy'] else 'other'
-            rows.append(f'<div class="compare-row"><span class="compare-label">{text(variant.upper())}<small>{len(variants[variant])} published runs</small></span><div class="bar-track" aria-hidden="true"><div class="bar-fill {color}-bar" style="left:{lo/maximum*100:.4f}%;width:{(hi-lo)/maximum*100:.4f}%"></div></div><strong class="compare-value">{number(lo)}–{number(hi)} <small>{unit}</small></strong></div>')
-        panels.append(f'<div id="{ident}-{key}" data-metric-panel="{key}"{ "" if selected else " hidden" }><div class="compare-rows">'+''.join(rows)+'</div></div>')
-        buttons.append(f'<button type="button" data-metric="{key}" aria-controls="{ident}-{key}" aria-pressed="{str(selected).lower()}">{label}</button>')
-    if not panels:
-        return ''
-    return f'''<div class="comparison" data-comparison><div class="compare-top"><div><h3>Published run ranges</h3><p class="range-legend">{text(model)} · min–max of the supplied outputs only; no claim about a complete study cohort.</p></div><div class="metric-switch" role="group" aria-label="Compare a metric" hidden>{''.join(buttons)}</div></div><div aria-live="polite">{''.join(panels)}</div><p class="metric-caveat">Effects count code constructs, not visual quality. Time and output tokens do not measure the cost of equivalent work in an open-ended task.</p></div>'''
+def episode_result(runs):
+    """Conclude only from complete, repeated, non-overlapping effect ranges."""
+    groups = {v: [r.get('efekty') for r in runs if r['wariant'] == v] for v in ['bare', 'karpathy']}
+    if any(len(g) < 3 or any(x is None for x in g) for g in groups.values()):
+        return '<strong class="result-number">not measured yet</strong><span>Repeated effect comparison</span>'
+    bare, karpathy = groups['bare'], groups['karpathy']
+    if max(karpathy) < min(bare):
+        reduction = round((1 - (sum(karpathy)/len(karpathy)) / (sum(bare)/len(bare))) * 100)
+        return f'<strong class="result-number">−{reduction}%</strong><span>fewer counted effects</span><p class="result-repeat">{len(karpathy)} / {len(karpathy)} Karpathy runs below every bare run · mean reduction</p>'
+    if min(karpathy) > max(bare):
+        return '<strong class="result-number result-words">More effects</strong><span>Every Karpathy run above every bare run</span>'
+    return '<strong class="result-number result-words">Ranges overlap</strong><span>No demonstrated difference in counted effects</span>'
+
+
+def episode_heading(ep):
+    """Present model and comparison consistently, using only published metadata."""
+    title = ep['title'].removesuffix(' | PC Magik Lab')
+    models = list(dict.fromkeys(r['model'] for r in ep['measurements']))
+    variants = list(dict.fromkeys(r['wariant'] for r in ep['measurements']))
+    model = ' / '.join(models)
+    if len(models) == 1:
+        match = re.fullmatch(r'Karpathy skills on (.+?): .+|(.+) with and without Karpathy rules', title)
+        if match:
+            model = match[1] or match[2]
+    comparison = ' vs '.join(v.upper() for v in variants) if len(variants) > 1 else title
+    return f'<span class="episode-model">{text(model)}</span><span class="episode-question">{text(comparison)}</span>'
 
 
 def episode_body(ep, feed):
     slug = ep['slug']
-    video = f'<a class="button primary" href="{text(ep["youtube"])}">Watch episode ↗</a>' if ep['youtube'] else '<span class="soon">Video link not published yet</span>'
+    title = ep['title'].removesuffix(' | PC Magik Lab')
+    repo = f'https://github.com/pcmagik/pcmagik-lab/tree/main/episodes/{slug}'
     body = [f'''<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Lab</a><span>/</span><a href="/episodes/">Episodes</a></nav>
-<section><div class="section-head"><div><p class="eyebrow">THE EXPERIMENT</p><h1 class="page-title">{text(ep['title'])}</h1></div></div><p class="episode-thesis">{text(ep['opis'])}</p><div class="material-links">{video}<a class="button" href="#materials">Test materials ↓</a></div><p class="study-note">{text(feed.get('note', ''))}</p>''']
+<section class="episode-intro"><h1 class="page-title">{episode_heading(ep)}</h1></section>''']
     grouped = defaultdict(list)
-    for i, run in enumerate(ep['runs']):
-        grouped[run['model']].append((i, run))
-    prompts, rows = [], []
-    for group_id, (model, indexed) in enumerate(grouped.items()):
-        body.append(f'<article class="ep glass"><div class="ep-h"><h2 class="model-heading">{text(model)}</h2></div>')
-        body.append(comparison(model, [r for _, r in indexed], f'comparison-{group_id}'))
-        body.append('<div class="runs">')
-        for i, r in indexed:
-            variant = r['wariant']
+    for run in ep['measurements']:
+        grouped[run['model']].append(run)
+    for group_id, (model, runs) in enumerate(grouped.items()):
+        body.append(f'<section class="episode-results" aria-label="{text(model)} results"><div class="result-hero glass"><div><p class="eyebrow">{text(model)}</p>{episode_result(runs)}<p class="measurement-note">Effects count CSS/JS constructs, not visual quality.</p></div><a class="button" href="#runs-{group_id}">Explore all {len(runs)} runs ↓</a></div>')
+        group_ep = dict(ep, measurements=runs)
+        body.append(home_comparison(group_ep, study_for(group_ep), f'comparison-{group_id}', detailed=True))
+        previews = [r for r in ep['runs'] if r['model'] == model]
+        if previews:
+            body.append('<div class="output-previews runs">')
+            for r in previews:
+                color = r['wariant'] if r['wariant'] in ['bare', 'karpathy'] else 'other'
+                body.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}"><img src="/{text(r['zrzut'])}" alt="{text(model)} / {text(r['wariant'])} live output" loading="lazy"></a><div class="body"><div class="name"><b class="v-{color}">{text(r['wariant'].upper())}</b><span class="tag">Published output</span></div><div class="foot"><a href="/{text(r['strona'])}">Explore live output ↗</a><a href="/{text(r['zrzut'])}">Screenshot ↗</a></div></div></div>''')
+            body.append('</div>')
+        body.append(f'<div id="runs-{group_id}" class="section-head"><h2>Every run. Every result.</h2></div><div class="cohort-grid">')
+        variants = dict.fromkeys(r['wariant'] for r in runs)
+        for variant in variants:
             color = variant if variant in ['bare', 'karpathy'] else 'other'
-            explanation = {'bare':'NO RULES, NO EXTRAS', 'karpathy':'ONE RULES FILE'}.get(variant, '')
-            reload = {True:'Yes', False:'No', None:'not measured yet'}[r.get('model_przeladowany')]
-            prompts.append(f'<details id="prompt-{i}" class="material-details glass"><summary>{text(model)} / {text(variant)} — prompt</summary><div class="details-body"><pre class="prompt-text">{text(artifact(r["prompt"], slug).read_text())}</pre><a class="button" href="/{text(r["prompt"])}" download>Download prompt ↓</a></div></details>')
-            cells = ''.join(f'<td>{number(r.get(key))}</td>' for key in ['sekundy','tokeny','tokeny_myslenia','tok_s','linie','efekty'])
-            rows.append(f'<tr><th scope="row">{text(r["bieg"])}</th><td>{text(model)}</td><td>{text(variant)}</td>{cells}</tr>')
-            body.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['zrzut'])}" aria-label="View {text(model)} {text(variant)} screenshot"><img src="/{text(r['zrzut'])}" alt="{text(model)} / {text(variant)} published output" loading="lazy"></a><div class="body"><div class="name"><div><b class="v-{color}">{text(variant.upper())}</b><small class="variant-description">{explanation}</small></div><span class="tag">Published output</span></div>
-<p class="run-id">{text(r['bieg'])}</p><div class="kv"><div><b>{number(r.get('sekundy'))} s</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{number(r.get('myslenie_pct'))}{'%' if r.get('myslenie_pct') is not None else ''}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div></div>
-<p class="measurement-note">output = thinking + final code</p><p class="measurement-note">Lines of code show the page size the model chose, not the cost of equivalent work.</p><p class="measurement-note">Effects: {number(r.get('efekty'))} · tok/s: {number(r.get('tok_s'))}</p><p class="measurement-note">Requested effort: {text(r.get('effort_zadany') or 'not measured yet')} · received effort: {text(r.get('effort_otrzymany') or 'not measured yet')} · model reloaded: {reload}</p>
-<div class="foot"><a href="/{text(r['strona'])}">Open live output ↗</a><a href="/{text(r['zrzut'])}">Screenshot</a><a href="/{text(r['metrics'])}">metrics.json</a><a href="#prompt-{i}">Read prompt</a></div></div></div>''')
-        body.append('</div></article>')
-    body.append('</section><section id="materials"><div class="section-head"><h2>Check the measurements.</h2></div><div class="material-links"><a class="button" href="/assets/homepage-benchmarks.json" download>Download published data ↓</a><a class="button" href="#task-prompt">Read the test prompts ↓</a></div>')
-    body.append('<details id="measurements" class="material-details glass"><summary>All published run measurements</summary><div class="details-body"><p>These are the outputs supplied with this episode, not an assertion that all study runs were published. Output tokens include thinking and final code. Effects do not rate appearance.</p><div class="measurement-table-wrap" tabindex="0" role="region" aria-label="Run measurements; scroll horizontally"><table><thead><tr><th>Run</th><th>Model</th><th>Variant</th><th>Time (s)</th><th>output tokens</th><th>thinking tokens</th><th>tok/s</th><th>lines of code</th><th>Effects</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div></div></details><div id="task-prompt">'+''.join(prompts)+'</div></section>')
+            description = {'bare': 'NO RULES, NO EXTRAS', 'karpathy': 'ONE RULES FILE'}.get(variant, '')
+            cohort = [r for r in runs if r['wariant'] == variant]
+            body.append(f'<div class="cohort"><div class="cohort-heading"><h3 class="v-{color}">{text(variant.upper())}</h3><span>{text(description)} · n={len(cohort)}</span></div>')
+            for i, r in enumerate(cohort, 1):
+                metrics = ''.join(f'<div><strong>{number(r.get(key))}{suffix if r.get(key) is not None else ""}</strong><span>{label}</span></div>' for key, label, suffix in [('sekundy','time',' s'),('tokeny','output tokens',''),('myslenie_pct','thinking','%'),('tok_s','tok/s',''),('linie','lines of code','')])
+                links = ''.join(f'<a href="/{text(r[key])}">{label} ↗</a>' for key,label in [('strona','Live output'),('zrzut','Screenshot')] if r.get(key))
+                body.append(f'''<article class="run-result glass" data-run="{text(r['bieg'])}"><div class="run-result-head"><h4>Run {i:02}</h4><div class="run-effects v-{color}"><strong>{number(r.get('efekty'))}</strong><span>effects</span></div></div><div class="run-metrics">{metrics}</div><p class="run-id">{text(r['bieg'])}</p>{f'<div class="foot">{links}</div>' if links else ''}</article>''')
+            body.append('</div>')
+        body.append('</div><p class="measurement-note">output = thinking + final code. Lines of code show the page size the model chose, not the cost of equivalent work.</p></section>')
+    if ep['youtube']:
+        video = urlparse(ep['youtube'])
+        video_id = video.path.strip('/') if video.hostname == 'youtu.be' else (parse_qs(video.query).get('v') or [video.path.split('/')[-1]])[0]
+        if re.fullmatch(r'[A-Za-z0-9_-]{11}', video_id):
+            body.append(f'<section class="episode-video"><h2>Watch the experiment.</h2><iframe src="https://www.youtube-nocookie.com/embed/{video_id}" title="{text(title)}" loading="lazy" allow="fullscreen; picture-in-picture" allowfullscreen></iframe></section>')
+        body.append(f'<a class="button" href="{text(ep["youtube"])}">Watch episode ↗</a>')
+    body.append(f'''<section id="materials" class="episode-materials glass"><div id="task-prompt"><p class="eyebrow">REPRODUCE THE EXPERIMENT</p><h2>One prompt. All the evidence.</h2><p class="study-note">Compare runs within the same model. Inspect the shared prompt, settings and raw measurements in the repository.</p><a class="button" href="{repo}">Prompt &amp; test materials on GitHub ↗</a></div></section>''')
     return '\n'.join(body)
 
 
 def study_for(ep):
-    # Preserved full cohort; the publisher feed contains representative artifacts only.
-    path = ROOT / 'data/studies' / f'{ep["slug"]}.json'
-    if not path.is_file():
+    runs = ep['measurements']
+    models = {r['model'] for r in runs}
+    if len(models) != 1:
         return None
-    study = json.loads(path.read_text())
-    for variant, cohort in study['cohorts'].items():
-        if cohort['n'] != len(cohort['runs']) or cohort['n'] < 3:
-            raise ValueError(f'{ep["slug"]}: incomplete study cohort')
-        for run in cohort['runs']:
-            for key in ['seconds', 'output_tokens', 'tok_s', 'effects']:
-                if type(run.get(key)) not in (int, float) or not math.isfinite(run[key]) or run[key] < 0:
-                    raise ValueError(f'{ep["slug"]}: invalid study measurement')
-        representative = next((r for r in cohort['runs'] if r['id'] == cohort['representative']), None)
-        supplied = [r for r in ep['runs'] if r['wariant'] == variant]
-        if representative is None or not supplied:
-            raise ValueError(f'{ep["slug"]}: missing study representative')
-        fields = [('sekundy', 'seconds'), ('tokeny', 'output_tokens'), ('linie', 'lines_of_code'), ('efekty', 'effects')]
-        if not any(all(r.get(a) == representative[b] for a, b in fields) for r in supplied):
-            raise ValueError(f'{ep["slug"]}: feed representatives differ from preserved study; update study data')
-    return study
+    cohorts = defaultdict(lambda: {'runs': []})
+    for r in runs:
+        cohorts[r['wariant']]['runs'].append({
+            'id': r['bieg'], 'seconds': r.get('sekundy'), 'output_tokens': r.get('tokeny'),
+            'tok_s': r.get('tok_s'), 'effects': r.get('efekty'),
+            'thinking': r.get('myslenie_pct'), 'lines': r.get('linie'),
+        })
+    return {'model': next(iter(models)), 'cohorts': dict(cohorts)}
 
 
 def duration(value):
@@ -200,7 +271,7 @@ def duration(value):
     return f'{seconds // 60} min {seconds % 60:02} s'
 
 
-def home_comparison(ep, study, ident):
+def home_comparison(ep, study, ident, detailed=False):
     if study:
         cohorts = study['cohorts']
         model = study['model']
@@ -208,17 +279,20 @@ def home_comparison(ep, study, ident):
         fields = ['seconds', 'output_tokens', 'tok_s', 'effects']
     else:
         groups = defaultdict(list)
-        models = {r['model'] for r in ep['runs']}
+        models = {r['model'] for r in ep['measurements']}
         if len(models) != 1:
             return '<p class="ep-subtitle">See the episode for comparisons within each model.</p>'
         model = next(iter(models))
-        for run in ep['runs']:
+        for run in ep['measurements']:
             groups[run['wariant']].append(run)
         fields = ['sekundy', 'tokeny', 'tok_s', 'efekty']
     if set(groups) != {'bare', 'karpathy'} or any(len(g) < 3 for g in groups.values()):
         return '<p class="ep-subtitle">Published examples; repeated ranges not measured yet in the supplied data.</p>'
     panels, buttons = [], []
-    for i, (key, label, field) in enumerate(zip(['time', 'tokens', 'throughput', 'effects'], ['Time', 'output tokens', 'tok/s', 'Effects'], fields)):
+    metrics = list(zip(['time', 'tokens', 'throughput', 'effects'], ['Time', 'output tokens', 'tok/s', 'Effects'], fields))
+    if detailed:
+        metrics = [metrics[-1]] + metrics[:-1] + [('thinking', 'thinking', 'thinking'), ('lines', 'lines of code', 'lines')]
+    for i, (key, label, field) in enumerate(metrics):
         if any(r.get(field) is None for group in groups.values() for r in group):
             continue
         ranges = {v: (min(r[field] for r in g), max(r[field] for r in g)) for v, g in groups.items()}
@@ -231,7 +305,7 @@ def home_comparison(ep, study, ident):
             elif key == 'throughput':
                 value = f'{lo:.2f}–{hi:.2f} tok/s'
             else:
-                value = f'{number(lo)}–{number(hi)}'
+                value = f'{number(lo)}–{number(hi)}' + ('%' if key == 'thinking' else '')
             rows.append(f'<div class="compare-row"><span class="compare-label">{variant.upper()}</span><div class="bar-track" aria-hidden="true"><div class="bar-fill {variant}-bar" style="width:{hi/maximum*100:.4f}%"></div></div><strong class="compare-value">{value}</strong></div>')
         overlap = max(lo for lo, hi in ranges.values()) <= min(hi for lo, hi in ranges.values())
         summary = f'On {model}: ranges overlap; no demonstrated difference.' if overlap else f'On {model}: ranges do not overlap.'
@@ -241,6 +315,10 @@ def home_comparison(ep, study, ident):
             reduction = round((1 - karpathy_mean / bare_mean) * 100)
             summary = f'On {model}: {reduction}% fewer counted effects on average; every Karpathy run below every bare run.'
         caveat = 'CSS/JS CONSTRUCTS, NOT VISUAL QUALITY' if key == 'effects' else 'OPEN-ENDED TASK / NOT EQUIVALENT-WORK COST'
+        if key == 'thinking':
+            caveat = 'output = thinking + final code'
+        elif key == 'lines':
+            caveat = 'PAGE SIZE CHOSEN BY THE MODEL, NOT COST'
         selected = not panels
         panels.append(f'<div data-metric-panel="{key}" id="{ident}-{key}"{ "" if selected else " hidden" }><div class="compare-rows">'+''.join(rows)+f'</div><div class="compare-footer"><p class="compare-summary">{text(summary)}</p><span>{caveat}</span></div></div>')
         buttons.append(f'<button type="button" data-metric="{key}" aria-controls="{ident}-{key}" aria-pressed="{str(selected).lower()}">{label}</button>')
@@ -257,15 +335,10 @@ def home_cards(episodes, feed):
         day, date_label = episode_date(ep, feed['generated'])
         slug = ep['slug']
         models = ', '.join(dict.fromkeys(r['model'] for r in ep['runs']))
-        title = f'What do rules change on {study["model"]}?' if study else ep['title'].split(' | ')[0]
+        title = ep['title'].split(' | ')[0]
         video = f'<a class="soon" href="{text(ep["youtube"])}">Watch episode ↗</a>' if ep['youtube'] else '<span class="soon"><span class="dot"></span>Video coming soon</span>'
         header = f'<article class="ep glass reveal" data-episode="{slug}"><div class="ep-h"><div><div class="ep-meta"><span class="chip">{text(slug.split("-")[0].upper())} / EXPERIMENT</span><time datetime="{day}">{date_label}: {day}</time><span>TASK: {text(ep["task"].upper())}</span></div><h3><a href="/episodes/{slug}/">{text(title)}</a></h3><p class="ep-subtitle">{text(models)} <span>/</span> Published model outputs</p></div><div class="episode-links">{video}<a class="button" href="/episodes/{slug}/">Test materials ↗</a></div></div>'
-        representatives = []
-        # The feed owns the public artifacts and their card measurements.
-        for variant in dict.fromkeys(r['wariant'] for r in ep['runs']):
-            candidates = [r for r in ep['runs'] if r['wariant'] == variant]
-            candidates.sort(key=lambda r: r.get('sekundy') or 0)
-            representatives.append(candidates[len(candidates)//2])
+        representatives = ep['runs'] if len({r['model'] for r in ep['runs']}) == 1 else []
         previews = []
         for r in representatives[:2]:
             variant = r['wariant']
@@ -273,9 +346,6 @@ def home_cards(episodes, feed):
             description = {'bare':'NO RULES, NO EXTRAS','karpathy':'ONE RULES FILE'}.get(variant,'PUBLISHED OUTPUT')
             previews.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}"><img src="/{text(r['zrzut'])}" alt="{text(r['model'])} {text(variant)} live output" loading="lazy"></a><div class="body"><div class="name"><b class="v-{color}">{text(variant.upper())}</b><span class="tag">{description}</span></div><div class="kv"><div><b>{duration(r.get('sekundy'))}</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{number(r.get('myslenie_pct'))}{'%' if r.get('myslenie_pct') is not None else ''}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div></div><div class="foot"><a href="/{text(r['strona'])}">Open live demo ↗</a><a href="/{text(r['zrzut'])}">Screenshot</a><a href="/{text(r['metrics'])}">metrics.json</a><a href="/episodes/{slug}/#task-prompt">Prompt</a></div></div></div>''')
         notes = '<p class="ep-subtitle">Representative outputs only · output = thinking + final code.<br>Lines of code show the page size the model chose, not the cost of equivalent work. Effects count code constructs, not visual quality.</p>'
-        if study:
-            context = study['series_context']
-            notes += f'<p class="ep-subtitle"><a href="/data/studies/{slug}.json">Full cohort data ↗</a> · On {context["overlapping_count"]} of {context["model_count"]} other local models, effects ranges overlap (n=3; {context["as_of"]}).</p>'
         result.append(header+home_comparison(ep,study,'home-'+slug)+'<div class="runs">'+''.join(previews)+'</div>'+notes+'</article>')
     return '\n'.join(result) or '<p class="ep-subtitle">No episodes published yet.</p>'
 
@@ -291,10 +361,10 @@ def build(check=False):
     telemetry = f'<a class="telemetry telemetry-run glass" href="/episodes/{latest["slug"]+"/" if latest else ""}"><span class="tiny-label">LATEST EXPERIMENT <span>↗</span></span><strong>{model_label}</strong><small><span class="violet-dot"></span>{text(variants)}</small></a>'
     outputs = {'index.html': template('home.html', cards=home_cards(episodes[:3], feed), telemetry=telemetry, episode_count=f'{len(episodes):02}', prompt_link=f'/episodes/{latest["slug"]}/#task-prompt' if latest else '/episodes/')}
     listing = '<section><div class="section-head"><div><p class="eyebrow">THE EXPERIMENTS / ALL EPISODES</p><h1 class="page-title">The evidence.<br><span>One experiment at a time.</span></h1></div></div><p class="study-note">Newest run dates first. Each episode includes its published measurements, prompts and model outputs.</p><div class="episode-list">'+cards(episodes, feed)+'</div></section>'
-    outputs['episodes/index.html'] = template('page.html', title='All episodes | PC Magik Lab', description='Published experiments, prompts and model outputs.', path='/episodes/', body=listing)
+    outputs['episodes/index.html'] = template('page.html', title='All episodes | PC Magik Lab', description='Published experiments, prompts and model outputs.', path='/episodes/', body=listing, episode_count=f'{len(episodes):02}')
     for ep in episodes:
         path = f'/episodes/{ep["slug"]}/'
-        outputs[path.strip('/')+'/index.html'] = template('page.html', title=text(ep['title']), description=text(ep['opis']), path=path, body=episode_body(ep, feed))
+        outputs[path.strip('/')+'/index.html'] = template('page.html', title=text(ep['title']), description=text(ep['opis']), path=path, body=episode_body(ep, feed), episode_count=f'{len(episodes):02}')
     outputs['assets/homepage-benchmarks.json'] = json.dumps(feed, ensure_ascii=False, indent=2, allow_nan=False)+'\n'
     # Complete validation and rendering before touching any published file.
     for filename in outputs:
@@ -336,7 +406,7 @@ def build(check=False):
                     else:
                         target.write_bytes(content)
                 raise
-    print(f'PASS feed build: {len(episodes)} episodes, {sum(len(ep["runs"]) for ep in episodes)} published outputs; HTML and snapshot {"verified" if check else "rebuilt"}')
+    print(f'PASS feed build: {len(episodes)} episodes, {sum(len(ep["measurements"]) for ep in episodes)} measurements, {sum(len(ep["runs"]) for ep in episodes)} published outputs; HTML and snapshot {"verified" if check else "rebuilt"}')
 
 
 if __name__ == '__main__':

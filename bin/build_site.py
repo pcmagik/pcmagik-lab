@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 import sys
 import tempfile
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 ROOT = Path(__file__).resolve().parents[1]
 NUMBERS = ['sekundy', 'tokeny', 'tokeny_myslenia', 'myslenie_pct', 'tok_s', 'linie', 'efekty']
@@ -92,6 +92,9 @@ def load():
                 raise ValueError(f'{slug}: model_przeladowany must be boolean or null')
             for key in ARTIFACTS:
                 artifact(run.get(key), slug)
+            for key in ['strona', 'zrzut']:
+                if run.get(key):
+                    artifact(run[key], slug)
             validate_evidence(run, slug)
         if not isinstance(episode.get('cohorts'), list) or not episode['cohorts']:
             raise ValueError(f'{slug}: declared cohorts are required')
@@ -162,37 +165,60 @@ def cards(episodes, feed):
     return '\n'.join(result) or '<p class="study-note">No episodes published yet.</p>'
 
 
+def episode_result(runs):
+    """Conclude only from complete, repeated, non-overlapping effect ranges."""
+    groups = {v: [r.get('efekty') for r in runs if r['wariant'] == v] for v in ['bare', 'karpathy']}
+    if any(len(g) < 3 or any(x is None for x in g) for g in groups.values()):
+        return '<strong class="result-number">not measured yet</strong><span>Repeated effect comparison</span>'
+    bare, karpathy = groups['bare'], groups['karpathy']
+    if max(karpathy) < min(bare):
+        reduction = round((1 - (sum(karpathy)/len(karpathy)) / (sum(bare)/len(bare))) * 100)
+        return f'<strong class="result-number">−{reduction}%</strong><span>fewer counted effects</span><p class="result-repeat">{len(karpathy)} / {len(karpathy)} Karpathy runs below every bare run · mean reduction</p>'
+    if min(karpathy) > max(bare):
+        return '<strong class="result-number result-words">More effects</strong><span>Every Karpathy run above every bare run</span>'
+    return '<strong class="result-number result-words">Ranges overlap</strong><span>No demonstrated difference in counted effects</span>'
+
+
 def episode_body(ep, feed):
     slug = ep['slug']
-    video = f'<a class="button primary" href="{text(ep["youtube"])}">Watch episode ↗</a>' if ep['youtube'] else '<span class="soon">Video link not published yet</span>'
+    title = ep['title'].removesuffix(' | PC Magik Lab')
+    repo = f'https://github.com/pcmagik/pcmagik-lab/tree/main/episodes/{slug}'
     body = [f'''<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Lab</a><span>/</span><a href="/episodes/">Episodes</a></nav>
-<section><div class="section-head"><div><p class="eyebrow">THE EXPERIMENT</p><h1 class="page-title">{text(ep['title'])}</h1></div></div><p class="episode-thesis">{text(ep['opis'])}</p><div class="material-links">{video}<a class="button" href="#materials">Test materials ↓</a></div><p class="study-note">{text(feed.get('note', ''))}</p>''']
+<section class="episode-intro"><p class="eyebrow">THE EXPERIMENT / {text(ep['task'].upper())}</p><h1 class="page-title">{text(title)}</h1></section>''']
     grouped = defaultdict(list)
-    for i, run in enumerate(ep['measurements']):
-        grouped[run['model']].append((i, run))
-    prompts, rows = [], []
-    for group_id, (model, indexed) in enumerate(grouped.items()):
-        body.append(f'<article class="ep glass"><div class="ep-h"><h2 class="model-heading">{text(model)}</h2></div>')
-        group_ep = dict(ep, measurements=[r for _, r in indexed])
-        body.append(home_comparison(group_ep, study_for(group_ep), f'comparison-{group_id}'))
-        body.append('<div class="runs">')
-        for i, r in indexed:
-            variant = r['wariant']
+    for run in ep['measurements']:
+        grouped[run['model']].append(run)
+    for group_id, (model, runs) in enumerate(grouped.items()):
+        body.append(f'<section class="episode-results" aria-label="{text(model)} results"><div class="result-hero glass"><div><p class="eyebrow">{text(model)}</p>{episode_result(runs)}<p class="measurement-note">Effects count CSS/JS constructs, not visual quality.</p></div><a class="button" href="#runs-{group_id}">Explore all {len(runs)} runs ↓</a></div>')
+        group_ep = dict(ep, measurements=runs)
+        body.append(home_comparison(group_ep, study_for(group_ep), f'comparison-{group_id}', detailed=True))
+        previews = [r for r in ep['runs'] if r['model'] == model]
+        if previews:
+            body.append('<div class="output-previews runs">')
+            for r in previews:
+                color = r['wariant'] if r['wariant'] in ['bare', 'karpathy'] else 'other'
+                body.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}"><img src="/{text(r['zrzut'])}" alt="{text(model)} / {text(r['wariant'])} live output" loading="lazy"></a><div class="body"><div class="name"><b class="v-{color}">{text(r['wariant'].upper())}</b><span class="tag">Published output</span></div><div class="foot"><a href="/{text(r['strona'])}">Explore live output ↗</a><a href="/{text(r['zrzut'])}">Screenshot ↗</a></div></div></div>''')
+            body.append('</div>')
+        body.append(f'<div id="runs-{group_id}" class="section-head"><h2>Every run. Every result.</h2></div><div class="cohort-grid">')
+        variants = dict.fromkeys(r['wariant'] for r in runs)
+        for variant in variants:
             color = variant if variant in ['bare', 'karpathy'] else 'other'
-            explanation = {'bare':'NO RULES, NO EXTRAS', 'karpathy':'ONE RULES FILE'}.get(variant, '')
-            reload = {True:'Yes', False:'No', None:'not measured yet'}[r.get('model_przeladowany')]
-            prompts.append(f'<details id="prompt-{i}" class="material-details glass"><summary>{text(model)} / {text(variant)} — {text(r["bieg"])} — prompt</summary><div class="details-body"><pre class="prompt-text">{text(artifact(r["prompt"], slug).read_text())}</pre><a class="button" href="/{text(r["prompt"])}" download>Download prompt ↓</a></div></details>')
-            cells = ''.join(f'<td>{number(r.get(key))}</td>' for key in ['sekundy','tokeny','tokeny_myslenia','tok_s','linie','efekty'])
-            rows.append(f'<tr><th scope="row"><a href="/{text(r["metrics"])}">{text(r["bieg"])}</a></th><td>{text(model)}</td><td>{text(variant)}</td>{cells}</tr>')
-            if r not in ep['runs']:
-                continue
-            body.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}" aria-label="Open {text(model)} {text(variant)} live output"><img src="/{text(r['zrzut'])}" alt="{text(model)} / {text(variant)} published output" loading="lazy"></a><div class="body"><div class="name"><div><b class="v-{color}">{text(variant.upper())}</b><small class="variant-description">{explanation}</small></div><span class="tag">Published output</span></div>
-<p class="run-id">{text(r['bieg'])}</p><div class="kv"><div><b>{number(r.get('sekundy'))} s</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{number(r.get('myslenie_pct'))}{'%' if r.get('myslenie_pct') is not None else ''}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div></div>
-<p class="measurement-note">output = thinking + final code</p><p class="measurement-note">Lines of code show the page size the model chose, not the cost of equivalent work.</p><p class="measurement-note">Effects: {number(r.get('efekty'))} · tok/s: {number(r.get('tok_s'))}</p><p class="measurement-note">Requested effort: {text(r.get('effort_zadany') or 'not measured yet')} · received effort: {text(r.get('effort_otrzymany') or 'not measured yet')} · model reloaded: {reload}</p>
-<div class="foot"><a href="/{text(r['strona'])}">Open live output ↗</a><a href="/{text(r['zrzut'])}">Screenshot</a><a href="/{text(r['metrics'])}">metrics.json</a><a href="#prompt-{i}">Read prompt</a></div></div></div>''')
-        body.append('</div></article>')
-    body.append('</section><section id="materials"><div class="section-head"><h2>Check the measurements.</h2></div><div class="material-links"><a class="button" href="/assets/homepage-benchmarks.json" download>Download published data ↓</a><a class="button" href="#task-prompt">Read the test prompts ↓</a></div>')
-    body.append('<details id="measurements" class="material-details glass"><summary>All published run measurements</summary><div class="details-body"><p>All measurements in this episode’s registered cohorts are shown here. Live pages are selected representatives. Output tokens include thinking and final code. Effects do not rate appearance.</p><div class="measurement-table-wrap" tabindex="0" role="region" aria-label="Run measurements; scroll horizontally"><table><thead><tr><th>Run</th><th>Model</th><th>Variant</th><th>Time (s)</th><th>output tokens</th><th>thinking tokens</th><th>tok/s</th><th>lines of code</th><th>Effects</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div></div></details><div id="task-prompt">'+''.join(prompts)+'</div></section>')
+            description = {'bare': 'NO RULES, NO EXTRAS', 'karpathy': 'ONE RULES FILE'}.get(variant, '')
+            cohort = [r for r in runs if r['wariant'] == variant]
+            body.append(f'<div class="cohort"><div class="cohort-heading"><h3 class="v-{color}">{text(variant.upper())}</h3><span>{text(description)} · n={len(cohort)}</span></div>')
+            for i, r in enumerate(cohort, 1):
+                metrics = ''.join(f'<div><strong>{number(r.get(key))}{suffix if r.get(key) is not None else ""}</strong><span>{label}</span></div>' for key, label, suffix in [('sekundy','time',' s'),('tokeny','output tokens',''),('myslenie_pct','thinking','%'),('tok_s','tok/s',''),('linie','lines of code','')])
+                links = ''.join(f'<a href="/{text(r[key])}">{label} ↗</a>' for key,label in [('strona','Live output'),('zrzut','Screenshot')] if r.get(key))
+                body.append(f'''<article class="run-result glass" data-run="{text(r['bieg'])}"><div class="run-result-head"><h4>Run {i:02}</h4><div class="run-effects v-{color}"><strong>{number(r.get('efekty'))}</strong><span>effects</span></div></div><div class="run-metrics">{metrics}</div><p class="run-id">{text(r['bieg'])}</p>{f'<div class="foot">{links}</div>' if links else ''}</article>''')
+            body.append('</div>')
+        body.append('</div><p class="measurement-note">output = thinking + final code. Lines of code show the page size the model chose, not the cost of equivalent work.</p></section>')
+    if ep['youtube']:
+        video = urlparse(ep['youtube'])
+        video_id = video.path.strip('/') if video.hostname == 'youtu.be' else (parse_qs(video.query).get('v') or [video.path.split('/')[-1]])[0]
+        if re.fullmatch(r'[A-Za-z0-9_-]{11}', video_id):
+            body.append(f'<section class="episode-video"><h2>Watch the experiment.</h2><iframe src="https://www.youtube-nocookie.com/embed/{video_id}" title="{text(title)}" loading="lazy" allow="fullscreen; picture-in-picture" allowfullscreen></iframe></section>')
+        body.append(f'<a class="button" href="{text(ep["youtube"])}">Watch episode ↗</a>')
+    body.append(f'''<section id="materials" class="episode-materials glass"><div id="task-prompt"><p class="eyebrow">REPRODUCE THE EXPERIMENT</p><h2>One prompt. All the evidence.</h2><p class="study-note">Compare runs within the same model. Inspect the shared prompt, settings and raw measurements in the repository.</p><a class="button" href="{repo}">Prompt &amp; test materials on GitHub ↗</a></div></section>''')
     return '\n'.join(body)
 
 
@@ -206,6 +232,7 @@ def study_for(ep):
         cohorts[r['wariant']]['runs'].append({
             'id': r['bieg'], 'seconds': r.get('sekundy'), 'output_tokens': r.get('tokeny'),
             'tok_s': r.get('tok_s'), 'effects': r.get('efekty'),
+            'thinking': r.get('myslenie_pct'), 'lines': r.get('linie'),
         })
     return {'model': next(iter(models)), 'cohorts': dict(cohorts)}
 
@@ -217,7 +244,7 @@ def duration(value):
     return f'{seconds // 60} min {seconds % 60:02} s'
 
 
-def home_comparison(ep, study, ident):
+def home_comparison(ep, study, ident, detailed=False):
     if study:
         cohorts = study['cohorts']
         model = study['model']
@@ -235,7 +262,10 @@ def home_comparison(ep, study, ident):
     if set(groups) != {'bare', 'karpathy'} or any(len(g) < 3 for g in groups.values()):
         return '<p class="ep-subtitle">Published examples; repeated ranges not measured yet in the supplied data.</p>'
     panels, buttons = [], []
-    for i, (key, label, field) in enumerate(zip(['time', 'tokens', 'throughput', 'effects'], ['Time', 'output tokens', 'tok/s', 'Effects'], fields)):
+    metrics = list(zip(['time', 'tokens', 'throughput', 'effects'], ['Time', 'output tokens', 'tok/s', 'Effects'], fields))
+    if detailed:
+        metrics = [metrics[-1]] + metrics[:-1] + [('thinking', 'thinking', 'thinking'), ('lines', 'lines of code', 'lines')]
+    for i, (key, label, field) in enumerate(metrics):
         if any(r.get(field) is None for group in groups.values() for r in group):
             continue
         ranges = {v: (min(r[field] for r in g), max(r[field] for r in g)) for v, g in groups.items()}
@@ -248,7 +278,7 @@ def home_comparison(ep, study, ident):
             elif key == 'throughput':
                 value = f'{lo:.2f}–{hi:.2f} tok/s'
             else:
-                value = f'{number(lo)}–{number(hi)}'
+                value = f'{number(lo)}–{number(hi)}' + ('%' if key == 'thinking' else '')
             rows.append(f'<div class="compare-row"><span class="compare-label">{variant.upper()}</span><div class="bar-track" aria-hidden="true"><div class="bar-fill {variant}-bar" style="width:{hi/maximum*100:.4f}%"></div></div><strong class="compare-value">{value}</strong></div>')
         overlap = max(lo for lo, hi in ranges.values()) <= min(hi for lo, hi in ranges.values())
         summary = f'On {model}: ranges overlap; no demonstrated difference.' if overlap else f'On {model}: ranges do not overlap.'
@@ -258,6 +288,10 @@ def home_comparison(ep, study, ident):
             reduction = round((1 - karpathy_mean / bare_mean) * 100)
             summary = f'On {model}: {reduction}% fewer counted effects on average; every Karpathy run below every bare run.'
         caveat = 'CSS/JS CONSTRUCTS, NOT VISUAL QUALITY' if key == 'effects' else 'OPEN-ENDED TASK / NOT EQUIVALENT-WORK COST'
+        if key == 'thinking':
+            caveat = 'output = thinking + final code'
+        elif key == 'lines':
+            caveat = 'PAGE SIZE CHOSEN BY THE MODEL, NOT COST'
         selected = not panels
         panels.append(f'<div data-metric-panel="{key}" id="{ident}-{key}"{ "" if selected else " hidden" }><div class="compare-rows">'+''.join(rows)+f'</div><div class="compare-footer"><p class="compare-summary">{text(summary)}</p><span>{caveat}</span></div></div>')
         buttons.append(f'<button type="button" data-metric="{key}" aria-controls="{ident}-{key}" aria-pressed="{str(selected).lower()}">{label}</button>')

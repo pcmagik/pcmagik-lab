@@ -14,8 +14,7 @@ async page => {
       const panel=page.locator('[data-metric-panel="effects"]');
       if (!(await panel.isVisible()) || !(await panel.innerText()).includes('22%')) throw Error('Effects panel failed');
       if (route !== '/') {
-        await page.locator('#measurements summary').click();
-        if (await page.locator('#measurements tbody tr').count()!==10) throw Error('Full cohort not rendered');
+        if (await page.locator('[data-run]').count()!==10) throw Error('Full cohort not rendered');
       }
       const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
       if (overflow) throw Error('Horizontal page overflow '+width+' '+route);

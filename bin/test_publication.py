@@ -102,13 +102,56 @@ class PublicationTest(unittest.TestCase):
             self.assertIn('karpathy: n=3',html)
             self.assertIn('110–112',html)
             self.assertIn('113–115',html)
-            self.assertEqual(html.count('class="shot"'),2)
+            if path == 'index.html':
+                self.assertEqual(html.count('class="shot"'),2)
         for run in ep['measurements']:
-            self.assertIn(run['metrics'],(self.root/'episodes/first/index.html').read_text())
+            self.assertIn(run['bieg'],(self.root/'episodes/first/index.html').read_text())
         before = self.generated()
         ep['runs'][0]['tokeny'] = 999
         self.assertNotEqual(self.publish().returncode,0)
         self.assertEqual(before,self.generated())
+
+    def test_episode_prioritizes_results_and_links_every_available_output(self):
+        ep = self.episode('results', 10)
+        ep['title'] = 'Measured question | PC Magik Lab'
+        ep['measurements'], ep['runs'] = [], []
+        for day, variant, effects in [(10,'bare',100),(11,'bare',110),(12,'bare',120),(13,'karpathy',80),(14,'karpathy',85),(15,'karpathy',90)]:
+            run = self.episode('results', day)['runs'][0]
+            run.update(wariant=variant, efekty=effects)
+            self.evidence(run)
+            ep['measurements'].append(run)
+            if day in [11,14]:
+                ep['runs'].append(run)
+        self.feed['episodes'] = [ep]
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        html = (self.root/'episodes/results/index.html').read_text()
+        self.assertIn('<h1 class="page-title">Measured question</h1>', html)
+        self.assertIn('23%', html)
+        self.assertIn('3 / 3', html)
+        self.assertNotIn('material-details', html)
+        self.assertNotIn('Video link not published yet', html)
+        self.assertNotIn('metrics.json</a>', html)
+        self.assertIn('github.com/pcmagik/pcmagik-lab/tree/main/episodes/results', html)
+        self.assertEqual(html.count('data-run='), 6)
+        for run in ep['measurements']:
+            self.assertIn('href="/'+run['strona']+'"', html)
+            self.assertIn('href="/'+run['zrzut']+'"', html)
+        ep['youtube'] = 'https://youtu.be/abcdefghijk'
+        self.assertEqual(self.publish().returncode, 0)
+        html = (self.root/'episodes/results/index.html').read_text()
+        self.assertIn('https://www.youtube-nocookie.com/embed/abcdefghijk', html)
+        # Overlap invalidates the headline even if the means still differ.
+        ep['measurements'][-1]['efekty'] = 105
+        self.evidence(ep['measurements'][-1])
+        self.assertEqual(self.publish().returncode, 0)
+        html = (self.root/'episodes/results/index.html').read_text()
+        self.assertNotIn('fewer counted effects</span>', html)
+        self.assertIn('Ranges overlap', html)
+        before = self.generated()
+        ep['measurements'][0]['strona'] = 'episodes/results/missing/index.html'
+        self.assertNotEqual(self.publish().returncode, 0)
+        self.assertEqual(before, self.generated())
 
     def generated(self):
         return {str(p.relative_to(self.root)):p.read_bytes() for p in self.root.rglob('*')

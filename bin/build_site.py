@@ -26,8 +26,21 @@ def number(value):
 
 
 def template(name, **values):
-    source = (ROOT / 'bin/templates' / name).read_text()
-    return re.sub(r'\{\{(\w+)\}\}', lambda m: values[m[1]], source)
+    def render(filename, context):
+        source = (ROOT / 'bin/templates' / filename).read_text()
+        return re.sub(r'\{\{(\w+)\}\}', lambda m: context[m[1]], source)
+    home = name == 'home.html'
+    content = render(name, values)
+    context = dict(values, body=content, asset_prefix='' if home else '/',
+                   home_url='./' if home else '/', nav_prefix='' if home else '/',
+                   extra_styles='' if home else '  <link rel="stylesheet" href="/assets/interior.css">\n')
+    if home:
+        context.update(title='PC Magik Lab — Intelligence, under the microscope.',
+                       og_title='PC Magik Lab — AI benchmarks, measured across repeated runs',
+                       description='Independent AI experiments on real hardware. Inspect published model outputs, prompts and measurements.', path='/')
+    else:
+        context['og_title'] = context['title']
+    return render('layout.html', context)
 
 
 def artifact(path, slug):
@@ -179,12 +192,25 @@ def episode_result(runs):
     return '<strong class="result-number result-words">Ranges overlap</strong><span>No demonstrated difference in counted effects</span>'
 
 
+def episode_heading(title):
+    """Break at the title's clause boundary; keep short closing phrases together."""
+    if ': ' not in title:
+        return text(title)
+    subject, detail = title.split(': ', 1)
+    phrases = ', '.join(f'<span class="title-phrase">{text(part)}</span>' for part in detail.split(', '))
+    words = subject.split(' ')
+    subject_html = text(subject) + ':'
+    if len(words) > 2:
+        subject_html = text(' '.join(words[:-2])) + ' ' + f'<span class="title-phrase">{text(" ".join(words[-2:]))}:</span>'
+    return f'{subject_html}<br>{phrases}'
+
+
 def episode_body(ep, feed):
     slug = ep['slug']
     title = ep['title'].removesuffix(' | PC Magik Lab')
     repo = f'https://github.com/pcmagik/pcmagik-lab/tree/main/episodes/{slug}'
     body = [f'''<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Lab</a><span>/</span><a href="/episodes/">Episodes</a></nav>
-<section class="episode-intro"><p class="eyebrow">THE EXPERIMENT / {text(ep['task'].upper())}</p><h1 class="page-title">{text(title)}</h1></section>''']
+<section class="episode-intro"><p class="eyebrow">THE EXPERIMENT / {text(ep['task'].upper())}</p><h1 class="page-title">{episode_heading(title)}</h1></section>''']
     grouped = defaultdict(list)
     for run in ep['measurements']:
         grouped[run['model']].append(run)
@@ -334,10 +360,10 @@ def build(check=False):
     telemetry = f'<a class="telemetry telemetry-run glass" href="/episodes/{latest["slug"]+"/" if latest else ""}"><span class="tiny-label">LATEST EXPERIMENT <span>↗</span></span><strong>{model_label}</strong><small><span class="violet-dot"></span>{text(variants)}</small></a>'
     outputs = {'index.html': template('home.html', cards=home_cards(episodes[:3], feed), telemetry=telemetry, episode_count=f'{len(episodes):02}', prompt_link=f'/episodes/{latest["slug"]}/#task-prompt' if latest else '/episodes/')}
     listing = '<section><div class="section-head"><div><p class="eyebrow">THE EXPERIMENTS / ALL EPISODES</p><h1 class="page-title">The evidence.<br><span>One experiment at a time.</span></h1></div></div><p class="study-note">Newest run dates first. Each episode includes its published measurements, prompts and model outputs.</p><div class="episode-list">'+cards(episodes, feed)+'</div></section>'
-    outputs['episodes/index.html'] = template('page.html', title='All episodes | PC Magik Lab', description='Published experiments, prompts and model outputs.', path='/episodes/', body=listing)
+    outputs['episodes/index.html'] = template('page.html', title='All episodes | PC Magik Lab', description='Published experiments, prompts and model outputs.', path='/episodes/', body=listing, episode_count=f'{len(episodes):02}')
     for ep in episodes:
         path = f'/episodes/{ep["slug"]}/'
-        outputs[path.strip('/')+'/index.html'] = template('page.html', title=text(ep['title']), description=text(ep['opis']), path=path, body=episode_body(ep, feed))
+        outputs[path.strip('/')+'/index.html'] = template('page.html', title=text(ep['title']), description=text(ep['opis']), path=path, body=episode_body(ep, feed), episode_count=f'{len(episodes):02}')
     outputs['assets/homepage-benchmarks.json'] = json.dumps(feed, ensure_ascii=False, indent=2, allow_nan=False)+'\n'
     # Complete validation and rendering before touching any published file.
     for filename in outputs:

@@ -1,5 +1,6 @@
 """Integration tests of the public post-publication hook, isolated inside .tmp."""
 import json
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -152,6 +153,25 @@ class PublicationTest(unittest.TestCase):
         ep['measurements'][0]['strona'] = 'episodes/results/missing/index.html'
         self.assertNotEqual(self.publish().returncode, 0)
         self.assertEqual(before, self.generated())
+
+    def test_pages_share_home_navigation_footer_and_assets(self):
+        ep = self.episode('shared', 19)
+        ep['title'] = 'Measured question: what you gain, what you lose | PC Magik Lab'
+        self.feed['episodes'] = [ep]
+        self.assertEqual(self.publish().returncode, 0)
+        home = (self.root/'index.html').read_text()
+        header = re.search(r'<header>.*?</header>', home, re.S)[0]
+        footer = re.search(r'<footer>.*?</footer>', home, re.S)[0]
+        expected_header = header.replace('href="./"', 'href="/"').replace('src="assets/', 'src="/assets/').replace('href="#', 'href="/#')
+        for name in ['episodes/index.html', 'episodes/shared/index.html']:
+            page = (self.root/name).read_text()
+            self.assertEqual(re.search(r'<header>.*?</header>', page, re.S)[0], expected_header)
+            self.assertEqual(re.search(r'<footer>.*?</footer>', page, re.S)[0], footer)
+            self.assertIn('src="/assets/lab.js"', page)
+            self.assertIn('href="/assets/lab.css"', page)
+        episode = (self.root/'episodes/shared/index.html').read_text()
+        self.assertIn('Measured question:<br>', episode)
+        self.assertIn('<span class="title-phrase">what you lose</span>', episode)
 
     def generated(self):
         return {str(p.relative_to(self.root)):p.read_bytes() for p in self.root.rglob('*')

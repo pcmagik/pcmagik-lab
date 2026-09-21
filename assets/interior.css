@@ -53,9 +53,6 @@ thead { background: #ffffff06; }thead th { font-size: var(--minimum-text); font-
 .other-bar { background: var(--violet); }
 .measurement-table-wrap th:first-child { overflow-wrap: anywhere; min-width: 160px; max-width: 280px; }
 
-@media (max-width: 480px) {
-  :root { --minimum-text: 12px; }
-}
 
 .interior section > .ep + .ep { margin-top: 24px; }
 .material-links { margin-top: 24px; }
@@ -108,3 +105,10 @@ thead { background: #ffffff06; }thead th { font-size: var(--minimum-text); font-
 }
 .output-previews { margin-top: 26px; }
 .output-previews .foot a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* Fixed result panels keep episode summaries aligned without clipping content. */
+.result-hero { height: 340px; }
+.title-phrase { display: inline-block; }
+@media (max-width: 600px) {
+  .result-hero { height: 390px; justify-content: space-between; }
+}

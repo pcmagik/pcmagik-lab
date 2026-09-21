@@ -68,7 +68,7 @@ h1 em, .closing em { font-style: normal; background: linear-gradient(95deg, #91f
 .scene.is-ready #neural-canvas { opacity: 1; }
 .scene-fallback { overflow: hidden; position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
 .scene-fallback span { font: 60px "Segoe UI", sans-serif; color: #a5ffeb; text-shadow: 0 0 22px #85ffe8; }
-.fallback-knot { position: absolute; width: 220px; height: 270px; border: 24px solid #76ffe170; border-radius: 45% 60% 48% 60%; transform: rotate(-36deg); box-shadow: inset 0 0 35px #77ffe588, 0 0 35px #b495ff66; }
+.fallback-knot { position: absolute; width: 220px; height: 270px; border: 1px solid #a5ffe580; border-radius: 28px; transform: rotate(-13deg) skewY(-5deg); background: linear-gradient(130deg, #a5ffe519, #a78bfa15); box-shadow: 16px 10px 0 -1px #162a30, 16px 10px 0 0 #a5ffe550, 32px 20px 0 -1px #182433, 32px 20px 0 0 #b495ff60, 0 0 35px #77ffe525; }
 .scene.is-ready .scene-fallback { visibility: hidden; }
 .scene-label { position: absolute; top: 25px; right: 65px; color: #acb2c8; font-size: var(--minimum-text); display: flex; align-items: center; gap: 10px; }
 .scene-label > span:last-child { color: #777f99; }
@@ -324,4 +324,32 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
 
 @media (max-width: 480px) {
   :root { --minimum-text: 12px; }
+}
+
+/* The replacement occupies only the existing scene, underneath its telemetry. */
+.model-flow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.has-model-flow #neural-canvas { display: none; }
+.mf-space { position: absolute; inset: 0; perspective: 900px; perspective-origin: 47% 43%; }
+.mf-stack { position: absolute; left: 46%; top: 45%; width: 0; height: 0; transform-style: preserve-3d; }
+.mf-plate { position: absolute; width: 190px; height: 255px; left: -95px; top: -127px; border: 1px solid #a5ffe566; border-radius: 29px; transform-style: preserve-3d; background: linear-gradient(140deg, #c8fff82e, #75dfcb08 25%, #030f1399 49%, #8062bd30 90%, #c4a8ff55); box-shadow: inset 2px 2px 2px #d7fff53d, inset -2px -2px 4px #ad8cff4d, 0 0 28px #67ffda0a; }
+.mf-plate::before { content: ''; position: absolute; inset: 11px; border: 1px solid #b0ffe019; border-radius: 20px; background: repeating-linear-gradient(90deg, transparent 0 17px, #a8ffe516 18px, transparent 19px), repeating-linear-gradient(0deg, transparent 0 17px, #a8ffe514 18px, transparent 19px); mask-image: linear-gradient(150deg, #000, transparent 90%); }
+.mf-plate::after { content: ''; position: absolute; left: -2px; top: 18%; height: 55%; width: 3px; background: #b7ffe9; border-radius: 100%; box-shadow: 0 0 12px #7bffe0, 0 0 35px #7bffe099; }
+.mf-plate:nth-child(even)::after { left: auto; right: -2px; background: #c6abff; box-shadow: 0 0 14px #a78bfa, 0 0 35px #a78bfa88; }
+.mf-scan { position: absolute; inset: 18px; border-radius: 20px; background: linear-gradient(0deg, transparent 30%, #b9ffed44 48%, #e5fffdbb 50%, #b9ffed22 52%, transparent 70%); mix-blend-mode: screen; }
+.mf-label { position: absolute; bottom: 18px; left: 20px; color: #b9d4ce; font: 16px ui-monospace, monospace; letter-spacing: 2px; }
+.mf-beam { position: absolute; left: 5%; right: 4%; top: 49%; height: 1px; transform: rotate(11deg); background: linear-gradient(90deg, transparent, #9affe361, #dcfff599, #ac8cff66, transparent); box-shadow: 0 0 18px 2px #89ffe126; }
+.mf-binary, .mf-word { position: absolute; left: 0; top: 0; white-space: nowrap; will-change: transform, opacity; font: 14px/1.4 ui-monospace, monospace; border-radius: 7px; }
+.mf-binary { padding: 6px 8px; color: #bbffe7; border: 1px solid #a8ffe32b; background: linear-gradient(130deg, #aaffdf12, #102a26c9); box-shadow: inset 0 1px #d4ffee18; }
+.mf-word { padding: 8px 11px; color: #e5d7ff; border: 1px solid #bba0ff66; background: linear-gradient(130deg, #bca0ff26, #211a32ed); box-shadow: inset 0 1px #e4d6ff33, 0 10px 25px #0006, 0 0 17px #bba0ff0d; }
+@media (max-width: 1100px) {
+  .mf-plate { width: 160px; height: 225px; left: -80px; top: -112px; }
+  .mf-binary, .mf-word { font-size: 13px; }
+  .mf-word { padding: 7px 9px; }
+}
+@media (max-width: 600px) {
+  .mf-plate { width: 126px; height: 185px; left: -63px; top: -92px; border-radius: 24px; }
+  .mf-plate::before { inset: 8px; border-radius: 17px; }
+  .mf-binary { padding: 5px; }
+  .mf-word { padding: 6px 7px; }
+  .mf-label { font-size: 15px; bottom: 15px; left: 15px; }
 }

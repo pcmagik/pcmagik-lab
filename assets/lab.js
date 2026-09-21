@@ -140,9 +140,9 @@
   window.addEventListener('resize', updateProgress);
   updateProgress();
 
-  // Lazy loading keeps the benchmark controls usable if WebGL or Three.js fails.
-  if (document.querySelector('.scene')) import('./neural-scene.js').then(({ createNeuralScene }) => {
-    sceneController = createNeuralScene(document.querySelector('.scene'), motionEnabled);
+  // Keep the decorative flow independent from benchmark controls.
+  if (document.querySelector('.scene')) import('./model-flow.js').then(({ createModelFlow }) => {
+    sceneController = createModelFlow(document.querySelector('.scene'), motionEnabled);
     if (sceneController) motionListeners.add(sceneController.setMotion);
   }).catch(() => {
     // The CSS sculpture remains visible when the optional renderer is unavailable.

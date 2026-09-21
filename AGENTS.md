@@ -84,6 +84,8 @@ Opisy wariantów: `NO RULES, NO EXTRAS` i `ONE RULES FILE`.
 
 ## Wygląd
 
+Aktualna decyzja operatora: `.claude/DECISIONS.md`, **D1**.
+
 - **Ciemny motyw jest domyślny.** Beż, krem, écru i ciepłe palety papierowe są zakazane wprost.
   Jasny wariant, jeśli powstanie, buduj na chłodnej bieli z niebieskim podkładem.
 - Kierunek: Awwwards, szkło, neon. Wzorzec: `tokenchaser.net`, własny kierunek w repo pomiarowym

@@ -186,7 +186,7 @@ def episode_body(ep, feed):
             rows.append(f'<tr><th scope="row"><a href="/{text(r["metrics"])}">{text(r["bieg"])}</a></th><td>{text(model)}</td><td>{text(variant)}</td>{cells}</tr>')
             if r not in ep['runs']:
                 continue
-            body.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['zrzut'])}" aria-label="View {text(model)} {text(variant)} screenshot"><img src="/{text(r['zrzut'])}" alt="{text(model)} / {text(variant)} published output" loading="lazy"></a><div class="body"><div class="name"><div><b class="v-{color}">{text(variant.upper())}</b><small class="variant-description">{explanation}</small></div><span class="tag">Published output</span></div>
+            body.append(f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}" aria-label="Open {text(model)} {text(variant)} live output"><img src="/{text(r['zrzut'])}" alt="{text(model)} / {text(variant)} published output" loading="lazy"></a><div class="body"><div class="name"><div><b class="v-{color}">{text(variant.upper())}</b><small class="variant-description">{explanation}</small></div><span class="tag">Published output</span></div>
 <p class="run-id">{text(r['bieg'])}</p><div class="kv"><div><b>{number(r.get('sekundy'))} s</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{number(r.get('myslenie_pct'))}{'%' if r.get('myslenie_pct') is not None else ''}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div></div>
 <p class="measurement-note">output = thinking + final code</p><p class="measurement-note">Lines of code show the page size the model chose, not the cost of equivalent work.</p><p class="measurement-note">Effects: {number(r.get('efekty'))} · tok/s: {number(r.get('tok_s'))}</p><p class="measurement-note">Requested effort: {text(r.get('effort_zadany') or 'not measured yet')} · received effort: {text(r.get('effort_otrzymany') or 'not measured yet')} · model reloaded: {reload}</p>
 <div class="foot"><a href="/{text(r['strona'])}">Open live output ↗</a><a href="/{text(r['zrzut'])}">Screenshot</a><a href="/{text(r['metrics'])}">metrics.json</a><a href="#prompt-{i}">Read prompt</a></div></div></div>''')
@@ -249,7 +249,7 @@ def home_comparison(ep, study, ident):
                 value = f'{lo:.2f}–{hi:.2f} tok/s'
             else:
                 value = f'{number(lo)}–{number(hi)}'
-            rows.append(f'<div class="compare-row"><span class="compare-label">{variant.upper()}</span><div class="bar-track" aria-hidden="true"><div class="bar-fill {variant}-bar" style="left:{lo/maximum*100:.4f}%;width:{(hi-lo)/maximum*100:.4f}%"></div></div><strong class="compare-value">{value}</strong></div>')
+            rows.append(f'<div class="compare-row"><span class="compare-label">{variant.upper()}</span><div class="bar-track" aria-hidden="true"><div class="bar-fill {variant}-bar" style="width:{hi/maximum*100:.4f}%"></div></div><strong class="compare-value">{value}</strong></div>')
         overlap = max(lo for lo, hi in ranges.values()) <= min(hi for lo, hi in ranges.values())
         summary = f'On {model}: ranges overlap; no demonstrated difference.' if overlap else f'On {model}: ranges do not overlap.'
         if key == 'effects' and ranges['karpathy'][1] < ranges['bare'][0]:

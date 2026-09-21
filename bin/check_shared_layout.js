@@ -43,17 +43,15 @@ async page => {
         if(overflow)failures.push('Card overflow '+route);
         if(card.y+card.height>(width===390?844:1080))failures.push('Card below first screen '+route);
       }
-      if(route.includes('01-karpathy')) {
-        if(await page.locator('h1').evaluate(e=>e.scrollWidth>e.clientWidth)) failures.push('Title overflow '+width);
-        const title=page.locator('h1');
-        if(await title.locator('br').count()!==1)failures.push('Missing explicit title break');
-        // The final two words must stay on the same rendered line.
-        const lines=await title.evaluate(e=>{
-          const walker=document.createTreeWalker(e,NodeFilter.SHOW_TEXT),rects=[]; let n;
-          while(n=walker.nextNode())for(const m of n.textContent.matchAll(/\S+/g)){const r=document.createRange();r.setStart(n,m.index);r.setEnd(n,m.index+m[0].length);rects.push({word:m[0],y:r.getBoundingClientRect().y});}
-          return rects.slice(-2);
-        });
-        if(lines.length!==2||Math.abs(lines[0].y-lines[1].y)>1)failures.push('Orphan title ending '+width);
+      if(route.includes('/episodes/0')) {
+        const heading=page.locator('h1');
+        if(await heading.evaluate(e=>e.scrollWidth>e.clientWidth))failures.push('Title overflow '+width);
+        const model=await heading.locator('.episode-model').boundingBox();
+        const question=await heading.locator('.episode-question').boundingBox();
+        if(question.y<model.y+model.height)failures.push('Heading rows overlap');
+        if(await heading.locator('.episode-question').innerText()!=='BARE vs KARPATHY')failures.push('Inconsistent comparison title');
+        const expected=route.includes('01-karpathy')?'Qwen3.8 27B':'Qwen3.6 27B';
+        if(await heading.locator('.episode-model').innerText()!==expected)failures.push('Model title mismatch');
       }
       const name=route==='/'?'home':route==='/episodes/'?'list':route.split('/')[2];
       await page.screenshot({path:'.screenshots/shared-layout-'+name+'-'+width+'.png',fullPage:true});

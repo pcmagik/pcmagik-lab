@@ -84,3 +84,9 @@ Słowa operatora: „ta karta powinna być taka sama, jeśli chodzi o wielkość
 - `playwright-cli -s=publication --raw run-code --filename=bin/check_shared_layout.js` → **PASS**: główna, lista, odcinki 01/02 przy 1920 i 390. Porównanie obliczonych stylów wszystkich elementów navbaru i stopki oraz stylów body, kontrola wymiarów kart, linków menu, zasobów, menu mobilnego, przepełnienia i łamania tytułu. Dodatkowo pauza/wznowienie animacji na podstronach przy standardowych ustawieniach ruchu. Przed poprawką ten sam scenariusz odtworzył różne wysokości kart, navbar/stopkę i samotne słowo w tytule.
 - Zrzuty pełnostronicowe: `.screenshots/shared-layout-{home,list,01-karpathy-vs-bare,02-qwen3.6-27b}-{1920,390}.png` — osiem plików.
 - Podglądy 8765/8766 odświeżone. Bez merge, wdrożenia i edycji repo pomiarowego. Ograniczenia eksportera z poprzedniej rundy pozostają aktualne.
+
+### Ujednolicenie tytułów — dalsza uwaga operatora
+
+Na polecenie operatora zastąpiono długie nagłówki stałym układem: nazwa modelu w pierwszym wierszu, nazwy porównywanych wariantów w drugim (`BARE vs KARPATHY`). Usunięto dodatkowe hasła i etykietę nad tytułem. Zastępuje to poprzednie rozwiązanie z łamaniem długiego tytułu po dwukropku. Nazwy modeli są pobierane z istniejących tytułów feedu (dla dwóch dotychczasowych formatów); dla innych formatów używane są identyfikatory modeli z pomiarów. Nie zmieniono źródła, feedu ani strony głównej.
+
+Dowody: hook publikacji PASS; 16 testów Python OK; `check_shared_layout.js` PASS dla czterech stron przy 1920/390 px, z kontrolą dwóch wierszy nagłówka odcinków 01 i 02. Zaktualizowano cztery zrzuty `.screenshots/shared-layout-0*`. Podglądy 8765/8766 odświeżone.

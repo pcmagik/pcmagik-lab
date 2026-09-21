@@ -127,7 +127,8 @@ class PublicationTest(unittest.TestCase):
         result = self.publish()
         self.assertEqual(result.returncode, 0, result.stderr)
         html = (self.root/'episodes/results/index.html').read_text()
-        self.assertIn('<h1 class="page-title">Measured question</h1>', html)
+        self.assertIn('<span class="episode-question">BARE vs KARPATHY</span>', html)
+        self.assertIn('<span class="episode-model">test/model</span>', html)
         self.assertIn('23%', html)
         self.assertIn('3 / 3', html)
         self.assertNotIn('material-details', html)
@@ -170,8 +171,24 @@ class PublicationTest(unittest.TestCase):
             self.assertIn('src="/assets/lab.js"', page)
             self.assertIn('href="/assets/lab.css"', page)
         episode = (self.root/'episodes/shared/index.html').read_text()
-        self.assertIn('Measured question:<br>', episode)
-        self.assertIn('<span class="title-phrase">what you lose</span>', episode)
+        self.assertIn('<span class="episode-model">test/model</span>', episode)
+        self.assertIn('<span class="episode-question">Measured question: what you gain, what you lose</span>', episode)
+
+    def test_legacy_episode_titles_share_model_comparison_heading(self):
+        for title, model in [('Karpathy skills on Qwen3.8 27B: what you gain, what you lose', 'Qwen3.8 27B'), ('Qwen3.6 27B with and without Karpathy rules', 'Qwen3.6 27B')]:
+            ep = self.episode('normalized', 19)
+            ep['title'] = title + ' | PC Magik Lab'
+            other = self.episode('normalized', 20)['runs'][0]
+            other['wariant'] = 'karpathy'
+            self.evidence(other)
+            ep['measurements'].append(other)
+            self.feed['episodes'] = [ep]
+            self.assertEqual(self.publish().returncode, 0)
+            page = (self.root/'episodes/normalized/index.html').read_text()
+            heading = re.search(r'<h1.*?</h1>', page)[0]
+            self.assertIn(f'<span class="episode-model">{model}</span>', heading)
+            self.assertIn('<span class="episode-question">BARE vs KARPATHY</span>', heading)
+            self.assertNotIn('what you', heading)
 
     def generated(self):
         return {str(p.relative_to(self.root)):p.read_bytes() for p in self.root.rglob('*')

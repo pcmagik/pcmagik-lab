@@ -192,17 +192,18 @@ def episode_result(runs):
     return '<strong class="result-number result-words">Ranges overlap</strong><span>No demonstrated difference in counted effects</span>'
 
 
-def episode_heading(title):
-    """Break at the title's clause boundary; keep short closing phrases together."""
-    if ': ' not in title:
-        return text(title)
-    subject, detail = title.split(': ', 1)
-    phrases = ', '.join(f'<span class="title-phrase">{text(part)}</span>' for part in detail.split(', '))
-    words = subject.split(' ')
-    subject_html = text(subject) + ':'
-    if len(words) > 2:
-        subject_html = text(' '.join(words[:-2])) + ' ' + f'<span class="title-phrase">{text(" ".join(words[-2:]))}:</span>'
-    return f'{subject_html}<br>{phrases}'
+def episode_heading(ep):
+    """Present model and comparison consistently, using only published metadata."""
+    title = ep['title'].removesuffix(' | PC Magik Lab')
+    models = list(dict.fromkeys(r['model'] for r in ep['measurements']))
+    variants = list(dict.fromkeys(r['wariant'] for r in ep['measurements']))
+    model = ' / '.join(models)
+    if len(models) == 1:
+        match = re.fullmatch(r'Karpathy skills on (.+?): .+|(.+) with and without Karpathy rules', title)
+        if match:
+            model = match[1] or match[2]
+    comparison = ' vs '.join(v.upper() for v in variants) if len(variants) > 1 else title
+    return f'<span class="episode-model">{text(model)}</span><span class="episode-question">{text(comparison)}</span>'
 
 
 def episode_body(ep, feed):
@@ -210,7 +211,7 @@ def episode_body(ep, feed):
     title = ep['title'].removesuffix(' | PC Magik Lab')
     repo = f'https://github.com/pcmagik/pcmagik-lab/tree/main/episodes/{slug}'
     body = [f'''<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Lab</a><span>/</span><a href="/episodes/">Episodes</a></nav>
-<section class="episode-intro"><p class="eyebrow">THE EXPERIMENT / {text(ep['task'].upper())}</p><h1 class="page-title">{episode_heading(title)}</h1></section>''']
+<section class="episode-intro"><h1 class="page-title">{episode_heading(ep)}</h1></section>''']
     grouped = defaultdict(list)
     for run in ep['measurements']:
         grouped[run['model']].append(run)

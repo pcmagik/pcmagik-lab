@@ -108,7 +108,8 @@ thead { background: #ffffff06; }thead th { font-size: var(--minimum-text); font-
 
 /* Fixed result panels keep episode summaries aligned without clipping content. */
 .result-hero { height: 340px; }
-.title-phrase { display: inline-block; }
+.episode-intro .episode-model { display: block; color: inherit; }
+.episode-intro .episode-question { display: block; font-size: clamp(20px, 2vw, 28px); letter-spacing: -.02em; margin-top: 12px; }
 @media (max-width: 600px) {
   .result-hero { height: 390px; justify-content: space-between; }
 }

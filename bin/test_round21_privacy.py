@@ -63,11 +63,11 @@ Last updated: 27 September 2026.
 
 Who runs this site. lab.pcmagik.pl is run by PC Magik Mateusz Piekut, Elizy Orzeszkowej 12b, 05-660 Warka, Poland, NIP 797-197-26-95. Contact: {CONTACT_EMAIL}. We are the data controller for this site.
 
-No accounts, no forms, no cookies. This site has no sign-up, no contact form and sets no cookies. The only thing it stores in your browser is your choice of the “Pause motion” button (localStorage key lab-motion-paused), and only after you press it. It never leaves your browser.
+No accounts, no forms, no tracking cookies. This site has no sign-up and no contact form, and it sets no advertising or analytics cookies. Two things may be stored in your browser. Cloudflare, which delivers the site, sets a security cookie, cf_clearance, to protect the site from bots; it is strictly necessary and is not used to track you. The site itself stores only your choice of the “Pause motion” button (localStorage key lab-motion-paused), and only after you press it; it never leaves your browser.
 
 Visitor statistics — Cloudflare Web Analytics. To know how many people visit and which pages they read, we use Cloudflare Web Analytics. Its script does not use cookies or local storage and does not fingerprint visitors. It sends Cloudflare: the page address, the referring page, browser and operating system type, device type, country, and page load timings. We see only aggregated counts. Cloudflare keeps unsampled data for 7 days and then aggregates it. Legal basis: our legitimate interest in knowing whether the site is read (Art. 6(1)(f) GDPR). Provider: Cloudflare, Inc. (privacy policy: https://www.cloudflare.com/privacypolicy/).
 
-Hosting and delivery. The site is hosted on GitHub Pages (GitHub, Inc.) and delivered through Cloudflare. As with any website, their servers receive your IP address and request details to deliver the pages and protect them from abuse. Legal basis: Art. 6(1)(f) GDPR.
+Hosting and delivery. The site is hosted on GitHub Pages (GitHub, Inc.) and delivered through Cloudflare. As with any website, their servers receive your IP address and request details to deliver the pages and protect them from abuse. To tell people from bots, Cloudflare runs a short check script in your browser and keeps the result in the cf_clearance cookie. The cookie is strictly necessary for security, so it does not require consent. Legal basis: Art. 6(1)(f) GDPR.
 
 Embedded videos. Episode pages embed our YouTube videos in privacy-enhanced mode (youtube-nocookie.com). When the page loads, your browser connects to YouTube (Google) to show the player. YouTube may store data in your browser once you play the video. Google privacy policy: https://policies.google.com/privacy.
 

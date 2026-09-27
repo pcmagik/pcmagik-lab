@@ -15,6 +15,7 @@ from urllib.parse import urlparse, parse_qs
 ROOT = Path(__file__).resolve().parents[1]
 NUMBERS = ['sekundy', 'tokeny', 'tokeny_myslenia', 'myslenie_pct', 'tok_s', 'linie', 'efekty']
 ARTIFACTS = ['metrics', 'prompt']
+CLOUDFLARE_ANALYTICS_TOKEN = '07bc67564faa42ceb381c751c2b66861'
 
 
 def text(value):
@@ -35,7 +36,7 @@ def template(name, **values):
         content = content.replace('<a href="/episodes/">Read the task ↗</a> or open', 'Open')
     path = values.get("path", "/")
     episodes_current = ' aria-current="page"' if path == "/episodes/" else ' aria-current="true"' if path.startswith("/episodes/") else ""
-    context = dict(values, body=content, asset_prefix='' if home else '/',
+    context = dict(values, body=content, analytics_token=CLOUDFLARE_ANALYTICS_TOKEN, asset_prefix='' if home else '/',
                    home_url='./' if home else '/', episodes_current=episodes_current,
                    benchmarks_url='#episodes' if home else '/#episodes',
                    episodes_counter=f' <sup>{values["episode_count"]}</sup>' if values['episode_count'] != '00' else '',
@@ -729,6 +730,7 @@ def build(check=False):
         listing = listing[:listing.index('<p class="study-note">')] + f'<p class="ep-subtitle">{EMPTY_FEED}</p><a class="text-link" href="https://www.youtube.com/@PCMagikLab">Watch the experiments on YouTube ↗</a></section>'
     outputs['404.html'] = template('page.html', title='Page not found | PC Magik Lab', description='Return to the lab or browse published episodes.', path='/404.html', body='<section><h1 class="page-title">Page not found</h1><div class="actions not-found-actions"><a class="button" href="/">Return to the lab</a><a class="button" href="/episodes/">Browse episodes</a></div></section>', episode_count=f'{len(episodes):02}')
     outputs['episodes/index.html'] = template('page.html', title='All episodes | PC Magik Lab', description='Published experiments, prompts and model outputs.', path='/episodes/', body=listing, episode_count=f'{len(episodes):02}')
+    outputs['privacy/index.html'] = template('privacy.html', title='Privacy policy | PC Magik Lab', description='Privacy policy for lab.pcmagik.pl.', path='/privacy/', episode_count=f'{len(episodes):02}')
     for ep in episodes:
         path = f'/episodes/{ep["slug"]}/'
         outputs[path.strip('/')+'/index.html'] = template('page.html', title=text(ep['title']), description=text(ep['opis']), path=path, body=episode_body(ep, feed), episode_count=f'{len(episodes):02}')

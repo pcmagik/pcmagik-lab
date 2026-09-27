@@ -73,7 +73,11 @@ class Round3Test(unittest.TestCase):
 
     def test_B14_hero_language(self):
         for path in [*ROOT.glob('assets/*.js'), *ROOT.glob('bin/templates/*')]:
-            self.assertNotRegex(path.read_text(), '[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]', str(path))
+            content = path.read_text()
+            if path.name == 'privacy.html':
+                # The approved English policy retains the authority's Polish name.
+                content = content.replace('Prezes Urzędu Ochrony Danych Osobowych', '')
+            self.assertNotRegex(content, '[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]', str(path))
 
     def test_B15_no_generated_fake_link(self):
         css = (ROOT/'assets/lab.css').read_text()

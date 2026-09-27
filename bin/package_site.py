@@ -8,7 +8,7 @@ from build_site import ROOT, build, load
 def package(destination):
     build(check=True)
     feed = load()
-    files = {'404.html', 'index.html', 'episodes/index.html', 'CNAME', '.nojekyll', 'data/episodes.json', 'README.md', 'LICENSE'}
+    files = {'404.html', 'index.html', 'episodes/index.html', 'privacy/index.html', 'CNAME', '.nojekyll', 'data/episodes.json', 'README.md', 'LICENSE'}
     files.update(str(p.relative_to(ROOT)) for p in (ROOT/'assets').rglob('*') if p.is_file())
     files.update(str(p.relative_to(ROOT)) for p in (ROOT/'tasks').glob('*.txt'))
     for ep in feed['episodes']:

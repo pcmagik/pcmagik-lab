@@ -151,3 +151,9 @@
 
 .not-found-actions { margin-top: 24px; gap: 24px; }
 @media (hover: none) { .hover-instruction { display: none; } }
+
+/* Readable policy copy within the shared interior shell. */
+.privacy-policy { max-width: 800px; }
+.privacy-policy p { margin-top: 24px; font-size: 16px; line-height: 1.8; color: var(--muted); overflow-wrap: anywhere; }
+.privacy-policy strong { color: var(--text); }
+.privacy-policy a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }

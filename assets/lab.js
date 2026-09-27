@@ -1,4 +1,11 @@
 (() => {
+  // Keep contact details readable without JavaScript; enable mail links locally.
+  document.querySelectorAll('a[data-email]').forEach(link => {
+    const address = [link.dataset.user, link.dataset.domain].join('@');
+    link.href = `mailto:${address}`;
+    link.textContent = address;
+  });
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const motionButton = document.querySelector('.motion-toggle');

@@ -1,0 +1,299 @@
+"""Integration tests of the build CLI, isolated inside .tmp; hook tested separately."""
+import json
+import re
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+
+class PublicationTest(unittest.TestCase):
+    def setUp(self):
+        (ROOT / '.tmp').mkdir(exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(dir=ROOT / '.tmp')
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        shutil.copytree(ROOT / 'bin', self.root / 'bin', ignore=shutil.ignore_patterns('test_*.py', '__pycache__'))
+        self.feed = {'schema_version':2,'generated':'2026-09-20','source':'fixture','note':'Effects count code, not visual quality.', 'episodes':[]}
+        (self.root / 'data').mkdir()
+
+    def episode(self, slug, day):
+        name=f'2026-09-{day:02}_test_bare'
+        prefix=f'episodes/{slug}/{name}'
+        run={'bieg':name,'model':'test/model','wariant':'bare','harness':'pi','sekundy':12.5,'tokeny':321,'tokeny_myslenia':21,'myslenie_pct':6.54,'tok_s':25.68,'linie':42,'efekty':7,'effort_zadany':'medium','effort_otrzymany':None,'model_przeladowany':True}
+        for key, filename in [('strona','index.html'),('zrzut','screenshot.png'),('metrics','metrics.json'),('prompt','prompt.txt')]:
+            run[key]=prefix+'/'+filename
+            file=self.root/run[key];file.parent.mkdir(parents=True,exist_ok=True);file.write_text('Test artifact')
+        self.evidence(run)
+        return {'measurements':[run], 'slug':slug,'title':'Test <episode> '+slug,'task':'easy','youtube':'','opis':'Measured test description.', 'runs':[run]}
+
+    def evidence(self, run):
+        raw = {'model':run['model'], 'variant':run['wariant'], 'harness':run['harness'],
+               'seconds':run['sekundy'], 'usage':{'completion_tokens':run['tokeny'],
+               'completion_tokens_details':{'reasoning_tokens':run['tokeny_myslenia']}},
+               'tokens_per_second':run['tok_s'], 'html_lines':run['linie'],
+               'effort':run['effort_zadany'], 'effort_otrzymany':run['effort_otrzymany'],
+               'model_reloaded':run['model_przeladowany']}
+        (self.root/run['metrics']).write_text(json.dumps(raw))
+        run['efekty_plik'] = str(Path(run['metrics']).with_name('efekty.json'))
+        (self.root/run['efekty_plik']).write_text(json.dumps({'razem':run['efekty']}))
+        run['myslenie_pct'] = round(run['tokeny_myslenia']/run['tokeny']*100,2) if run['tokeny'] and run['tokeny_myslenia'] is not None else None
+
+    def publish(self):
+        for ep in self.feed['episodes']:
+            if 'cohorts' not in ep:
+                groups = {}
+                for run in ep['measurements']:
+                    key = (run['model'],run['wariant'])
+                    groups[key] = groups.get(key,0)+1
+                ep['cohorts'] = [{'model':m,'wariant':v,'n':n} for (m,v),n in groups.items()]
+        (self.root/'data/episodes.json').write_text(json.dumps(self.feed))
+        result = subprocess.run(['python3', str(self.root/'bin/build_site.py')], cwd=self.root/'data', capture_output=True, text=True)
+        if result.returncode:
+            return result
+        return subprocess.run(['python3', str(self.root/'bin/build_site.py'), '--check'], cwd=self.root/'data', capture_output=True, text=True)
+
+    def test_new_episode_and_feed_update(self):
+        self.feed['episodes']=[self.episode('new-episode',19)]
+        result=self.publish()
+        self.assertEqual(result.returncode,0,result.stderr)
+        output=self.root/'episodes/new-episode/index.html'
+        self.assertIn('321',output.read_text())
+        self.assertIn('Test &lt;episode&gt;',output.read_text())
+        self.feed['episodes'][0]['runs'][0]['tokeny']=987
+        self.evidence(self.feed['episodes'][0]['runs'][0])
+        self.assertEqual(self.publish().returncode,0)
+        self.assertIn('987',output.read_text())
+        data=json.loads((self.root/'assets/homepage-benchmarks.json').read_text())
+        self.assertEqual(data['episodes'][0]['runs'][0]['tokeny'],987)
+
+    def test_order_limit_video_and_idempotence(self):
+        self.feed['episodes']=[self.episode(f'episode-{day}',day) for day in [12,19,10,15]]
+        self.feed['episodes'][1]['youtube']='https://www.youtube.com/watch?v=abc123'
+        result=self.publish()
+        self.assertEqual(result.returncode,0,result.stderr)
+        home=(self.root/'index.html').read_text()
+        listing=(self.root/'episodes/index.html').read_text()
+        self.assertEqual(home.count('data-episode='),3)
+        self.assertEqual(listing.count('data-episode='),4)
+        self.assertNotIn('href="/episodes/episode-10/"',home)
+        self.assertLess(home.index('Test &lt;episode&gt; episode-19'),home.index('Test &lt;episode&gt; episode-15'))
+        self.assertIn('https://www.youtube.com/watch?v=abc123',(self.root/'episodes/episode-19/index.html').read_text())
+        before=self.generated()
+        self.assertEqual(self.publish().returncode,0)
+        self.assertEqual(before,self.generated())
+
+    def test_full_cohort_is_exported_only_on_episode(self):
+        ep = self.episode('first', 10)
+        ep['measurements'] = []
+        ep['runs'] = []
+        for day, variant in [(10,'bare'),(11,'bare'),(12,'bare'),(13,'karpathy'),(14,'karpathy'),(15,'karpathy')]:
+            run = self.episode('first',day)['runs'][0]
+            run['wariant'] = variant
+            run['tokeny'] = 100 + day
+            self.evidence(run)
+            ep['measurements'].append(run)
+            if day in [11,14]:
+                ep['runs'].append(run)
+        self.feed['episodes'] = [ep]
+        result = self.publish()
+        self.assertEqual(result.returncode,0,result.stderr)
+        for path in ['episodes/first/index.html']:
+            html = (self.root/path).read_text()
+            self.assertIn('bare: n=3',html)
+            self.assertIn('karpathy: n=3',html)
+            self.assertIn('110–112',html)
+            self.assertIn('113–115',html)
+        home = (self.root/'index.html').read_text()
+        self.assertNotIn('110–112', home)
+        self.assertNotIn('113–115', home)
+        self.assertNotIn('class="shot"', home)
+        for run in ep['measurements']:
+            self.assertIn(run['bieg'],(self.root/'episodes/first/index.html').read_text())
+        before = self.generated()
+        ep['runs'][0]['tokeny'] = 999
+        self.assertNotEqual(self.publish().returncode,0)
+        self.assertEqual(before,self.generated())
+
+    def test_episode_prioritizes_results_and_links_every_available_output(self):
+        ep = self.episode('results', 10)
+        ep['title'] = 'Measured question | PC Magik Lab'
+        ep['measurements'], ep['runs'] = [], []
+        for day, variant, effects in [(10,'bare',100),(11,'bare',110),(12,'bare',120),(13,'karpathy',80),(14,'karpathy',85),(15,'karpathy',90)]:
+            run = self.episode('results', day)['runs'][0]
+            run.update(wariant=variant, efekty=effects)
+            self.evidence(run)
+            ep['measurements'].append(run)
+            if day in [11,14]:
+                ep['runs'].append(run)
+        self.feed['episodes'] = [ep]
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        html = (self.root/'episodes/results/index.html').read_text()
+        self.assertIn('<h1 class="page-title">Measured question | PC Magik Lab</h1>', html)
+        self.assertIn('<p class="episode-subject">test/model</p>', html)
+        self.assertIn('23%', html)
+        self.assertIn('3 / 3', html)
+        self.assertNotIn('material-details', html)
+        self.assertNotIn('Video link not published yet', html)
+        self.assertEqual(html.count('metrics.json</a>'), len(ep['runs']) + len(ep['measurements']))
+        self.assertIn('github.com/pcmagik/pcmagik-lab/tree/main/episodes/results', html)
+        self.assertEqual(html.count('data-run='), 6)
+        for run in ep['measurements']:
+            self.assertIn('href="/'+run['strona']+'"', html)
+            self.assertIn('href="/'+run['zrzut']+'"', html)
+        ep['youtube'] = 'https://youtu.be/abcdefghijk'
+        self.assertEqual(self.publish().returncode, 0)
+        html = (self.root/'episodes/results/index.html').read_text()
+        self.assertIn('https://www.youtube-nocookie.com/embed/abcdefghijk', html)
+        # Overlap invalidates the headline even if the means still differ.
+        ep['measurements'][-1]['efekty'] = 105
+        self.evidence(ep['measurements'][-1])
+        self.assertEqual(self.publish().returncode, 0)
+        html = (self.root/'episodes/results/index.html').read_text()
+        self.assertNotIn('fewer counted effects</span>', html)
+        self.assertIn('Ranges overlap', html)
+        before = self.generated()
+        ep['measurements'][0]['strona'] = 'episodes/results/missing/index.html'
+        self.assertNotEqual(self.publish().returncode, 0)
+        self.assertEqual(before, self.generated())
+
+    def test_pages_share_home_navigation_footer_and_assets(self):
+        ep = self.episode('shared', 19)
+        ep['title'] = 'Measured question: what you gain, what you lose | PC Magik Lab'
+        self.feed['episodes'] = [ep]
+        self.assertEqual(self.publish().returncode, 0)
+        home = (self.root/'index.html').read_text()
+        header = re.search(r'<header>.*?</header>', home, re.S)[0]
+        footer = re.search(r'<footer>.*?</footer>', home, re.S)[0]
+        expected_header = header.replace('href="./"', 'href="/"').replace('src="assets/', 'src="/assets/').replace('href="#', 'href="/#')
+        for name in ['episodes/index.html', 'episodes/shared/index.html']:
+            page = (self.root/name).read_text()
+            self.assertEqual(re.sub(r' aria-current="[^"]*"', '', re.search(r'<header>.*?</header>', page, re.S)[0]), expected_header)
+            self.assertEqual(re.search(r'<footer>.*?</footer>', page, re.S)[0], footer)
+            self.assertIn('src="/assets/lab.js"', page)
+            self.assertIn('href="/assets/lab.css"', page)
+        episode = (self.root/'episodes/shared/index.html').read_text()
+        self.assertIn('<p class="episode-subject">test/model</p>', episode)
+        self.assertIn('<h1 class="page-title">Measured question: what you gain, what you lose | PC Magik Lab</h1>', episode)
+
+    def test_legacy_episode_titles_remain_publisher_titles(self):
+        for title, model in [('Karpathy skills on Qwen3.8 27B: what you gain, what you lose', 'Qwen3.8 27B'), ('Qwen3.6 27B with and without Karpathy rules', 'Qwen3.6 27B')]:
+            ep = self.episode('normalized', 19)
+            ep['title'] = title + ' | PC Magik Lab'
+            other = self.episode('normalized', 20)['runs'][0]
+            other['wariant'] = 'karpathy'
+            self.evidence(other)
+            ep['measurements'].append(other)
+            self.feed['episodes'] = [ep]
+            self.assertEqual(self.publish().returncode, 0)
+            page = (self.root/'episodes/normalized/index.html').read_text()
+            heading = re.search(r'<h1.*?</h1>', page)[0]
+            self.assertIn(ep['title'], heading)
+            self.assertIn('<p class="episode-subject">test/model</p>', page)
+
+    def generated(self):
+        return {str(p.relative_to(self.root)):p.read_bytes() for p in self.root.rglob('*')
+                if p.is_file() and (p.name=='homepage-benchmarks.json' or (p.name=='index.html' and 'Generated from data/episodes.json' in p.read_text()))}
+
+    def test_invalid_second_episode_preserves_previous_publication(self):
+        self.feed['episodes']=[self.episode('first',19)]
+        self.assertEqual(self.publish().returncode,0)
+        before=self.generated()
+        self.feed['episodes'][0]['title']='CHANGED BUT MUST NOT BE WRITTEN'
+        second=self.episode('second',20)
+        self.feed['episodes'].append(second)
+        bad_cases=[('sekundy',-1),('tokeny',float('nan')),('tok_s','oops'),('prompt','../../secret'),('strona','episodes/second/missing/index.html')]
+        for key,value in bad_cases:
+            with self.subTest(key=key):
+                original=second['runs'][0][key]
+                second['runs'][0][key]=value
+                result=self.publish()
+                self.assertNotEqual(result.returncode,0)
+                self.assertIn('Publication build failed',result.stderr)
+                self.assertEqual(before,self.generated())
+                second['runs'][0][key]=original
+        second['slug']='first'
+        self.assertNotEqual(self.publish().returncode,0)
+        self.assertEqual(before,self.generated())
+        second['slug']='second';second['youtube']='javascript:alert(1)'
+        self.assertNotEqual(self.publish().returncode,0)
+        self.assertEqual(before,self.generated())
+
+    def test_empty_feed_withdraws_wrappers_but_preserves_raw_outputs(self):
+        ep=self.episode('first',19)
+        self.feed['episodes']=[ep]
+        self.assertEqual(self.publish().returncode,0)
+        raw=self.root/ep['runs'][0]['strona']
+        self.feed['episodes']=[]
+        self.assertEqual(self.publish().returncode,0)
+        self.assertFalse((self.root/'episodes/first/index.html').exists())
+        self.assertEqual(raw.read_text(),'Test artifact')
+        self.assertIn('First results will arrive with the first film.',(self.root/'index.html').read_text())
+
+    def test_single_examples_do_not_claim_cohort_ranges(self):
+        ep=self.episode('first',19)
+        second=self.episode('first',20)['runs'][0]
+        second['wariant']='karpathy'
+        self.evidence(second)
+        ep['runs'].append(second)
+        ep['measurements'].append(second)
+        self.feed['episodes']=[ep]
+        self.assertEqual(self.publish().returncode,0)
+        output=(self.root/'episodes/first/index.html').read_text()
+        self.assertNotIn('data-comparison',output)
+        self.assertNotIn('22%',output)
+        self.assertIn('repeated ranges not measured yet',output)
+        ep['runs'][0]['tokeny']=None
+        self.evidence(ep['runs'][0])
+        self.assertEqual(self.publish().returncode,0)
+        self.assertIn('not measured yet',(self.root/'episodes/first/index.html').read_text())
+
+    def test_multiple_models_do_not_mix_representatives(self):
+        ep = self.episode('first',10)
+        other = self.episode('first',11)['runs'][0]
+        other['model'] = 'another/model'
+        self.evidence(other)
+        ep['runs'].append(other)
+        ep['measurements'].append(other)
+        self.feed['episodes'] = [ep]
+        result = self.publish()
+        self.assertEqual(result.returncode,0,result.stderr)
+        home = (self.root/'index.html').read_text()
+        self.assertNotIn('class="shot"',home)
+        self.assertIn('2 models',home)
+        self.assertIn('another/model',(self.root/'episodes/first/index.html').read_text())
+
+def browser_fixture():
+    case = PublicationTest()
+    case.setUp()
+    try:
+        ep = case.episode('first', 10)
+        for day, variant in [(11, 'bare'), (12, 'karpathy'), (13, 'karpathy')]:
+            run = case.episode('first', day)['runs'][0]
+            run['wariant'] = variant
+            run['tokeny'] = 100 + day
+            case.evidence(run)
+            ep['runs'].append(run)
+            ep['measurements'].append(run)
+        case.feed['episodes'] = [ep]
+        result = case.publish()
+        if result.returncode:
+            raise RuntimeError(result.stderr)
+        target = ROOT / '.tmp/browser-fixture'
+        if target.exists():
+            shutil.rmtree(target)
+        shutil.copytree(case.root, target)
+    finally:
+        case.doCleanups()
+
+
+if __name__ == '__main__':
+    import sys
+    if sys.argv[1:] == ['--browser-fixture']:
+        browser_fixture()
+    else:
+        unittest.main()
+

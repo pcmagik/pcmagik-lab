@@ -1,0 +1,7 @@
+.tmp/
+.playwright-cli/
+__pycache__/
+.claude/
+.docs/
+.screenshots/
+.mockups/

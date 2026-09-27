@@ -1,0 +1,40 @@
+{
+  "kind": "pixel",
+  "thesis": {
+    "metric": "checks",
+    "models": [
+      {
+        "model": "zai-org/glm-4.7-flash",
+        "n_bare": 3,
+        "n_karpathy": 3,
+        "bare": {
+          "min": 6,
+          "max": 18,
+          "n": 3,
+          "mean": 11.3
+        },
+        "karpathy": {
+          "min": 22,
+          "max": 23,
+          "n": 3,
+          "mean": 22.7
+        },
+        "class": "karpathy-wiecej",
+        "karpathy_ponizej_kazdego_bare": 0,
+        "karpathy_powyzej_kazdego_bare": 3,
+        "zmiana_sredniej_pct": 100.0
+      }
+    ],
+    "summary": {
+      "models": 1,
+      "karpathy-mniej": 0,
+      "nakladaja-sie": 0,
+      "karpathy-wiecej": 1,
+      "brak-danych": 0,
+      "jeden-wariant": 0
+    },
+    "total": 29,
+    "pary": [],
+    "claim": "Karpathy above every bare run (checks passed)"
+  }
+}

@@ -1,0 +1,153 @@
+/* Shared components come from lab.css; this file styles only interior content. */
+.material-details > summary { cursor: pointer; padding: 15px 18px; font-size: 14px; }
+.material-details > summary::marker { color: var(--cyan); }
+.material-details > summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+.metric-caveat, .study-note { font-size: 13px; color: var(--muted); line-height: 1.8; margin-top: 13px; }
+.study-note { margin-bottom: 22px; }
+.variant-description { display: block; color: var(--muted); font-size: var(--minimum-text); line-height: 1.7; margin-top: 4px; }
+.measurement-note { font-size: var(--minimum-text); line-height: 1.8; color: var(--muted); margin-top: 12px; }
+.archive-details, .material-details { margin-top: 16px; border-radius: 12px; }
+.details-body { padding: 4px 20px 22px; }
+.details-body > p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+.archive-links, .material-links { display: flex; flex-wrap: wrap; gap: 12px; }
+#series, #materials { margin-top: 58px; }
+.prompt-text { white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.85 ui-monospace, monospace; color: #d1dceb; padding: 20px; background: #080c1499; border: 1px solid var(--line); border-radius: 8px; }
+.footer-address { font-size: 16px; color: var(--cyan); }
+
+/* The homepage is a gateway; complete measurements live on interior pages. */
+.interior { padding-top: 35px; padding-bottom: 70px; }
+.breadcrumbs { display: flex; align-items: center; gap: 16px; margin-bottom: 36px; color: var(--muted); }
+.page-title { font-size: clamp(32px, 5vw, 64px); line-height: 1.12; letter-spacing: -.04em; margin: 0; max-width: 950px; }
+.page-title span { color: var(--muted); }
+.episode-list { display: grid; gap: 24px; }
+.episode-card { padding: clamp(24px, 4vw, 46px); border-radius: 24px; position: relative; overflow: hidden; }
+.episode-card .eyebrow { margin-top: 26px; }
+.episode-card h3 { font-size: clamp(26px, 3vw, 40px); line-height: 1.2; max-width: 850px; margin: 12px 0 20px; letter-spacing: -.03em; }
+.episode-card h3 a { gap: 24px; }
+.episode-card h3 a:hover { color: var(--cyan); }
+.episode-thesis { font-size: clamp(17px, 2vw, 21px); line-height: 1.6; max-width: 850px; }
+.episode-card .measurement-note { margin-top: 14px; }
+.research-teaser { padding: 22px 28px; border-radius: 18px; margin: 22px 0 0; font-size: 16px; line-height: 1.7; color: var(--muted); }
+.research-teaser a { color: var(--cyan); margin-left: 8px; }
+.interior > .button { margin-top: 24px; }
+@media (max-width: 600px) {
+  .interior { padding-top: 18px; }
+  .breadcrumbs { margin-bottom: 24px; }
+  .episode-card .ep-meta { flex-wrap: wrap; }
+  .episode-card h3 a { display: block; }
+  .research-teaser { padding: 20px; }
+  .research-teaser a { margin-left: 0; }
+}
+
+/* Published output pages retain the same glass cards for any model. */
+.model-heading { font-size: clamp(22px, 3vw, 36px); overflow-wrap: anywhere; }
+.run-id { font: var(--minimum-text)/1.6 ui-monospace, monospace; color: var(--muted); overflow-wrap: anywhere; margin: 14px 0; }
+.episode-card .eyebrow { overflow-wrap: anywhere; }
+.v-other { color: var(--violet); }
+.other-bar { background: var(--violet); }
+.measurement-table-wrap th:first-child { overflow-wrap: anywhere; min-width: 160px; max-width: 280px; }
+
+
+.interior section > .ep + .ep { margin-top: 24px; }
+.material-links { margin-top: 24px; }
+@media (max-width: 600px) {
+  .details-body { padding-inline: 14px; }
+  .prompt-text { padding: 12px; font-size: 12px; }
+  .material-links { flex-direction: column; align-items: stretch; }
+}
+
+/* Episode results use the accepted homepage palette and shared comparison bars. */
+.episode-intro { margin-bottom: 28px; }
+.episode-intro .page-title { font-size: clamp(27px, 3.1vw, 46px); max-width: 1100px; }
+.episode-intro .eyebrow { margin-bottom: 14px; }
+.episode-results { margin-bottom: 64px; }
+.episode-results .section-head { margin-top: 46px; margin-bottom: 24px; }
+.cohort-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.cohort { min-width: 0; }
+.cohort-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 20px; }
+.cohort-heading h3 { font-size: 20px; }
+.cohort-heading span { color: var(--muted); font: 11px ui-monospace, monospace; }
+.run-result { border-radius: 14px; padding: 22px; margin-bottom: 16px; }
+.run-result-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.run-result-head h4 { font-size: 16px; font-weight: 500; }
+.run-effects { display: flex; align-items: baseline; gap: 9px; }
+.run-effects strong { font-size: 36px; font-weight: 500; letter-spacing: -.04em; }
+.run-effects span { font: 12px ui-monospace, monospace; }
+.run-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 12px; }
+.run-metrics strong { display: block; font-size: 21px; font-weight: 500; overflow-wrap: anywhere; }
+.run-metrics span { display: block; font: 11px ui-monospace, monospace; color: var(--muted); margin-top: 5px; }
+.output-previews .run .foot, .run-result .foot { display: flex; flex-wrap: wrap; gap: 0 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+.output-previews .run .foot a, .run-result .foot a { display: inline-flex; align-items: center; min-height: 44px; margin: 0; color: var(--cyan); font-size: 13px; font-weight: 400; }
+.episode-materials { border-radius: 18px; padding: 32px; }
+.episode-materials h2 { margin-top: 12px; }
+.episode-video { margin: 48px 0 24px; }
+.episode-video iframe { display: block; width: 100%; max-width: 405px; aspect-ratio: 9/16; border: 0; margin-top: 24px; border-radius: 18px; }
+@media (max-width: 600px) {
+
+
+  .cohort-grid { grid-template-columns: 1fr; gap: 30px; }
+  .run-result { padding: 18px; }
+  .run-metrics { grid-template-columns: 1fr 1fr; }
+  .episode-materials { padding: 22px; }
+  .episode-results .section-head h2 { font-size: 25px; }
+}
+.output-previews { margin-top: 26px; }
+
+/* Keep the full settings table readable without widening the mobile page. */
+.reproduction { margin-top: 48px; min-width: 0; }
+.reproduction h2 { font-size: clamp(25px, 3vw, 36px); }
+.reproduction-model { border: 1px solid var(--line); border-radius: 14px; margin: 8px 0; overflow: hidden; }
+.reproduction-model > summary { padding: 14px 18px; min-height: 48px; cursor: pointer; font-size: 16px; overflow-wrap: anywhere; }
+.reproduction-model > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: -3px; }
+.reproduction-model.result-separated { background: rgba(167, 139, 250, .12); box-shadow: inset 3px 0 #a78bfa; }
+.reproduction-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
+.reproduction-table { width: 100%; min-width: 1100px; table-layout: fixed; border-collapse: collapse; font-size: 14px; line-height: 1.6; }
+.reproduction-table caption { text-align: left; padding: 16px; font-size: 12px; color: var(--muted); }
+.reproduction-table th, .reproduction-table td { text-align: left; vertical-align: top; padding: 16px; border-bottom: 1px solid var(--line); white-space: normal; overflow-wrap: anywhere; }
+.reproduction-table thead th { color: var(--muted); font-size: 12px; font-weight: 500; }
+.reproduction-table thead th:first-child { width: 20%; }
+.reproduction-table thead th:nth-child(4) { width: 14%; }
+.reproduction-table thead th:nth-child(6) { width: 22%; }
+.reproduction-table tbody th { font-weight: 500; }
+.reproduction-table [title] { text-decoration: underline dotted var(--muted); text-underline-offset: 4px; }
+.reproduction .actions { margin-top: 20px; }
+
+
+/* Fixed result panels keep episode summaries aligned without clipping content. */
+.episode-intro .episode-model { display: block; color: inherit; }
+.episode-intro .episode-question { display: block; font-size: clamp(20px, 2vw, 28px); letter-spacing: -.02em; margin-top: 12px; }
+@media (max-width: 600px) {
+
+}
+
+.episode-description { max-width: 1000px; font-size: 15px; line-height: 1.65; color: var(--muted); margin-top: 14px; }
+.episode-subject, .story-evidence { font-size: 12px; color: var(--muted); margin-top: 12px; overflow-wrap: anywhere; }
+.story-evidence a { color: var(--cyan); display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; }
+.cohort-grid:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }
+.model-results { padding: 22px; border-radius: 0; }
+@media (max-width: 600px) {
+  .model-results { padding: 12px; }
+}
+
+/* Every model becomes a labelled settings list on phones. */
+@media (max-width: 600px) {
+  .reproduction-table th, .reproduction-table td { overflow-wrap: normal; word-break: normal; }
+  .reproduction-table { display: block; min-width: 0; table-layout: auto; }
+  .reproduction-table caption { display: block; }
+  .reproduction-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .reproduction-table tbody,
+  .reproduction-table tr { display: block; }
+  .reproduction-table tbody :is(th, td) { display: block; padding: 12px 16px; }
+  .reproduction-table tbody :is(th, td)::before { display: block; color: var(--muted); font-size: 12px; font-weight: 500; }
+  .reproduction-table [data-field="model"]::before { content: "Model:"; }
+  .reproduction-table [data-field="quantization"]::before { content: "Quantization:"; }
+  .reproduction-table [data-field="context_window"]::before { content: "Context window:"; }
+  .reproduction-table [data-field="kv_cache"]::before { content: "K/V cache:"; }
+  .reproduction-table [data-field="max_tokens"]::before { content: "max_tokens:"; }
+  .reproduction-table [data-field="engine"]::before { content: "Engine:"; }
+  .reproduction-table [data-field="harness"]::before { content: "Harness:"; }
+  .reproduction-table [data-field="effort"]::before { content: "Effort requested:"; }
+}
+
+.not-found-actions { margin-top: 24px; gap: 24px; }
+@media (hover: none) { .hover-instruction { display: none; } }

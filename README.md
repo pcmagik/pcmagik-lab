@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 01 | [Karpathy skills on Qwen3.8 27B: what you gain, what you lose](episodes/01-karpathy-vs-bare/README.md) | easy | 10 | [YouTube](https://www.youtube.com/shorts/5xvHtb7y0zY) |
 
 ## Layout
 

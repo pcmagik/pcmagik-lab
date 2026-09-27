@@ -28,9 +28,9 @@
 <header>
   <div class="wrap header-inner glass">
     <a class="brand" href="./" aria-label="PC Magik Lab — home"><span class="brand-logo" aria-hidden="true"></span><span>PC MAGIK <span>LAB</span></span></a>
-    <nav aria-label="Main navigation"><a href="#episodes">Benchmarks</a><a href="/episodes/">Episodes</a><a href="/#method">The process</a><a href="https://github.com/pcmagik/pcmagik-lab">Repository ↗</a></nav>
+    <nav aria-label="Main navigation"><a href="#episodes">Benchmarks</a><a href="/episodes/">Episodes <sup>01</sup></a><a href="/#method">The process</a><a href="https://github.com/pcmagik/pcmagik-lab">Repository ↗</a></nav>
     <div class="header-actions"><button class="motion-toggle" type="button" aria-pressed="false" hidden><span aria-hidden="true">Ⅱ</span> Pause motion</button><a class="header-youtube" href="https://www.youtube.com/@PCMagikLab" aria-label="PC Magik Lab on YouTube">▷</a></div>
-    <details class="mobile-nav"><summary aria-label="Open navigation menu">Menu <span aria-hidden="true">＋</span></summary><div class="mobile-links"><a href="#episodes">Benchmarks</a><a href="/episodes/">Episodes</a><a href="/#method">The process</a><a href="https://github.com/pcmagik/pcmagik-lab">Repository ↗</a><a href="https://www.youtube.com/@PCMagikLab">YouTube ↗</a></div></details>
+    <details class="mobile-nav"><summary aria-label="Open navigation menu">Menu <span aria-hidden="true">＋</span></summary><div class="mobile-links"><a href="#episodes">Benchmarks</a><a href="/episodes/">Episodes <sup>01</sup></a><a href="/#method">The process</a><a href="https://github.com/pcmagik/pcmagik-lab">Repository ↗</a><a href="https://www.youtube.com/@PCMagikLab">YouTube ↗</a></div></details>
   </div>
 </header>
 <!-- Generated from data/episodes.json; edit bin/templates instead. -->
@@ -49,20 +49,25 @@
       <canvas id="neural-canvas" aria-hidden="true"></canvas>
       <div class="scene-label"><span class="cross">+</span> NEURAL CORE <span>/ 001</span></div>
       <div class="telemetry telemetry-hardware glass"><span class="tiny-label"><span class="dot"></span> BENCHMARK HARDWARE</span><strong>RTX 3090<span>24 GB</span></strong><div class="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small><span>LOCAL INFERENCE</span> / <span>REAL SILICON</span></small></div>
-      <a class="telemetry telemetry-run glass" href="/episodes/" data-fx="fx-border fx-glass"><span class="tiny-label">EXPLORE THE LAB <span>↗</span></span><strong>Explore the lab</strong><small><span class="violet-dot"></span>BROWSE EPISODES</small></a>
+      <a class="telemetry telemetry-run glass" href="/episodes/01-karpathy-vs-bare/" data-fx="fx-border fx-glass"><span class="tiny-label">LATEST EXPERIMENT <span>↗</span></span><strong>Qwen3.8 <span>27B</span></strong><small><span class="violet-dot"></span><span class="v-bare">BARE</span> VS <span class="v-karpathy">KARPATHY</span></small><small><time datetime="2026-09-27">Published 2026-09-27</time></small></a>
       <div class="scene-bottom"><span class="scene-hint">FORM / LIGHT / INTELLIGENCE</span><button class="rotate-core" type="button" hidden>Rotate core <span aria-hidden="true">⤾</span></button></div>
     </div>
     <div class="hero-bottom"><a href="#episodes" class="scroll-cue"><span>↓</span> SCROLL TO EXPLORE</a><span>Same prompt. Same rig. One variable.</span><a class="coordinate" href="https://lab.pcmagik.pl/">lab.pcmagik.pl ↗</a></div>
   </section>
   <div class="lab-strip"><div class="wrap"><span>BUILT TO BE VERIFIED</span><span class="strip-item">OPEN PROMPTS <i>✳</i> RAW METRICS <i>✳</i> LIVE OUTPUTS <i>✳</i> REAL HARDWARE</span><span class="strip-end">PCML / RESEARCH ARCHIVE</span></div></div>
   <div class="wrap content-wrap">
-    <section id="episodes" class="empty-experiments" aria-labelledby="experiments-title"><p class="eyebrow"><span class="section-number">01 /</span> THE EXPERIMENTS</p><h2 id="experiments-title">The next experiment<br><span>starts here.</span></h2><p class="ep-subtitle">First results will arrive with the first film.</p><a class="text-link" href="https://www.youtube.com/@PCMagikLab">Watch the experiments on YouTube ↗</a></section>
+        <section id="episodes" aria-labelledby="episodes-title">
+      <div class="section-head reveal"><div><p class="eyebrow"><span class="section-number">01 /</span> THE EXPERIMENTS</p><h2 id="episodes-title">Less hype.<br><span>More evidence.</span></h2></div><div class="section-aside"><p>Same task. Different approach.<br>Explore exactly what the models produced.</p><span class="archive-count">01 published episodes <span>·</span> <a href="/episodes/">View all episodes ↗</a></span></div></div>
+      <div class="episode-teasers"><article class="ep ep-teaser glass reveal fx-border fx-comet" data-episode="01-karpathy-vs-bare"><div class="ep-h"><div><div class="ep-meta"><span class="chip episode-number">EP 01</span><time datetime="2026-09-27">Published 2026-09-27</time></div><h3><a href="/episodes/01-karpathy-vs-bare/">Karpathy skills on Qwen3.8 27B: what you gain, what you lose</a></h3><p class="ep-subtitle">qwen/qwen3.8-27b</p></div><a class="button" href="/episodes/01-karpathy-vs-bare/">See the results →</a></div></article></div>
+      <div class="evidence-note reveal"><span>↳</span><p>Each episode includes measurements and the models’ actual outputs. No touch-ups.<br><strong>Open an episode to explore the evidence.</strong></p><a href="https://github.com/pcmagik/pcmagik-lab" class="text-link">View the source ↗</a></div>
+    </section>
+
     <section id="method" aria-labelledby="method-title"><div class="section-head reveal"><div><p class="eyebrow"><span class="section-number">02 /</span> THE PROCESS</p><h2 id="method-title">No black box.<br><span>Just the whole picture.</span></h2></div><p class="section-aside">A benchmark is only useful if you can check it.<br>Here’s what goes into every experiment.</p></div>
 <div class="method">
-<div class="m glass reveal spotlight fx-spotlight"><div class="method-icon" aria-hidden="true">01</div><h3>One variable at a time</h3><p>Same prompt, same rig, one variable. Model reloaded before every run. Repeat each variant and compare the measured ranges.</p></div>
+<div class="m glass reveal spotlight fx-spotlight"><div class="method-icon" aria-hidden="true">01</div><h3>One variable at a time</h3><p>Same prompt, same rig, one variable. Model reloaded before every run. Published cohorts: n=5 per variant. See each episode for cohort details.</p></div>
 <div class="m glass reveal spotlight fx-spotlight"><div class="method-icon" aria-hidden="true">{ }</div><h3>Metrics from the run</h3><p>Repeated runs can vary. Compare ranges, not single runs. Inspect <code>metrics.json</code> beside each output.</p></div>
 <div class="m glass reveal spotlight fx-spotlight"><div class="method-icon" aria-hidden="true">⌘</div><h3>Real hardware</h3><p>Ryzen 5 PRO 3600, 32 GB DDR4 ECC and an RTX 3090 with 24 GB VRAM. Local models are served through LM Studio.</p></div>
-<div class="m glass reveal spotlight fx-spotlight"><div class="method-icon" aria-hidden="true">&gt;_</div><h3>The exact prompt</h3><p>The full input, byte for byte. Open <code>prompt.txt</code> next to each run to reproduce the test.</p></div>
+<div class="m glass reveal spotlight fx-spotlight"><div class="method-icon" aria-hidden="true">&gt;_</div><h3>The exact prompt</h3><p>The full input, byte for byte. <a href="/episodes/01-karpathy-vs-bare/prompt.txt">Read the task ↗</a> or open <code>prompt.txt</code> next to each run to reproduce the test.</p></div>
 </div></section>
 
     <section class="closing glass reveal fx-aurora" aria-labelledby="closing-title"><p class="eyebrow">BEHIND THE LAB / CURIOSITY IS THE STARTING POINT.</p><h2 id="closing-title">Don't take our word.<br><em>Take a look.</em></h2><div class="closing-bottom"><p>Mateusz Piekut (PC Magik).<br>Computer service and homelab operator from Poland.</p><div class="actions"><a class="button primary magnetic" href="https://github.com/pcmagik/pcmagik-lab">Explore the repository ↗</a><a class="button" href="https://www.youtube.com/@PCMagikLab">YouTube ↗</a></div></div><span class="closing-asterisk" aria-hidden="true">✳</span></section>

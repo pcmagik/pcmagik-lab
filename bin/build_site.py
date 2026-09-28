@@ -41,6 +41,11 @@ def template(name, **values):
                    benchmarks_url='#episodes' if home else '/#episodes',
                    episodes_counter=f' <sup>{values["episode_count"]}</sup>' if values['episode_count'] != '00' else '',
                    extra_styles='' if home else '  <link rel="stylesheet" href="/assets/interior.css">\n')
+    card = values.get('social_card')
+    context.update(social_image='https://lab.pcmagik.pl/' + text(card) if card else 'https://lab.pcmagik.pl/assets/avatar-400.png',
+                   social_width='1200' if card else '400', social_height='630' if card else '400',
+                   social_alt=values['title'] if card else 'PC Magik Lab logo',
+                   twitter_card='summary_large_image' if card else 'summary')
     if home:
         context.update(title='PC Magik Lab — Intelligence, under the microscope.',
                        og_title='PC Magik Lab — AI benchmarks, measured across repeated runs',
@@ -101,6 +106,13 @@ def load():
             raise ValueError(f'{slug}: runs must be an array')
         if not isinstance(episode.get('measurements'), list) or not episode['measurements']:
             raise ValueError(f'{slug}: full measurements are required')
+        if episode.get('social_card') is not None:
+            card = episode['social_card']
+            if card != f'episodes/{slug}/card.jpg':
+                raise ValueError(f'{slug}: invalid social_card path {card!r}')
+            target = ROOT / card
+            if target.is_symlink() or not target.resolve().is_relative_to(ROOT.resolve()) or not target.is_file():
+                raise ValueError(f'{slug}: missing or unsafe social_card')
         if episode.get('prompt_file') is not None:
             episode_prompt(episode['prompt_file'], slug)
         if episode.get('task_file') is not None:
@@ -733,7 +745,7 @@ def build(check=False):
     outputs['privacy/index.html'] = template('privacy.html', title='Privacy policy | PC Magik Lab', description='Privacy policy for lab.pcmagik.pl.', path='/privacy/', episode_count=f'{len(episodes):02}')
     for ep in episodes:
         path = f'/episodes/{ep["slug"]}/'
-        outputs[path.strip('/')+'/index.html'] = template('page.html', title=text(ep['title']), description=text(ep['opis']), path=path, body=episode_body(ep, feed), episode_count=f'{len(episodes):02}')
+        outputs[path.strip('/')+'/index.html'] = template('page.html', title=text(ep['title']), description=text(ep['opis']), path=path, body=episode_body(ep, feed), social_card=ep.get('social_card'), episode_count=f'{len(episodes):02}')
     outputs['assets/homepage-benchmarks.json'] = json.dumps(feed, ensure_ascii=False, indent=2, allow_nan=False)+'\n'
     # Complete validation and rendering before touching any published file.
     for filename in outputs:

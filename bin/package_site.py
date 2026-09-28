@@ -15,7 +15,7 @@ def package(destination):
         files.add(f'episodes/{ep["slug"]}/index.html')
         if (ROOT/f'episodes/{ep["slug"]}/README.md').is_file():
             files.add(f'episodes/{ep["slug"]}/README.md')
-        files.update(ep[k] for k in ['prompt_file', 'task_file'] if ep.get(k))
+        files.update(ep[k] for k in ['prompt_file', 'task_file', 'social_card'] if ep.get(k))
         for r in ep['measurements']:
             rules = (r.get('odtworzenie') or {}).get('rules')
             if rules:

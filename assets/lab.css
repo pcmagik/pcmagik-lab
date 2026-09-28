@@ -591,7 +591,7 @@ body::after { transform: translateZ(0); will-change: transform; }
 }
 nav[aria-label="Main navigation"] a { position: relative; }
 nav[aria-label="Main navigation"] a::after {
-  content: ''; position: absolute; bottom: 5px; left: 0; right: 0; height: 2px;
+  content: ''; position: absolute; top: calc(100% + 3px); left: 0; right: 0; height: 2px;
   background: var(--cyan); transform: scaleX(0); transition: transform .35s;
 }
 nav[aria-label="Main navigation"] a[aria-current] { text-decoration: none; }

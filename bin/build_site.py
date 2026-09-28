@@ -512,7 +512,7 @@ def episode_body(ep, feed):
         video = urlparse(ep['youtube'])
         video_id = video.path.strip('/') if video.hostname == 'youtu.be' else (parse_qs(video.query).get('v') or [video.path.split('/')[-1]])[0]
         if re.fullmatch(r'[A-Za-z0-9_-]{11}', video_id):
-            body.append(f'<section class="episode-video"><h2>Watch the experiment.</h2><iframe src="https://www.youtube-nocookie.com/embed/{video_id}" title="{text(title)}" loading="lazy" allow="fullscreen; picture-in-picture" allowfullscreen></iframe></section>')
+            body.append(f'<section class="episode-video"><h2>Watch the experiment.</h2><iframe src="https://www.youtube-nocookie.com/embed/{video_id}" title="{text(title)}" loading="lazy" allow="fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></section>')
         body.append(f'<a class="button" href="{text(ep["youtube"])}">Watch episode ↗</a>')
     materials = f'<a class="button" href="{repo}">Test materials on GitHub ↗</a>'
     if ep.get('prompt_file'):

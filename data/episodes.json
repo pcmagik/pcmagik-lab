@@ -1,9 +1,524 @@
 {
  "schema_version": 2,
- "generated": "2026-09-27",
+ "generated": "2026-09-29",
  "source": "seria/harness/publikuj.py",
  "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
  "episodes": [
+  {
+   "published": "2026-09-29",
+   "slug": "02-qwen3.6-27b",
+   "title": "Qwen3.6 27B with and without Karpathy rules",
+   "kind": "para-wariantow",
+   "task": "easy",
+   "task_file": "tasks/easy.txt",
+   "prompt_file": "episodes/02-qwen3.6-27b/prompt.txt",
+   "youtube": "https://www.youtube.com/shorts/Djku896tncg",
+   "opis": "Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (54–73 effects without the rules, 48–69 with them), so on this model the rules changed nothing measurable. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: on. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.",
+   "thesis": {
+    "metric": "efekty",
+    "models": [
+     {
+      "model": "qwen/qwen3.6-27b",
+      "n_bare": 3,
+      "n_karpathy": 3,
+      "bare": {
+       "min": 54,
+       "max": 73,
+       "n": 3,
+       "mean": 65.0
+      },
+      "karpathy": {
+       "min": 48,
+       "max": 69,
+       "n": 3,
+       "mean": 61.3
+      },
+      "class": "nakladaja-sie",
+      "karpathy_ponizej_kazdego_bare": 1,
+      "karpathy_powyzej_kazdego_bare": 0,
+      "zmiana_sredniej_pct": -5.6
+     }
+    ],
+    "summary": {
+     "models": 1,
+     "karpathy-mniej": 0,
+     "nakladaja-sie": 1,
+     "karpathy-wiecej": 0,
+     "brak-danych": 0,
+     "jeden-wariant": 0
+    },
+    "pary": [],
+    "claim": "Ranges overlap (counted effects)"
+   },
+   "runs": [
+    {
+     "bieg": "qwen3.6-27b_bare_r2",
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 259.27,
+     "tokeny": 9228,
+     "myslenie_pct": 5.17,
+     "tok_s": 35.59,
+     "linie": 548,
+     "tokeny_myslenia": 477,
+     "efekty": 54,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "qwen3.6-27b-r2_qwen3.6-27b_bare_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/index.html",
+     "zrzut": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/preview-390.png",
+     "metrics": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/metrics.json",
+     "prompt": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/prompt.txt",
+     "efekty_plik": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/efekty.json",
+     "odtworzenie": {
+      "model": "qwen/qwen3.6-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "qwen3.6-27b_karpathy_r2",
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 279.84,
+     "tokeny": 10439,
+     "myslenie_pct": 3.03,
+     "tok_s": 37.3,
+     "linie": 479,
+     "tokeny_myslenia": 316,
+     "efekty": 48,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "qwen3.6-27b-r2_qwen3.6-27b_karpathy_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/index.html",
+     "zrzut": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/preview-390.png",
+     "metrics": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/metrics.json",
+     "prompt": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/prompt.txt",
+     "efekty_plik": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/efekty.json",
+     "odtworzenie": {
+      "model": "qwen/qwen3.6-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/02-qwen3.6-27b/rules/karpathy/AGENTS.md"
+     }
+    }
+   ],
+   "measurements": [
+    {
+     "bieg": "qwen3.6-27b_bare_r1",
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 237.43,
+     "tokeny": 8896,
+     "myslenie_pct": 4.62,
+     "tok_s": 37.47,
+     "linie": 563,
+     "tokeny_myslenia": 411,
+     "efekty": 68,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "qwen3.6-27b-r1_qwen3.6-27b_bare_pi_eon",
+     "powtorzenie": 1,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r1/index.html",
+     "zrzut": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r1/preview-390.png",
+     "metrics": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r1/metrics.json",
+     "prompt": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r1/prompt.txt",
+     "efekty_plik": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r1/efekty.json",
+     "odtworzenie": {
+      "model": "qwen/qwen3.6-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "qwen3.6-27b_bare_r2",
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 259.27,
+     "tokeny": 9228,
+     "myslenie_pct": 5.17,
+     "tok_s": 35.59,
+     "linie": 548,
+     "tokeny_myslenia": 477,
+     "efekty": 54,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "qwen3.6-27b-r2_qwen3.6-27b_bare_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/index.html",
+     "zrzut": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/preview-390.png",
+     "metrics": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/metrics.json",
+     "prompt": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/prompt.txt",
+     "efekty_plik": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r2/efekty.json",
+     "odtworzenie": {
+      "model": "qwen/qwen3.6-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "qwen3.6-27b_bare_r3",
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 318.95,
+     "tokeny": 11787,
+     "myslenie_pct": 3.64,
+     "tok_s": 36.96,
+     "linie": 603,
+     "tokeny_myslenia": 429,
+     "efekty": 73,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "qwen3.6-27b-r3_qwen3.6-27b_bare_pi_eon",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r3/index.html",
+     "zrzut": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r3/preview-390.png",
+     "metrics": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r3/metrics.json",
+     "prompt": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r3/prompt.txt",
+     "efekty_plik": "episodes/02-qwen3.6-27b/qwen3.6-27b_bare_r3/efekty.json",
+     "odtworzenie": {
+      "model": "qwen/qwen3.6-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "qwen3.6-27b_karpathy_r1",
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 268.14,
+     "tokeny": 9861,
+     "myslenie_pct": 6.18,
+     "tok_s": 36.78,
+     "linie": 698,
+     "tokeny_myslenia": 609,
+     "efekty": 69,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "qwen3.6-27b-r1_qwen3.6-27b_karpathy_pi_eon",
+     "powtorzenie": 1,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r1/index.html",
+     "zrzut": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r1/preview-390.png",
+     "metrics": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r1/metrics.json",
+     "prompt": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r1/prompt.txt",
+     "efekty_plik": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r1/efekty.json",
+     "odtworzenie": {
+      "model": "qwen/qwen3.6-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/02-qwen3.6-27b/rules/karpathy/AGENTS.md"
+     }
+    },
+    {
+     "bieg": "qwen3.6-27b_karpathy_r2",
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 279.84,
+     "tokeny": 10439,
+     "myslenie_pct": 3.03,
+     "tok_s": 37.3,
+     "linie": 479,
+     "tokeny_myslenia": 316,
+     "efekty": 48,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "qwen3.6-27b-r2_qwen3.6-27b_karpathy_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/index.html",
+     "zrzut": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/preview-390.png",
+     "metrics": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/metrics.json",
+     "prompt": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/prompt.txt",
+     "efekty_plik": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r2/efekty.json",
+     "odtworzenie": {
+      "model": "qwen/qwen3.6-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/02-qwen3.6-27b/rules/karpathy/AGENTS.md"
+     }
+    },
+    {
+     "bieg": "qwen3.6-27b_karpathy_r3",
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 337.03,
+     "tokeny": 12415,
+     "myslenie_pct": 3.3,
+     "tok_s": 36.84,
+     "linie": 717,
+     "tokeny_myslenia": 410,
+     "efekty": 67,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "qwen3.6-27b-r3_qwen3.6-27b_karpathy_pi_eon",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r3/index.html",
+     "zrzut": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r3/preview-390.png",
+     "metrics": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r3/metrics.json",
+     "prompt": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r3/prompt.txt",
+     "efekty_plik": "episodes/02-qwen3.6-27b/qwen3.6-27b_karpathy_r3/efekty.json",
+     "odtworzenie": {
+      "model": "qwen/qwen3.6-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/02-qwen3.6-27b/rules/karpathy/AGENTS.md"
+     }
+    }
+   ],
+   "cohorts": [
+    {
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "bare",
+     "n": 3,
+     "kod": "E02-BARE",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "qwen3.6-27b_bare_r2",
+     "reprezentant_powod": null
+    },
+    {
+     "model": "qwen/qwen3.6-27b",
+     "wariant": "karpathy",
+     "n": 3,
+     "kod": "E02-KARP",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "qwen3.6-27b_karpathy_r2",
+     "reprezentant_powod": null
+    }
+   ],
+   "date": "2026-09-20",
+   "social_card": "episodes/02-qwen3.6-27b/card.jpg"
+  },
   {
    "published": "2026-09-27",
    "slug": "01-karpathy-vs-bare",

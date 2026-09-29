@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 02 | [Qwen3.6 27B with and without Karpathy rules](episodes/02-qwen3.6-27b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/Djku896tncg) |
 | 01 | [Karpathy skills on Qwen3.8 27B: what you gain, what you lose](episodes/01-karpathy-vs-bare/README.md) | easy | 10 | [YouTube](https://www.youtube.com/shorts/5xvHtb7y0zY) |
 
 ## Layout
@@ -12,6 +13,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 tasks/<task>.txt                the task file (placeholders unfilled)
 episodes/<NN-slug>/README.md    prompt, run table, links
 episodes/<NN-slug>/prompt.txt   the prompt every run got, byte for byte
+episodes/<NN-slug>/card.jpg     1200x630 share card (the episode thumbnail)
 episodes/<NN-slug>/<model>_<variant>_r<N>/  index.html metrics.json prompt.txt screenshot-1920.png screenshot-390.png
 ```
 

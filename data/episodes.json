@@ -1,9 +1,524 @@
 {
  "schema_version": 2,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "source": "seria/harness/publikuj.py",
  "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
  "episodes": [
+  {
+   "published": "2026-09-30",
+   "slug": "03-gemma-4-31b",
+   "title": "Gemma 4 31B with and without Karpathy rules",
+   "kind": "para-wariantow",
+   "task": "easy",
+   "task_file": "tasks/easy.txt",
+   "prompt_file": "episodes/03-gemma-4-31b/prompt.txt",
+   "youtube": "https://www.youtube.com/shorts/18ERHNd9M-0",
+   "opis": "Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (29–39 effects without the rules, 31–44 with them), so on this model the rules changed nothing measurable. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: on. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.",
+   "thesis": {
+    "metric": "efekty",
+    "models": [
+     {
+      "model": "google/gemma-4-31b-qat",
+      "n_bare": 3,
+      "n_karpathy": 3,
+      "bare": {
+       "min": 29,
+       "max": 39,
+       "n": 3,
+       "mean": 34.0
+      },
+      "karpathy": {
+       "min": 31,
+       "max": 44,
+       "n": 3,
+       "mean": 35.7
+      },
+      "class": "nakladaja-sie",
+      "karpathy_ponizej_kazdego_bare": 0,
+      "karpathy_powyzej_kazdego_bare": 1,
+      "zmiana_sredniej_pct": 4.9
+     }
+    ],
+    "summary": {
+     "models": 1,
+     "karpathy-mniej": 0,
+     "nakladaja-sie": 1,
+     "karpathy-wiecej": 0,
+     "brak-danych": 0,
+     "jeden-wariant": 0
+    },
+    "pary": [],
+    "claim": "Ranges overlap (counted effects)"
+   },
+   "runs": [
+    {
+     "bieg": "gemma-4-31b-qat_bare_r3",
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 397.62,
+     "tokeny": 11515,
+     "myslenie_pct": 8.7,
+     "tok_s": 28.96,
+     "linie": 385,
+     "tokeny_myslenia": 1002,
+     "efekty": 34,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "gemma31v2-r3_gemma-4-31b-qat_bare_pi_eon",
+     "powtorzenie": 3,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/index.html",
+     "zrzut": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/preview-390.png",
+     "metrics": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/metrics.json",
+     "prompt": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/prompt.txt",
+     "efekty_plik": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/efekty.json",
+     "odtworzenie": {
+      "model": "google/gemma-4-31b-qat",
+      "quantization": {
+       "value": "Q4_0",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 65536,
+      "kv_cache": {
+       "value": "K q8_0 / V q8_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 32768,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "gemma-4-31b-qat_karpathy_r2",
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 450.08,
+     "tokeny": 12835,
+     "myslenie_pct": 3.42,
+     "tok_s": 28.52,
+     "linie": 447,
+     "tokeny_myslenia": 439,
+     "efekty": 44,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "gemma31v2-r2_gemma-4-31b-qat_karpathy_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/index.html",
+     "zrzut": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/preview-390.png",
+     "metrics": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/metrics.json",
+     "prompt": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/prompt.txt",
+     "efekty_plik": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/efekty.json",
+     "odtworzenie": {
+      "model": "google/gemma-4-31b-qat",
+      "quantization": {
+       "value": "Q4_0",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 65536,
+      "kv_cache": {
+       "value": "K q8_0 / V q8_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 32768,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/03-gemma-4-31b/rules/karpathy/AGENTS.md"
+     }
+    }
+   ],
+   "measurements": [
+    {
+     "bieg": "gemma-4-31b-qat_bare_r1",
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 385.72,
+     "tokeny": 11279,
+     "myslenie_pct": 9.52,
+     "tok_s": 29.24,
+     "linie": 403,
+     "tokeny_myslenia": 1074,
+     "efekty": 29,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "gemma31v2-r1_gemma-4-31b-qat_bare_pi_eon",
+     "powtorzenie": 1,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r1/index.html",
+     "zrzut": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r1/preview-390.png",
+     "metrics": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r1/metrics.json",
+     "prompt": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r1/prompt.txt",
+     "efekty_plik": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r1/efekty.json",
+     "odtworzenie": {
+      "model": "google/gemma-4-31b-qat",
+      "quantization": {
+       "value": "Q4_0",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 65536,
+      "kv_cache": {
+       "value": "K q8_0 / V q8_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 32768,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "gemma-4-31b-qat_bare_r2",
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 1344.53,
+     "tokeny": 39349,
+     "myslenie_pct": 2.75,
+     "tok_s": 29.27,
+     "linie": 418,
+     "tokeny_myslenia": 1082,
+     "efekty": 39,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "gemma31v2-r2_gemma-4-31b-qat_bare_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r2/index.html",
+     "zrzut": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r2/preview-390.png",
+     "metrics": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r2/metrics.json",
+     "prompt": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r2/prompt.txt",
+     "efekty_plik": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r2/efekty.json",
+     "odtworzenie": {
+      "model": "google/gemma-4-31b-qat",
+      "quantization": {
+       "value": "Q4_0",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 65536,
+      "kv_cache": {
+       "value": "K q8_0 / V q8_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 32768,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "gemma-4-31b-qat_bare_r3",
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 397.62,
+     "tokeny": 11515,
+     "myslenie_pct": 8.7,
+     "tok_s": 28.96,
+     "linie": 385,
+     "tokeny_myslenia": 1002,
+     "efekty": 34,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "gemma31v2-r3_gemma-4-31b-qat_bare_pi_eon",
+     "powtorzenie": 3,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/index.html",
+     "zrzut": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/preview-390.png",
+     "metrics": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/metrics.json",
+     "prompt": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/prompt.txt",
+     "efekty_plik": "episodes/03-gemma-4-31b/gemma-4-31b-qat_bare_r3/efekty.json",
+     "odtworzenie": {
+      "model": "google/gemma-4-31b-qat",
+      "quantization": {
+       "value": "Q4_0",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 65536,
+      "kv_cache": {
+       "value": "K q8_0 / V q8_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 32768,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "gemma-4-31b-qat_karpathy_r1",
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 304.63,
+     "tokeny": 8910,
+     "myslenie_pct": 7.85,
+     "tok_s": 29.25,
+     "linie": 369,
+     "tokeny_myslenia": 699,
+     "efekty": 31,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "gemma31v2-r1_gemma-4-31b-qat_karpathy_pi_eon",
+     "powtorzenie": 1,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r1/index.html",
+     "zrzut": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r1/preview-390.png",
+     "metrics": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r1/metrics.json",
+     "prompt": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r1/prompt.txt",
+     "efekty_plik": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r1/efekty.json",
+     "odtworzenie": {
+      "model": "google/gemma-4-31b-qat",
+      "quantization": {
+       "value": "Q4_0",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 65536,
+      "kv_cache": {
+       "value": "K q8_0 / V q8_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 32768,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/03-gemma-4-31b/rules/karpathy/AGENTS.md"
+     }
+    },
+    {
+     "bieg": "gemma-4-31b-qat_karpathy_r2",
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 450.08,
+     "tokeny": 12835,
+     "myslenie_pct": 3.42,
+     "tok_s": 28.52,
+     "linie": 447,
+     "tokeny_myslenia": 439,
+     "efekty": 44,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "gemma31v2-r2_gemma-4-31b-qat_karpathy_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/index.html",
+     "zrzut": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/preview-390.png",
+     "metrics": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/metrics.json",
+     "prompt": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/prompt.txt",
+     "efekty_plik": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r2/efekty.json",
+     "odtworzenie": {
+      "model": "google/gemma-4-31b-qat",
+      "quantization": {
+       "value": "Q4_0",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 65536,
+      "kv_cache": {
+       "value": "K q8_0 / V q8_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 32768,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/03-gemma-4-31b/rules/karpathy/AGENTS.md"
+     }
+    },
+    {
+     "bieg": "gemma-4-31b-qat_karpathy_r3",
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 1294.59,
+     "tokeny": 37583,
+     "myslenie_pct": 2.91,
+     "tok_s": 29.03,
+     "linie": 431,
+     "tokeny_myslenia": 1093,
+     "efekty": 32,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "gemma31v2-r3_gemma-4-31b-qat_karpathy_pi_eon",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r3/index.html",
+     "zrzut": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r3/preview-390.png",
+     "metrics": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r3/metrics.json",
+     "prompt": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r3/prompt.txt",
+     "efekty_plik": "episodes/03-gemma-4-31b/gemma-4-31b-qat_karpathy_r3/efekty.json",
+     "odtworzenie": {
+      "model": "google/gemma-4-31b-qat",
+      "quantization": {
+       "value": "Q4_0",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 65536,
+      "kv_cache": {
+       "value": "K q8_0 / V q8_0",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 32768,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/03-gemma-4-31b/rules/karpathy/AGENTS.md"
+     }
+    }
+   ],
+   "cohorts": [
+    {
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "bare",
+     "n": 3,
+     "kod": "E03-BARE",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "gemma-4-31b-qat_bare_r3",
+     "reprezentant_powod": null
+    },
+    {
+     "model": "google/gemma-4-31b-qat",
+     "wariant": "karpathy",
+     "n": 3,
+     "kod": "E03-KARP",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "gemma-4-31b-qat_karpathy_r2",
+     "reprezentant_powod": null
+    }
+   ],
+   "date": "2026-09-20",
+   "social_card": "episodes/03-gemma-4-31b/card.jpg"
+  },
   {
    "published": "2026-09-29",
    "slug": "02-qwen3.6-27b",

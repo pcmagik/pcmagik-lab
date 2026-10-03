@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 04 | [GLM 4.7 Flash with and without Karpathy rules](episodes/04-glm-4.7-flash/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/l_IVcUg-V2E) |
 | 03 | [Gemma 4 31B with and without Karpathy rules](episodes/03-gemma-4-31b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/18ERHNd9M-0) |
 | 02 | [Qwen3.6 27B with and without Karpathy rules](episodes/02-qwen3.6-27b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/Djku896tncg) |
 | 01 | [Karpathy skills on Qwen3.8 27B: what you gain, what you lose](episodes/01-karpathy-vs-bare/README.md) | easy | 10 | [YouTube](https://www.youtube.com/shorts/5xvHtb7y0zY) |

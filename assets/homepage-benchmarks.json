@@ -1,9 +1,524 @@
 {
   "schema_version": 2,
-  "generated": "2026-09-30",
+  "generated": "2026-10-03",
   "source": "seria/harness/publikuj.py",
   "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
   "episodes": [
+    {
+      "published": "2026-10-03",
+      "slug": "04-glm-4.7-flash",
+      "title": "GLM 4.7 Flash with and without Karpathy rules",
+      "kind": "para-wariantow",
+      "task": "easy",
+      "task_file": "tasks/easy.txt",
+      "prompt_file": "episodes/04-glm-4.7-flash/prompt.txt",
+      "youtube": "https://www.youtube.com/shorts/l_IVcUg-V2E",
+      "opis": "Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (54–73 effects without the rules, 56–73 with them), so on this model the rules changed nothing measurable. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: on. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.",
+      "thesis": {
+        "metric": "efekty",
+        "models": [
+          {
+            "model": "zai-org/glm-4.7-flash",
+            "n_bare": 3,
+            "n_karpathy": 3,
+            "bare": {
+              "min": 54,
+              "max": 73,
+              "n": 3,
+              "mean": 65.0
+            },
+            "karpathy": {
+              "min": 56,
+              "max": 73,
+              "n": 3,
+              "mean": 62.0
+            },
+            "class": "nakladaja-sie",
+            "karpathy_ponizej_kazdego_bare": 0,
+            "karpathy_powyzej_kazdego_bare": 0,
+            "zmiana_sredniej_pct": -4.6
+          }
+        ],
+        "summary": {
+          "models": 1,
+          "karpathy-mniej": 0,
+          "nakladaja-sie": 1,
+          "karpathy-wiecej": 0,
+          "brak-danych": 0,
+          "jeden-wariant": 0
+        },
+        "pary": [],
+        "claim": "Ranges overlap (counted effects)"
+      },
+      "runs": [
+        {
+          "bieg": "glm-4.7-flash_bare_r3",
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 86.52,
+          "tokeny": 8404,
+          "myslenie_pct": 5.69,
+          "tok_s": 97.13,
+          "linie": 869,
+          "tokeny_myslenia": 478,
+          "efekty": 73,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "glm-4.7-flash-r3_glm-4.7-flash_bare_pi_eon",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/index.html",
+          "zrzut": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/preview-390.png",
+          "metrics": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/metrics.json",
+          "prompt": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/prompt.txt",
+          "efekty_plik": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/efekty.json",
+          "odtworzenie": {
+            "model": "zai-org/glm-4.7-flash",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 202752,
+            "kv_cache": {
+              "value": "K q8_0 / V q8_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "glm-4.7-flash_karpathy_r1",
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 94.04,
+          "tokeny": 9152,
+          "myslenie_pct": 5.67,
+          "tok_s": 97.32,
+          "linie": 876,
+          "tokeny_myslenia": 519,
+          "efekty": 56,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "glm-4.7-flash-r1_glm-4.7-flash_karpathy_pi_eon",
+          "powtorzenie": 1,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/index.html",
+          "zrzut": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/preview-390.png",
+          "metrics": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/metrics.json",
+          "prompt": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/prompt.txt",
+          "efekty_plik": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/efekty.json",
+          "odtworzenie": {
+            "model": "zai-org/glm-4.7-flash",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 202752,
+            "kv_cache": {
+              "value": "K q8_0 / V q8_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/04-glm-4.7-flash/rules/karpathy/AGENTS.md"
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "bieg": "glm-4.7-flash_bare_r1",
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 98.92,
+          "tokeny": 9511,
+          "myslenie_pct": 5.55,
+          "tok_s": 96.14,
+          "linie": 987,
+          "tokeny_myslenia": 528,
+          "efekty": 68,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "glm-4.7-flash-r1_glm-4.7-flash_bare_pi_eon",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r1/index.html",
+          "zrzut": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r1/preview-390.png",
+          "metrics": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r1/metrics.json",
+          "prompt": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r1/prompt.txt",
+          "efekty_plik": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r1/efekty.json",
+          "odtworzenie": {
+            "model": "zai-org/glm-4.7-flash",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 202752,
+            "kv_cache": {
+              "value": "K q8_0 / V q8_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "glm-4.7-flash_bare_r2",
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 83.71,
+          "tokeny": 8538,
+          "myslenie_pct": 6.04,
+          "tok_s": 102.0,
+          "linie": 775,
+          "tokeny_myslenia": 516,
+          "efekty": 54,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "glm-4.7-flash-r2_glm-4.7-flash_bare_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r2/index.html",
+          "zrzut": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r2/preview-390.png",
+          "metrics": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r2/metrics.json",
+          "prompt": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r2/prompt.txt",
+          "efekty_plik": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r2/efekty.json",
+          "odtworzenie": {
+            "model": "zai-org/glm-4.7-flash",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 202752,
+            "kv_cache": {
+              "value": "K q8_0 / V q8_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "glm-4.7-flash_bare_r3",
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 86.52,
+          "tokeny": 8404,
+          "myslenie_pct": 5.69,
+          "tok_s": 97.13,
+          "linie": 869,
+          "tokeny_myslenia": 478,
+          "efekty": 73,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "glm-4.7-flash-r3_glm-4.7-flash_bare_pi_eon",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/index.html",
+          "zrzut": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/preview-390.png",
+          "metrics": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/metrics.json",
+          "prompt": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/prompt.txt",
+          "efekty_plik": "episodes/04-glm-4.7-flash/glm-4.7-flash_bare_r3/efekty.json",
+          "odtworzenie": {
+            "model": "zai-org/glm-4.7-flash",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 202752,
+            "kv_cache": {
+              "value": "K q8_0 / V q8_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "glm-4.7-flash_karpathy_r1",
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 94.04,
+          "tokeny": 9152,
+          "myslenie_pct": 5.67,
+          "tok_s": 97.32,
+          "linie": 876,
+          "tokeny_myslenia": 519,
+          "efekty": 56,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "glm-4.7-flash-r1_glm-4.7-flash_karpathy_pi_eon",
+          "powtorzenie": 1,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/index.html",
+          "zrzut": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/preview-390.png",
+          "metrics": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/metrics.json",
+          "prompt": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/prompt.txt",
+          "efekty_plik": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r1/efekty.json",
+          "odtworzenie": {
+            "model": "zai-org/glm-4.7-flash",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 202752,
+            "kv_cache": {
+              "value": "K q8_0 / V q8_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/04-glm-4.7-flash/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "glm-4.7-flash_karpathy_r2",
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 79.0,
+          "tokeny": 7826,
+          "myslenie_pct": 8.47,
+          "tok_s": 99.06,
+          "linie": 762,
+          "tokeny_myslenia": 663,
+          "efekty": 57,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "glm-4.7-flash-r2_glm-4.7-flash_karpathy_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r2/index.html",
+          "zrzut": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r2/preview-390.png",
+          "metrics": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r2/metrics.json",
+          "prompt": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r2/prompt.txt",
+          "efekty_plik": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r2/efekty.json",
+          "odtworzenie": {
+            "model": "zai-org/glm-4.7-flash",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 202752,
+            "kv_cache": {
+              "value": "K q8_0 / V q8_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/04-glm-4.7-flash/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "glm-4.7-flash_karpathy_r3",
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 104.19,
+          "tokeny": 9934,
+          "myslenie_pct": 5.28,
+          "tok_s": 95.35,
+          "linie": 1080,
+          "tokeny_myslenia": 525,
+          "efekty": 73,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "glm-4.7-flash-r3_glm-4.7-flash_karpathy_pi_eon",
+          "powtorzenie": 3,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r3/index.html",
+          "zrzut": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r3/preview-390.png",
+          "metrics": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r3/metrics.json",
+          "prompt": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r3/prompt.txt",
+          "efekty_plik": "episodes/04-glm-4.7-flash/glm-4.7-flash_karpathy_r3/efekty.json",
+          "odtworzenie": {
+            "model": "zai-org/glm-4.7-flash",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 202752,
+            "kv_cache": {
+              "value": "K q8_0 / V q8_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/04-glm-4.7-flash/rules/karpathy/AGENTS.md"
+          }
+        }
+      ],
+      "cohorts": [
+        {
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "E04-BARE",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "glm-4.7-flash_bare_r3",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "zai-org/glm-4.7-flash",
+          "wariant": "karpathy",
+          "n": 3,
+          "kod": "E04-KARP",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "glm-4.7-flash_karpathy_r1",
+          "reprezentant_powod": null
+        }
+      ],
+      "date": "2026-09-20",
+      "social_card": "episodes/04-glm-4.7-flash/card.jpg"
+    },
     {
       "published": "2026-09-30",
       "slug": "03-gemma-4-31b",

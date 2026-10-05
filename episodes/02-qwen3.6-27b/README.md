@@ -1,4 +1,4 @@
-# Qwen3.6 27B with and without Karpathy rules
+# Qwen 3.6 27B builds a web page in 4 minutes. Do rules make it leaner?
 
 Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (54–73 effects without the rules, 48–69 with them), so on this model the rules changed nothing measurable. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: on. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.
 

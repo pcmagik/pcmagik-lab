@@ -1037,7 +1037,7 @@
   {
    "published": "2026-09-29",
    "slug": "02-qwen3.6-27b",
-   "title": "Qwen3.6 27B with and without Karpathy rules",
+   "title": "Qwen 3.6 27B builds a web page in 4 minutes. Do rules make it leaner?",
    "kind": "para-wariantow",
    "task": "easy",
    "task_file": "tasks/easy.txt",

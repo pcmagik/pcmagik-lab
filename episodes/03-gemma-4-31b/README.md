@@ -1,4 +1,4 @@
-# Gemma 4 31B with and without Karpathy rules
+# Gemma 4 31B needs 7 minutes for one web page. Do rules speed it up?
 
 Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (29–39 effects without the rules, 31–44 with them), so on this model the rules changed nothing measurable. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: on. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.
 

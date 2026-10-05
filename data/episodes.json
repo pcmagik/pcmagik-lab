@@ -522,7 +522,7 @@
   {
    "published": "2026-09-30",
    "slug": "03-gemma-4-31b",
-   "title": "Gemma 4 31B with and without Karpathy rules",
+   "title": "Gemma 4 31B needs 7 minutes for one web page. Do rules speed it up?",
    "kind": "para-wariantow",
    "task": "easy",
    "task_file": "tasks/easy.txt",

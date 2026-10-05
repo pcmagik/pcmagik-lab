@@ -7,7 +7,7 @@
   {
    "published": "2026-10-03",
    "slug": "04-glm-4.7-flash",
-   "title": "GLM 4.7 Flash with and without Karpathy rules",
+   "title": "GLM 4.7 Flash builds a full web page in under 2 minutes. Do rules slow it down?",
    "kind": "para-wariantow",
    "task": "easy",
    "task_file": "tasks/easy.txt",

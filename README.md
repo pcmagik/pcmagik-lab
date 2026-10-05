@@ -4,7 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
-| 04 | [GLM 4.7 Flash with and without Karpathy rules](episodes/04-glm-4.7-flash/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/l_IVcUg-V2E) |
+| 04 | [GLM 4.7 Flash builds a full web page in under 2 minutes. Do rules slow it down?](episodes/04-glm-4.7-flash/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/l_IVcUg-V2E) |
 | 03 | [Gemma 4 31B needs 7 minutes for one web page. Do rules speed it up?](episodes/03-gemma-4-31b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/18ERHNd9M-0) |
 | 02 | [Qwen 3.6 27B builds a web page in 4 minutes. Do rules make it leaner?](episodes/02-qwen3.6-27b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/Djku896tncg) |
 | 01 | [Qwen 3.8 27B with Karpathy skills: what you gain, what you lose](episodes/01-karpathy-vs-bare/README.md) | easy | 10 | [YouTube](https://www.youtube.com/shorts/5xvHtb7y0zY) |

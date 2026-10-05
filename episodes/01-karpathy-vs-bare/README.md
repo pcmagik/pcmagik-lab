@@ -1,4 +1,4 @@
-# Karpathy skills on Qwen3.8 27B: what you gain, what you lose
+# Qwen 3.8 27B with Karpathy skills: what you gain, what you lose
 
 On Qwen3.8 27B, one Karpathy rules file: no clear difference in time or tokens, 22% fewer visual effects, fewer in each of the 5 runs. Which page looks better? Tell me in the comments.
 

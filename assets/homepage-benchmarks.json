@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated": "2026-10-03",
+  "generated": "2026-10-05",
   "source": "seria/harness/publikuj.py",
   "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
   "episodes": [
@@ -1552,7 +1552,7 @@
     {
       "published": "2026-09-27",
       "slug": "01-karpathy-vs-bare",
-      "title": "Karpathy skills on Qwen3.8 27B: what you gain, what you lose",
+      "title": "Qwen 3.8 27B with Karpathy skills: what you gain, what you lose",
       "kind": "para-wariantow",
       "task": "easy",
       "task_file": "tasks/easy.txt",
@@ -2281,7 +2281,8 @@
           "reprezentant_powod": null
         }
       ],
-      "date": "2026-09-19"
+      "date": "2026-09-19",
+      "social_card": "episodes/01-karpathy-vs-bare/card.jpg"
     }
   ]
 }

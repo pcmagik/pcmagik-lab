@@ -1,9 +1,529 @@
 {
   "schema_version": 2,
-  "generated": "2026-10-05",
+  "generated": "2026-10-07",
   "source": "seria/harness/publikuj.py",
   "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
   "episodes": [
+    {
+      "published": "2026-10-07",
+      "slug": "05-nemotron-3-nano",
+      "title": "Nemotron 3 Nano spends 76% of its output thinking, and 2 of 6 pages broke",
+      "kind": "para-wariantow",
+      "task": "easy",
+      "task_file": "tasks/easy.txt",
+      "prompt_file": "episodes/05-nemotron-3-nano/prompt.txt",
+      "youtube": "https://www.youtube.com/shorts/i1rk2hLmOXU",
+      "opis": "Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (5–8 effects without the rules, 6–12 with them), so on this model the rules changed nothing measurable. What did change: 2 of 6 runs never produced a complete page. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: on. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.",
+      "thesis": {
+        "metric": "efekty",
+        "models": [
+          {
+            "model": "nvidia/nemotron-3-nano",
+            "n_bare": 3,
+            "n_karpathy": 3,
+            "bare": {
+              "min": 5,
+              "max": 8,
+              "n": 3,
+              "mean": 7.0
+            },
+            "karpathy": {
+              "min": 6,
+              "max": 12,
+              "n": 3,
+              "mean": 8.0
+            },
+            "class": "nakladaja-sie",
+            "karpathy_ponizej_kazdego_bare": 0,
+            "karpathy_powyzej_kazdego_bare": 1,
+            "zmiana_sredniej_pct": 14.3
+          }
+        ],
+        "summary": {
+          "models": 1,
+          "karpathy-mniej": 0,
+          "nakladaja-sie": 1,
+          "karpathy-wiecej": 0,
+          "brak-danych": 0,
+          "jeden-wariant": 0
+        },
+        "pary": [],
+        "claim": "Ranges overlap (counted effects)"
+      },
+      "runs": [
+        {
+          "bieg": "nemotron-3-nano_bare_r2",
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 59.15,
+          "tokeny": 5851,
+          "myslenie_pct": 77.49,
+          "tok_s": 98.91,
+          "linie": 162,
+          "tokeny_myslenia": 4534,
+          "efekty": 8,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "nemotron-3-nano-r2_nemotron-3-nano_bare_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/index.html",
+          "zrzut": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/preview-390.png",
+          "metrics": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/metrics.json",
+          "prompt": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/prompt.txt",
+          "efekty_plik": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/efekty.json",
+          "odtworzenie": {
+            "model": "nvidia/nemotron-3-nano",
+            "quantization": {
+              "value": "Q3_K_L",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "nemotron-3-nano_karpathy_r3",
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 42.14,
+          "tokeny": 4057,
+          "myslenie_pct": 75.6,
+          "tok_s": 96.27,
+          "linie": 122,
+          "tokeny_myslenia": 3067,
+          "efekty": 6,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "nemotron-3-nano-r3_nemotron-3-nano_karpathy_pi_eon",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/index.html",
+          "zrzut": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/preview-390.png",
+          "metrics": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/metrics.json",
+          "prompt": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/prompt.txt",
+          "efekty_plik": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/efekty.json",
+          "odtworzenie": {
+            "model": "nvidia/nemotron-3-nano",
+            "quantization": {
+              "value": "Q3_K_L",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/05-nemotron-3-nano/rules/karpathy/AGENTS.md"
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "bieg": "nemotron-3-nano_bare_r1",
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 45.93,
+          "tokeny": 4209,
+          "myslenie_pct": 76.24,
+          "tok_s": 91.64,
+          "linie": 114,
+          "tokeny_myslenia": 3209,
+          "efekty": 5,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "nemotron-3-nano-r1_nemotron-3-nano_bare_pi_eon",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [
+            "znacznik <style> bez domkniecia",
+            "brak/znikomy CSS"
+          ],
+          "zrzut_pusty": true,
+          "strona": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r1/index.html",
+          "zrzut": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r1/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r1/metrics.json",
+          "prompt": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r1/prompt.txt",
+          "efekty_plik": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r1/efekty.json",
+          "odtworzenie": {
+            "model": "nvidia/nemotron-3-nano",
+            "quantization": {
+              "value": "Q3_K_L",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "nemotron-3-nano_bare_r2",
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 59.15,
+          "tokeny": 5851,
+          "myslenie_pct": 77.49,
+          "tok_s": 98.91,
+          "linie": 162,
+          "tokeny_myslenia": 4534,
+          "efekty": 8,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "nemotron-3-nano-r2_nemotron-3-nano_bare_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/index.html",
+          "zrzut": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/preview-390.png",
+          "metrics": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/metrics.json",
+          "prompt": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/prompt.txt",
+          "efekty_plik": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r2/efekty.json",
+          "odtworzenie": {
+            "model": "nvidia/nemotron-3-nano",
+            "quantization": {
+              "value": "Q3_K_L",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "nemotron-3-nano_bare_r3",
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 36.93,
+          "tokeny": 3672,
+          "myslenie_pct": 53.24,
+          "tok_s": 99.43,
+          "linie": 212,
+          "tokeny_myslenia": 1955,
+          "efekty": 8,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "nemotron-3-nano-r3_nemotron-3-nano_bare_pi_eon",
+          "powtorzenie": 3,
+          "reprezentant": false,
+          "wady": [
+            "urwany (nie konczy sie tagiem)"
+          ],
+          "zrzut_pusty": false,
+          "strona": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r3/index.html",
+          "zrzut": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r3/preview-390.png",
+          "metrics": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r3/metrics.json",
+          "prompt": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r3/prompt.txt",
+          "efekty_plik": "episodes/05-nemotron-3-nano/nemotron-3-nano_bare_r3/efekty.json",
+          "odtworzenie": {
+            "model": "nvidia/nemotron-3-nano",
+            "quantization": {
+              "value": "Q3_K_L",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "nemotron-3-nano_karpathy_r1",
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 36.26,
+          "tokeny": 4032,
+          "myslenie_pct": 68.9,
+          "tok_s": 111.19,
+          "linie": 161,
+          "tokeny_myslenia": 2778,
+          "efekty": 6,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "nemotron-3-nano-r1_nemotron-3-nano_karpathy_pi_eon",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r1/index.html",
+          "zrzut": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r1/preview-390.png",
+          "metrics": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r1/metrics.json",
+          "prompt": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r1/prompt.txt",
+          "efekty_plik": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r1/efekty.json",
+          "odtworzenie": {
+            "model": "nvidia/nemotron-3-nano",
+            "quantization": {
+              "value": "Q3_K_L",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/05-nemotron-3-nano/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "nemotron-3-nano_karpathy_r2",
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 47.37,
+          "tokeny": 4407,
+          "myslenie_pct": 57.43,
+          "tok_s": 93.03,
+          "linie": 188,
+          "tokeny_myslenia": 2531,
+          "efekty": 12,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "nemotron-3-nano-r2_nemotron-3-nano_karpathy_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r2/index.html",
+          "zrzut": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r2/preview-390.png",
+          "metrics": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r2/metrics.json",
+          "prompt": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r2/prompt.txt",
+          "efekty_plik": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r2/efekty.json",
+          "odtworzenie": {
+            "model": "nvidia/nemotron-3-nano",
+            "quantization": {
+              "value": "Q3_K_L",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/05-nemotron-3-nano/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "nemotron-3-nano_karpathy_r3",
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 42.14,
+          "tokeny": 4057,
+          "myslenie_pct": 75.6,
+          "tok_s": 96.27,
+          "linie": 122,
+          "tokeny_myslenia": 3067,
+          "efekty": 6,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "nemotron-3-nano-r3_nemotron-3-nano_karpathy_pi_eon",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/index.html",
+          "zrzut": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/preview-390.png",
+          "metrics": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/metrics.json",
+          "prompt": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/prompt.txt",
+          "efekty_plik": "episodes/05-nemotron-3-nano/nemotron-3-nano_karpathy_r3/efekty.json",
+          "odtworzenie": {
+            "model": "nvidia/nemotron-3-nano",
+            "quantization": {
+              "value": "Q3_K_L",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/05-nemotron-3-nano/rules/karpathy/AGENTS.md"
+          }
+        }
+      ],
+      "cohorts": [
+        {
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "E05-BARE",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "nemotron-3-nano_bare_r2",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "nvidia/nemotron-3-nano",
+          "wariant": "karpathy",
+          "n": 3,
+          "kod": "E05-KARP",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "nemotron-3-nano_karpathy_r3",
+          "reprezentant_powod": null
+        }
+      ],
+      "date": "2026-09-20",
+      "social_card": "episodes/05-nemotron-3-nano/card.jpg"
+    },
     {
       "published": "2026-10-03",
       "slug": "04-glm-4.7-flash",

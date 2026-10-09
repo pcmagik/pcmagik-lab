@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 06 | [Muse Glimmer builds a web page in 2.5 minutes. What changes with Karpathy rules?](episodes/06-muse-glimmer/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/e8FWKxCOrPg) |
 | 05 | [Nemotron 3 Nano spends 76% of its output thinking, and 2 of 6 pages broke](episodes/05-nemotron-3-nano/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/i1rk2hLmOXU) |
 | 04 | [GLM 4.7 Flash builds a full web page in under 2 minutes. Do rules slow it down?](episodes/04-glm-4.7-flash/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/l_IVcUg-V2E) |
 | 03 | [Gemma 4 31B needs 7 minutes for one web page. Do rules speed it up?](episodes/03-gemma-4-31b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/18ERHNd9M-0) |

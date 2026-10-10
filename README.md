@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 07 | [Qwen 3.6 35B A3B puts 70+ effects on every page. Do rules tone it down?](episodes/07-qwen3.6-35b-a3b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/LI1199MruQ4) |
 | 06 | [Muse Glimmer builds a web page in 2.5 minutes. What changes with Karpathy rules?](episodes/06-muse-glimmer/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/e8FWKxCOrPg) |
 | 05 | [Nemotron 3 Nano spends 76% of its output thinking, and 2 of 6 pages broke](episodes/05-nemotron-3-nano/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/i1rk2hLmOXU) |
 | 04 | [GLM 4.7 Flash builds a full web page in under 2 minutes. Do rules slow it down?](episodes/04-glm-4.7-flash/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/l_IVcUg-V2E) |

@@ -1,0 +1,14 @@
+{
+ "@keyframes": 4,
+ "animation": 6,
+ "transition": 11,
+ ":hover": 8,
+ "gradient": 10,
+ "box-shadow": 6,
+ "backdrop-filter": 5,
+ "transform": 15,
+ "addEventListener": 4,
+ "IntersectionObserver": 1,
+ "svg": 17,
+ "razem": 87
+}

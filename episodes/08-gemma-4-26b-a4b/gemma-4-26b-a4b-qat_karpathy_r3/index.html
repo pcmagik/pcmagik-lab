@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Magik Lab | Local Models, Real GPUs</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --surface-color: rgba(255, 255, 255, 0.05);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.5);
+            --secondary-accent: #7000ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background Decorations */
+        .bg-glow {
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(80px);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .glow-1 { top: -10%; left: -10%; }
+        .glow-2 { bottom: -10%; right: -10%; background: radial-gradient(circle, var(--secondary-accent) 0%, transparent 70%); }
+
+        /* Layout Containers */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 100px 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-color);
+            margin: 15px auto 0;
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Components */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 0;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--accent-color);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            background: transparent;
+            margin-left: 15px;
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            padding: 40px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+        }
+
+        /* Grid Layouts */
+        .grid-methodology {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .methodology-step {
+            text-align: center;
+        }
+
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 242, 255, 0.1);
+            border-radius: 50%;
+            color: var(--accent-color);
+        }
+
+        .hardware-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .hardware-card {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .spec-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .spec-list li {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        footer {
+            padding: 50px 0;
+            border-top: 1px solid var(--surface-border);
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-links {
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero .btn-outline {
+                margin-left: 0;
+                margin-top: 15px;
+                display: block;
+            }
+            .btn-primary {
+                display: block;
+                margin-bottom: 10px;
+            }
+            section {
+                padding: 60px 0;
+            }
+        }
+
+        /* SVG Icon Styling */
+        .icon-svg {
+            width: 32px;
+            height: 32px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero visible">
+            <h1>PC Magik Lab</h1>
+            <p class="tagline">Local models, real GPUs.</p>
+            <div class="hero-buttons">
+                <a href="https://www.youtube.com/@PCMagikLab" target="_blank" class="btn btn-primary">Watch Series</a>
+                <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" class="btn btn-outline">View Repository</a>
+            </div>
+        </section>
+
+        <!-- Methodology Section -->
+        <section id="methodology">
+            <h2>Our Methodology</h2>
+            <div class="grid-methodology">
+                <div class="glass-card methodology-step">
+                    <div class="step-icon">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4.47 4.47 0 0 0-1-3.88M14 21a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2m7-3V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v6m0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M0 7h20"/></svg>
+                    </div>
+                    <h3>Consistent Prompt</h3>
+                    <p>Same prompt for every comparison.</p>
+                </div>
+                <div class="glass-card methodology-step">
+                    <div class="step-icon">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <h3>Same Rig</h3>
+                    <p>The hardware remains constant.</p>
+                </div>
+                <div class="glass-card methodology-step">
+                    <div class="step-icon">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </div>
+                    <h3>One Variable</h3>
+                    <p>Only one change per test run.</p>
+                </div>
+                <div class="glass-card methodology-step">
+                    <div class="step-icon">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.92-9.41"/><path d="M16 6a4 4 0 0 1 0 8"/></svg>
+                    </div>
+                    <h3>Fresh Reload</h3>
+                    <p>Model reloaded before every run.</p>
+                </div>
+                <div class="glass-card methodology-step">
+                    <div class="step-icon">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="16 2 16 6 10 6 10 2"/></svg>
+                    </div>
+                    <h3>Open Source</h3>
+                    <p>All prompts and results published.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hardware Section -->
+        <section id="hardware">
+            <h2>Hardware Setup</h2>
+            <div class="hardware-grid">
+                <div class="glass-card hardware-card">
+                    <h3>The Rig</h3>
+                    <ul class="spec-list">
+                        <li><strong>NVIDIA RTX 3090</strong></li>
+                        <li>24 GB VRAM</li>
+                    </ul>
+                </div>
+                <div class="glass-card hardware-card">
+                    <h3>Model Server</h3>
+                    <ul class="spec-list">
+                        <li><strong>LM Studio</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <div class="glass-card" style="text-align: center; max-width: 800px; margin: 0 auto;">
+                <h2>About the Series</h2>
+                <p>
+                    PC Magik Lab is dedicated to exploring the boundaries of local AI. 
+                    We run real models on real local hardware to understand their performance, 
+                    capabilities, and practical limits in real-world scenarios.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://www.youtube.com/@PCMagikLab" target="_blank">YouTube</a>
+                <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank">GitHub</a>
+            </div>
+            <p>&copy; PC Magik (Mateusz Piekut), computer service and homelab operator from Poland.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for Reveal Animation
+        const observerOptions = {
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Simple Mouse Parallax for Background Glows
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            const glow1 = document.querySelector('.glow-1');
+            const glow2 = document.querySelector('.glow-2');
+            
+            if (glow1 && glow2) {
+                glow1.style.transform = `translate(${x * 50}px, ${y * 50}px)`;
+                glow2.style.transform = `translate(-${x * 50}px, -${y * 50}px)`;
+            }
+        });
+    </script>
+</body>
+</html>

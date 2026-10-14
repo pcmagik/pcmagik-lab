@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 09 | [Nemotron 3.5 Lightning broke 1 page in 6. Can a rules file prevent that?](episodes/09-nemotron-3.5-lightning/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/90bUpSN-zUE) |
 | 08 | [Gemma 4 26B A4B: 110 tokens per second. Does a rules file change the page?](episodes/08-gemma-4-26b-a4b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/D_1GVPUnn5c) |
 | 07 | [Qwen 3.6 35B A3B puts 70+ effects on every page. Do rules tone it down?](episodes/07-qwen3.6-35b-a3b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/LI1199MruQ4) |
 | 06 | [Muse Glimmer builds a web page in 2.5 minutes. What changes with Karpathy rules?](episodes/06-muse-glimmer/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/e8FWKxCOrPg) |

@@ -1,9 +1,526 @@
 {
  "schema_version": 2,
- "generated": "2026-10-12",
+ "generated": "2026-10-14",
  "source": "seria/harness/publikuj.py",
  "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
  "episodes": [
+  {
+   "published": "2026-10-14",
+   "slug": "09-nemotron-3.5-lightning",
+   "title": "Nemotron 3.5 Lightning broke 1 page in 6. Can a rules file prevent that?",
+   "kind": "para-wariantow",
+   "task": "easy",
+   "task_file": "tasks/easy.txt",
+   "prompt_file": "episodes/09-nemotron-3.5-lightning/prompt.txt",
+   "youtube": "https://www.youtube.com/shorts/90bUpSN-zUE",
+   "opis": "Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (25–34 effects without the rules, 23–53 with them), so on this model the rules changed nothing measurable. What did change: 1 of 6 runs never produced a complete page. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: on. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.",
+   "thesis": {
+    "metric": "efekty",
+    "models": [
+     {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "n_bare": 3,
+      "n_karpathy": 3,
+      "bare": {
+       "min": 25,
+       "max": 34,
+       "n": 3,
+       "mean": 30.3
+      },
+      "karpathy": {
+       "min": 23,
+       "max": 53,
+       "n": 3,
+       "mean": 37.3
+      },
+      "class": "nakladaja-sie",
+      "karpathy_ponizej_kazdego_bare": 1,
+      "karpathy_powyzej_kazdego_bare": 2,
+      "zmiana_sredniej_pct": 23.1
+     }
+    ],
+    "summary": {
+     "models": 1,
+     "karpathy-mniej": 0,
+     "nakladaja-sie": 1,
+     "karpathy-wiecej": 0,
+     "brak-danych": 0,
+     "jeden-wariant": 0
+    },
+    "pary": [],
+    "claim": "Ranges overlap (counted effects)"
+   },
+   "runs": [
+    {
+     "bieg": "nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2",
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 97.54,
+     "tokeny": 7313,
+     "myslenie_pct": 7.27,
+     "tok_s": 74.98,
+     "linie": 568,
+     "tokeny_myslenia": 532,
+     "efekty": 34,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "nvidia-nemotron-3.5-lightning-30b-a3b-r2_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/index.html",
+     "zrzut": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/preview-390.png",
+     "metrics": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/metrics.json",
+     "prompt": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/prompt.txt",
+     "efekty_plik": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/efekty.json",
+     "odtworzenie": {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "quantization": {
+       "value": "Q3_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1",
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 89.66,
+     "tokeny": 6259,
+     "myslenie_pct": 12.06,
+     "tok_s": 69.81,
+     "linie": 600,
+     "tokeny_myslenia": 755,
+     "efekty": 36,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "nvidia-nemotron-3.5-lightning-30b-a3b-r1_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_eon",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/index.html",
+     "zrzut": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/preview-390.png",
+     "metrics": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/metrics.json",
+     "prompt": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/prompt.txt",
+     "efekty_plik": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/efekty.json",
+     "odtworzenie": {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "quantization": {
+       "value": "Q3_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/09-nemotron-3.5-lightning/rules/karpathy/AGENTS.md"
+     }
+    }
+   ],
+   "measurements": [
+    {
+     "bieg": "nvidia-nemotron-3.5-lightning-30b-a3b_bare_r1",
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 92.16,
+     "tokeny": 6772,
+     "myslenie_pct": 16.49,
+     "tok_s": 73.48,
+     "linie": 509,
+     "tokeny_myslenia": 1117,
+     "efekty": 32,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "nvidia-nemotron-3.5-lightning-30b-a3b-r1_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_eon",
+     "powtorzenie": 1,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r1/index.html",
+     "zrzut": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r1/preview-390.png",
+     "metrics": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r1/metrics.json",
+     "prompt": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r1/prompt.txt",
+     "efekty_plik": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r1/efekty.json",
+     "odtworzenie": {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "quantization": {
+       "value": "Q3_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2",
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 97.54,
+     "tokeny": 7313,
+     "myslenie_pct": 7.27,
+     "tok_s": 74.98,
+     "linie": 568,
+     "tokeny_myslenia": 532,
+     "efekty": 34,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "nvidia-nemotron-3.5-lightning-30b-a3b-r2_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/index.html",
+     "zrzut": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/preview-390.png",
+     "metrics": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/metrics.json",
+     "prompt": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/prompt.txt",
+     "efekty_plik": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2/efekty.json",
+     "odtworzenie": {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "quantization": {
+       "value": "Q3_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "nvidia-nemotron-3.5-lightning-30b-a3b_bare_r3",
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 139.69,
+     "tokeny": 9808,
+     "myslenie_pct": 19.07,
+     "tok_s": 70.21,
+     "linie": 456,
+     "tokeny_myslenia": 1870,
+     "efekty": 25,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "nvidia-nemotron-3.5-lightning-30b-a3b-r3_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_eon",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": true,
+     "strona": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r3/index.html",
+     "zrzut": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r3/screenshot-390.png",
+     "zrzut_390_kadr": null,
+     "metrics": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r3/metrics.json",
+     "prompt": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r3/prompt.txt",
+     "efekty_plik": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_bare_r3/efekty.json",
+     "odtworzenie": {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "quantization": {
+       "value": "Q3_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1",
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 89.66,
+     "tokeny": 6259,
+     "myslenie_pct": 12.06,
+     "tok_s": 69.81,
+     "linie": 600,
+     "tokeny_myslenia": 755,
+     "efekty": 36,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "nvidia-nemotron-3.5-lightning-30b-a3b-r1_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_eon",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/index.html",
+     "zrzut": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/preview-390.png",
+     "metrics": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/metrics.json",
+     "prompt": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/prompt.txt",
+     "efekty_plik": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1/efekty.json",
+     "odtworzenie": {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "quantization": {
+       "value": "Q3_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/09-nemotron-3.5-lightning/rules/karpathy/AGENTS.md"
+     }
+    },
+    {
+     "bieg": "nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r2",
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 83.08,
+     "tokeny": 5703,
+     "myslenie_pct": 15.48,
+     "tok_s": 68.65,
+     "linie": 425,
+     "tokeny_myslenia": 883,
+     "efekty": 23,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "nvidia-nemotron-3.5-lightning-30b-a3b-r2_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_eon",
+     "powtorzenie": 2,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r2/index.html",
+     "zrzut": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r2/preview-390.png",
+     "metrics": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r2/metrics.json",
+     "prompt": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r2/prompt.txt",
+     "efekty_plik": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r2/efekty.json",
+     "odtworzenie": {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "quantization": {
+       "value": "Q3_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/09-nemotron-3.5-lightning/rules/karpathy/AGENTS.md"
+     }
+    },
+    {
+     "bieg": "nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r3",
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 315.28,
+     "tokeny": 22560,
+     "myslenie_pct": 10.73,
+     "tok_s": 71.56,
+     "linie": 798,
+     "tokeny_myslenia": 2421,
+     "efekty": 53,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "on",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "on",
+      "zrodlo": "metrics.json",
+      "zgodny": false
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "nvidia-nemotron-3.5-lightning-30b-a3b-r3_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_eon",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [
+      "div 44/39"
+     ],
+     "zrzut_pusty": false,
+     "strona": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r3/index.html",
+     "zrzut": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r3/preview-390.png",
+     "metrics": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r3/metrics.json",
+     "prompt": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r3/prompt.txt",
+     "efekty_plik": "episodes/09-nemotron-3.5-lightning/nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r3/efekty.json",
+     "odtworzenie": {
+      "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+      "quantization": {
+       "value": "Q3_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/09-nemotron-3.5-lightning/rules/karpathy/AGENTS.md"
+     }
+    }
+   ],
+   "cohorts": [
+    {
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "bare",
+     "n": 3,
+     "kod": "E09-BARE",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "nvidia-nemotron-3.5-lightning-30b-a3b_bare_r2",
+     "reprezentant_powod": null
+    },
+    {
+     "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+     "wariant": "karpathy",
+     "n": 3,
+     "kod": "E09-KARP",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_r1",
+     "reprezentant_powod": null
+    }
+   ],
+   "date": "2026-09-20",
+   "social_card": "episodes/09-nemotron-3.5-lightning/card.jpg"
+  },
   {
    "published": "2026-10-12",
    "slug": "08-gemma-4-26b-a4b",

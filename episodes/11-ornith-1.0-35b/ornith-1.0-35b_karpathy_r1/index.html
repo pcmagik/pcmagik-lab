@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PC Magik Lab — Local models, real GPUs.</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12131a;
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --neon-blue: #00d4ff;
+      --neon-purple: #a855f7;
+      --neon-cyan: #22d3ee;
+      --text-primary: #e8e9ed;
+      --text-secondary: #8b8d97;
+      --glow-blue: 0 0 30px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--neon-blue) var(--bg-secondary);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      animation: orbFloat 20s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.15), transparent);
+      top: -100px; left: -100px;
+    }
+
+    .orb-2 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.12), transparent);
+      bottom: 20%; right: -80px;
+      animation-delay: -10s;
+    }
+
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.1), transparent);
+      top: 50%; left: 30%;
+      animation-delay: -5s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -40px) scale(1.05); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+      75% { transform: translate(40px, 30px) scale(1.02); }
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 1rem 2rem;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
+    }
+
+    nav.scrolled {
+      padding: 0.7rem 2rem;
+      background: rgba(10, 10, 15, 0.95);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--neon-blue);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+      text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Main content */
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 6rem 2rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding-top: 5rem;
+    }
+
+    .hero-content {
+      max-width: 800px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      font-size: 0.8rem;
+      color: var(--neon-cyan);
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--neon-blue);
+      box-shadow: 0 0 10px var(--neon-blue);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.8s ease 0.1s forwards;
+      opacity: 0;
+    }
+
+    .hero h1 .gradient-text {
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: clamp(1.2rem, 3vw, 1.6rem);
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      animation: fadeInUp 0.8s ease 0.2s forwards;
+      opacity: 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.8s ease 0.3s forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-blue), #0099cc);
+      color: #fff;
+      box-shadow: 0 4px 25px rgba(0, 212, 255, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--glow-blue), 0 8px 30px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--glass-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--neon-blue);
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.15);
+    }
+
+    /* SVG icons inline */
+    .icon {
+      width: 20px; height: 20px;
+      fill: currentColor;
+    }
+
+    .icon-lg {
+      width: 28px; height: 28px;
+    }
+
+    /* Section headers */
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--neon-blue);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* Methodology Section */
+    #methodology {
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .method-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .method-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .method-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 212, 255, 0.3);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 212, 255, 0.05);
+    }
+
+    .method-card:hover::before {
+      opacity: 1;
+    }
+
+    .method-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+    }
+
+    .method-icon svg {
+      width: 24px; height: 24px;
+      stroke: var(--neon-blue);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .method-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+
+    .method-card p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+
+    /* Hardware Section */
+    #hardware {
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .hardware-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .gpu-visual {
+      aspect-ratio: 4/3;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(168, 85, 247, 0.05));
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gpu-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 10, 15, 0.6));
+    }
+
+    .gpu-svg {
+      width: 70%;
+      height: 70%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hardware-details h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .hardware-details .subtitle {
+      color: var(--neon-cyan);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .spec-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      border-radius: 12px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
+    }
+
+    .spec-item:hover {
+      border-color: rgba(0, 212, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .spec-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--neon-blue);
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+      flex-shrink: 0;
+    }
+
+    .spec-item strong {
+      min-width: 80px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .spec-item span {
+      font-size: 1rem;
+    }
+
+    /* About Section */
+    #about {
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .about-content {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .about-text {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      line-height: 1.85;
+      margin-bottom: 2rem;
+    }
+
+    .about-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--glass-border);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    footer p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+
+    footer .author {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Scroll reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      section {
+        padding: 4rem 1.5rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hardware-showcase {
+        grid-template-columns: 1fr;
+      }
+
+      .gpu-visual {
+        max-height: 250px;
+      }
+
+      .method-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    /* Selection color */
+    ::selection {
+      background: rgba(0, 212, 255, 0.3);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">PC Magik Lab</div>
+      <ul class="nav-links">
+        <li><a href="#methodology">How We Measure</a></li>
+        <li><a href="#hardware">Hardware</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-content">
+        <div class="hero-badge">YouTube Series</div>
+        <h1><span class="gradient-text">PC Magik Lab</span></h1>
+        <p class="tagline">Local models, real GPUs.</p>
+        <div class="hero-actions">
+          <a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.84.029 8.258c0 2.418.459 4.807 4.356 5.074 3.6.245 11.626.246 15.23 0 3.9-0.267 4.356-2.656 4.356-5.074 0-2.418-.459-4.808-4.356-5.074z" fill="currentColor"/><path d="M9.546 8.483v7.034m0-7.034c0 .712.577 1.289 1.289 1.289s1.289-.577 1.289-1.289V15.5c0-.712-.577-1.289-1.289-1.289s-1.289.577-1.289 1.289z" fill="currentColor"/></svg>
+            Watch on YouTube
+          </a>
+          <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill="currentColor"/></svg>
+            View Repository
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section id="methodology">
+      <div class="section-header reveal">
+        <span class="section-label">Methodology</span>
+        <h2 class="section-title">How We Measure Things</h2>
+      </div>
+      <div class="method-grid">
+        <div class="method-card reveal">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke-linecap="round"/><path d="M9 5a2 2 0 012-2h2a2 2 0 012 2v0a2 2 0 01-2 2H9a2 2 0 01-2-2z"/><path d="M9 15l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Same Prompt, Every Time</h3>
+          <p>The exact same prompt is used across every run. No variations, no improvisation — just consistent input for fair comparison.</p>
+        </div>
+        <div class="method-card reveal">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+          </div>
+          <h3>Same Rig, Every Time</h3>
+          <p>All benchmarks run on the same physical hardware. No cloud instances, no virtual machines — just real local GPUs.</p>
+        </div>
+        <div class="method-card reveal">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="m21 9-7.5 7.5a3.18 3.18 0 11-4.5-4.5L15.5 6.5"/></svg>
+          </div>
+          <h3>One Variable Changed</h3>
+          <p>Each test changes exactly one variable at a time, so every result maps cleanly to its cause.</p>
+        </div>
+        <div class="method-card reveal">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M12 3v5"/></svg>
+          </div>
+          <h3>Fresh Model Reload</h3>
+          <p>The model is reloaded fresh before every run, eliminating cache artifacts and warmup bias.</p>
+        </div>
+        <div class="method-card reveal">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z"/><path d="M14 2v6h6" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Published Results</h3>
+          <p>Every prompt and every result file is published in full. Complete transparency, open for review.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hardware Section -->
+    <section id="hardware">
+      <div class="section-header reveal">
+        <span class="section-label">Hardware</span>
+        <h2 class="section-title">The Rig</h2>
+      </div>
+      <div class="hardware-showcase">
+        <div class="gpu-visual reveal">
+          <!-- Inline SVG of a GPU -->
+          <svg class="gpu-svg" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+            <!-- PCB Board -->
+            <rect x="25" y="40" width="250" height="160" rx="8" fill="#1a1b25" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+            <!-- GPU Chip -->
+            <rect x="95" y="75" width="110" height="100" rx="6" fill="#22233a" stroke="rgba(0,212,255,0.4)" stroke-width="1.5"/>
+            <!-- Chip label -->
+            <text x="150" y="120" text-anchor="middle" fill="var(--neon-cyan)" font-size="13" font-weight="bold">RTX 3090</text>
+            <text x="150" y="140" text-anchor="middle" fill="rgba(34,211,238,0.6)" font-size="9">24 GB GDDR6X</text>
+            <!-- Vents / fans -->
+            <circle cx="70" cy="120" r="28" fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+            <circle cx="70" cy="120" r="20" fill="none" stroke="rgba(0,212,255,0.1)" stroke-width="1"/>
+            <g opacity="0.4">
+              <line x1="70" y1="98" x2="70" y2="108" stroke="var(--neon-cyan)" stroke-width="1.5"/>
+              <line x1="70" y1="132" x2="70" y2="142" stroke="var(--neon-cyan)" stroke-width="1.5"/>
+              <line x1="48" y1="120" x2="58" y2="120" stroke="var(--neon-cyan)" stroke-width="1.5"/>
+              <line x1="82" y1="120" x2="92" y2="120" stroke="var(--neon-cyan)" stroke-width="1.5"/>
+            </g>
+            <!-- Power connector -->
+            <rect x="40" y="60" width="30" height="16" rx="3" fill="#2a2b3d" stroke="rgba(168,85,247,0.3)" stroke-width="1"/>
+            <!-- VRAM modules -->
+            <rect x="215" y="75" width="12" height="100" rx="2" fill="#2a2b3d" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+            <rect x="230" y="75" width="12" height="100" rx="2" fill="#2a2b3d" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+            <!-- PCIe connector -->
+            <rect x="60" y="195" width="180" height="10" rx="2" fill="#3a3b4f" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+            <!-- Glow effect -->
+            <circle cx="150" cy="120" r="60" fill="none" stroke="var(--neon-blue)" stroke-width="0.5" opacity="0.3">
+              <animate attributeName="opacity" values="0.1;0.4;0.1" dur="3s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+        <div class="hardware-details reveal">
+          <h3>NVIDIA RTX 3090</h3>
+          <p class="subtitle">24 GB VRAM — Single Rig Setup</p>
+          <ul class="spec-list">
+            <li class="spec-item">
+              <div class="spec-dot"></div>
+              <strong>GPU</strong>
+              <span>NVIDIA GeForce RTX 3090</span>
+            </li>
+            <li class="spec-item">
+              <div class="spec-dot"></div>
+              <strong>VRAM</strong>
+              <span>24 GB GDDR6X</span>
+            </li>
+            <li class="spec-item">
+              <div class="spec-dot"></div>
+              <strong>Server</strong>
+              <span>LM Studio</span>
+            </li>
+            <li class="spec-item">
+              <div class="spec-dot"></div>
+              <strong>Type</strong>
+              <span>Local, physical hardware</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+      <div class="section-header reveal">
+        <span class="section-label">About</span>
+        <h2 class="section-title">What This Is</h2>
+      </div>
+      <div class="about-content reveal">
+        <p class="about-text">
+          PC Magik Lab is a YouTube series dedicated to running AI language models locally on real, physical GPUs. No cloud abstractions, no serverless APIs — just raw hardware producing measurable output. Every benchmark follows the same rigorous method: one variable changed per test, fresh model reloads, and complete transparency with every prompt and result file published in full.
+        </p>
+        <div class="about-links">
+          <a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.84.029 8.258c0 2.418.459 4.807 4.356 5.074 3.6.245 11.626.246 15.23 0 3.9-0.267 4.356-2.656 4.356-5.074 0-2.418-.459-4.808-4.356-5.074z" fill="currentColor"/><path d="M9.546 8.483v7.034m0-7.034c0 .712.577 1.289 1.289 1.289s1.289-.577 1.289-1.289V15.5c0-.712-.577-1.289-1.289-1.289s-1.289.577-1.289 1.289z" fill="currentColor"/></svg>
+            YouTube Channel
+          </a>
+          <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill="currentColor"/></svg>
+            GitHub Repository
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <p>
+        PC Magik Lab &copy; — Created and operated by<br>
+        <span class="author">PC Magik (Mateusz Piekut)</span><br>
+        Computer service and homelab operator from Poland
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Scroll reveal using Intersection Observer
+    const reveals = document.querySelectorAll('.reveal');
+    const observerOptions = {
+      threshold: 0.15,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Interactive card tilt effect on hover
+    document.querySelectorAll('.method-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -3;
+        const rotateY = ((x - centerX) / centerX) * 3;
+        card.style.transform = `translateY(-4px) perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0) perspective(800px) rotateX(0deg) rotateY(0deg)';
+      });
+    });
+  </script>
+</body>
+</html>

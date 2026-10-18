@@ -1,9 +1,524 @@
 {
   "schema_version": 2,
-  "generated": "2026-10-16",
+  "generated": "2026-10-18",
   "source": "seria/harness/publikuj.py",
   "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
   "episodes": [
+    {
+      "published": "2026-10-18",
+      "slug": "11-ornith-1.0-35b",
+      "title": "Ornith 1.0 35B writes 945 lines for one web page. Do rules trim it?",
+      "kind": "para-wariantow",
+      "task": "easy",
+      "task_file": "tasks/easy.txt",
+      "prompt_file": "episodes/11-ornith-1.0-35b/prompt.txt",
+      "youtube": "https://www.youtube.com/shorts/JZv6WS69qyg",
+      "opis": "Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (65–91 effects without the rules, 63–98 with them), so on this model the rules changed nothing measurable. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: on. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.",
+      "thesis": {
+        "metric": "efekty",
+        "models": [
+          {
+            "model": "ornith-1.0-35b",
+            "n_bare": 3,
+            "n_karpathy": 3,
+            "bare": {
+              "min": 65,
+              "max": 91,
+              "n": 3,
+              "mean": 77.7
+            },
+            "karpathy": {
+              "min": 63,
+              "max": 98,
+              "n": 3,
+              "mean": 79.0
+            },
+            "class": "nakladaja-sie",
+            "karpathy_ponizej_kazdego_bare": 1,
+            "karpathy_powyzej_kazdego_bare": 1,
+            "zmiana_sredniej_pct": 1.7
+          }
+        ],
+        "summary": {
+          "models": 1,
+          "karpathy-mniej": 0,
+          "nakladaja-sie": 1,
+          "karpathy-wiecej": 0,
+          "brak-danych": 0,
+          "jeden-wariant": 0
+        },
+        "pary": [],
+        "claim": "Ranges overlap (counted effects)"
+      },
+      "runs": [
+        {
+          "bieg": "ornith-1.0-35b_bare_r2",
+          "model": "ornith-1.0-35b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 250.33,
+          "tokeny": 12177,
+          "myslenie_pct": 5.86,
+          "tok_s": 48.64,
+          "linie": 945,
+          "tokeny_myslenia": 714,
+          "efekty": 65,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "ornith-1.0-35b-r2_ornith-1.0-35b_bare_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/index.html",
+          "zrzut": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/preview-390.png",
+          "metrics": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/metrics.json",
+          "prompt": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/prompt.txt",
+          "efekty_plik": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/efekty.json",
+          "odtworzenie": {
+            "model": "ornith-1.0-35b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "ornith-1.0-35b_karpathy_r2",
+          "model": "ornith-1.0-35b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 250.27,
+          "tokeny": 12064,
+          "myslenie_pct": 2.54,
+          "tok_s": 48.2,
+          "linie": 709,
+          "tokeny_myslenia": 306,
+          "efekty": 63,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "ornith-1.0-35b-r2_ornith-1.0-35b_karpathy_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/index.html",
+          "zrzut": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/preview-390.png",
+          "metrics": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/metrics.json",
+          "prompt": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/prompt.txt",
+          "efekty_plik": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/efekty.json",
+          "odtworzenie": {
+            "model": "ornith-1.0-35b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/11-ornith-1.0-35b/rules/karpathy/AGENTS.md"
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "bieg": "ornith-1.0-35b_bare_r1",
+          "model": "ornith-1.0-35b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 259.02,
+          "tokeny": 12464,
+          "myslenie_pct": 2.17,
+          "tok_s": 48.12,
+          "linie": 538,
+          "tokeny_myslenia": 270,
+          "efekty": 91,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "ornith-1.0-35b-r1_ornith-1.0-35b_bare_pi_eon",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r1/index.html",
+          "zrzut": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r1/preview-390.png",
+          "metrics": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r1/metrics.json",
+          "prompt": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r1/prompt.txt",
+          "efekty_plik": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r1/efekty.json",
+          "odtworzenie": {
+            "model": "ornith-1.0-35b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "ornith-1.0-35b_bare_r2",
+          "model": "ornith-1.0-35b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 250.33,
+          "tokeny": 12177,
+          "myslenie_pct": 5.86,
+          "tok_s": 48.64,
+          "linie": 945,
+          "tokeny_myslenia": 714,
+          "efekty": 65,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "ornith-1.0-35b-r2_ornith-1.0-35b_bare_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/index.html",
+          "zrzut": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/preview-390.png",
+          "metrics": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/metrics.json",
+          "prompt": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/prompt.txt",
+          "efekty_plik": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r2/efekty.json",
+          "odtworzenie": {
+            "model": "ornith-1.0-35b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "ornith-1.0-35b_bare_r3",
+          "model": "ornith-1.0-35b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 188.85,
+          "tokeny": 9958,
+          "myslenie_pct": 6.36,
+          "tok_s": 52.73,
+          "linie": 864,
+          "tokeny_myslenia": 633,
+          "efekty": 77,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "ornith-1.0-35b-r3_ornith-1.0-35b_bare_pi_eon",
+          "powtorzenie": 3,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r3/index.html",
+          "zrzut": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r3/preview-390.png",
+          "metrics": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r3/metrics.json",
+          "prompt": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r3/prompt.txt",
+          "efekty_plik": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_bare_r3/efekty.json",
+          "odtworzenie": {
+            "model": "ornith-1.0-35b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "ornith-1.0-35b_karpathy_r1",
+          "model": "ornith-1.0-35b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 266.92,
+          "tokeny": 12266,
+          "myslenie_pct": 3.51,
+          "tok_s": 45.95,
+          "linie": 835,
+          "tokeny_myslenia": 430,
+          "efekty": 76,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "ornith-1.0-35b-r1_ornith-1.0-35b_karpathy_pi_eon",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r1/index.html",
+          "zrzut": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r1/preview-390.png",
+          "metrics": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r1/metrics.json",
+          "prompt": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r1/prompt.txt",
+          "efekty_plik": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r1/efekty.json",
+          "odtworzenie": {
+            "model": "ornith-1.0-35b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/11-ornith-1.0-35b/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "ornith-1.0-35b_karpathy_r2",
+          "model": "ornith-1.0-35b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 250.27,
+          "tokeny": 12064,
+          "myslenie_pct": 2.54,
+          "tok_s": 48.2,
+          "linie": 709,
+          "tokeny_myslenia": 306,
+          "efekty": 63,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "ornith-1.0-35b-r2_ornith-1.0-35b_karpathy_pi_eon",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/index.html",
+          "zrzut": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/preview-390.png",
+          "metrics": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/metrics.json",
+          "prompt": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/prompt.txt",
+          "efekty_plik": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r2/efekty.json",
+          "odtworzenie": {
+            "model": "ornith-1.0-35b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/11-ornith-1.0-35b/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "ornith-1.0-35b_karpathy_r3",
+          "model": "ornith-1.0-35b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 239.39,
+          "tokeny": 11528,
+          "myslenie_pct": 3.89,
+          "tok_s": 48.16,
+          "linie": 493,
+          "tokeny_myslenia": 448,
+          "efekty": 98,
+          "effort_zadany": "medium",
+          "effort_otrzymany": "on",
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "metrics.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "ornith-1.0-35b-r3_ornith-1.0-35b_karpathy_pi_eon",
+          "powtorzenie": 3,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r3/index.html",
+          "zrzut": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r3/preview-390.png",
+          "metrics": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r3/metrics.json",
+          "prompt": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r3/prompt.txt",
+          "efekty_plik": "episodes/11-ornith-1.0-35b/ornith-1.0-35b_karpathy_r3/efekty.json",
+          "odtworzenie": {
+            "model": "ornith-1.0-35b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/11-ornith-1.0-35b/rules/karpathy/AGENTS.md"
+          }
+        }
+      ],
+      "cohorts": [
+        {
+          "model": "ornith-1.0-35b",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "E11-BARE",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "ornith-1.0-35b_bare_r2",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "ornith-1.0-35b",
+          "wariant": "karpathy",
+          "n": 3,
+          "kod": "E11-KARP",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "ornith-1.0-35b_karpathy_r2",
+          "reprezentant_powod": null
+        }
+      ],
+      "date": "2026-09-20",
+      "social_card": "episodes/11-ornith-1.0-35b/card.jpg"
+    },
     {
       "published": "2026-10-16",
       "slug": "10-ornith-1.5-35b-a3b",

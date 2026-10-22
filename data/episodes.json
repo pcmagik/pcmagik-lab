@@ -1,9 +1,524 @@
 {
  "schema_version": 2,
- "generated": "2026-10-18",
+ "generated": "2026-10-22",
  "source": "seria/harness/publikuj.py",
  "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
  "episodes": [
+  {
+   "published": "2026-10-22",
+   "slug": "12-muse-glimmer-30b",
+   "title": "Muse Glimmer 30B spends a third of its output thinking. Do rules change that?",
+   "kind": "para-wariantow",
+   "task": "easy",
+   "task_file": "tasks/easy.txt",
+   "prompt_file": "episodes/12-muse-glimmer-30b/prompt.txt",
+   "youtube": "https://www.youtube.com/shorts/79nWI3PeOyI",
+   "opis": "Same model, same prompt, same rig. 3 runs with nothing added, 3 with one Karpathy rules file. The model was reloaded before every run; every number comes from the run logs. The ranges overlap (28–42 effects without the rules, 35–49 with them), so on this model the rules changed nothing measurable. Full cohort measurements, representative pages and prompts are available on the episode page. Harness: pi 0.85.1. Reasoning effort actually used by the model: medium. Sampling: LM Studio defaults, no fixed seed. Your numbers will differ from run to run; the pattern is what repeats.",
+   "thesis": {
+    "metric": "efekty",
+    "models": [
+     {
+      "model": "unsloth/muse-glimmer-30b",
+      "n_bare": 3,
+      "n_karpathy": 3,
+      "bare": {
+       "min": 28,
+       "max": 42,
+       "n": 3,
+       "mean": 36.0
+      },
+      "karpathy": {
+       "min": 35,
+       "max": 49,
+       "n": 3,
+       "mean": 40.7
+      },
+      "class": "nakladaja-sie",
+      "karpathy_ponizej_kazdego_bare": 0,
+      "karpathy_powyzej_kazdego_bare": 1,
+      "zmiana_sredniej_pct": 13.0
+     }
+    ],
+    "summary": {
+     "models": 1,
+     "karpathy-mniej": 0,
+     "nakladaja-sie": 1,
+     "karpathy-wiecej": 0,
+     "brak-danych": 0,
+     "jeden-wariant": 0
+    },
+    "pary": [],
+    "claim": "Ranges overlap (counted effects)"
+   },
+   "runs": [
+    {
+     "bieg": "muse-glimmer-30b_bare_r1",
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 197.08,
+     "tokeny": 7988,
+     "myslenie_pct": 32.31,
+     "tok_s": 40.53,
+     "linie": 275,
+     "tokeny_myslenia": 2581,
+     "efekty": 38,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "medium",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "medium",
+      "zrodlo": "metrics.json",
+      "zgodny": true
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "muse-glimmer-30b-r1_muse-glimmer-30b_bare_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/index.html",
+     "zrzut": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/preview-390.png",
+     "metrics": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/metrics.json",
+     "prompt": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/prompt.txt",
+     "efekty_plik": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/efekty.json",
+     "odtworzenie": {
+      "model": "unsloth/muse-glimmer-30b",
+      "quantization": {
+       "value": "Q4_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 131072,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 125548,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "muse-glimmer-30b_karpathy_r1",
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 199.68,
+     "tokeny": 7973,
+     "myslenie_pct": 19.21,
+     "tok_s": 39.93,
+     "linie": 324,
+     "tokeny_myslenia": 1532,
+     "efekty": 38,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "medium",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "medium",
+      "zrodlo": "metrics.json",
+      "zgodny": true
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "muse-glimmer-30b-r1_muse-glimmer-30b_karpathy_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/index.html",
+     "zrzut": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/preview-390.png",
+     "metrics": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/metrics.json",
+     "prompt": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/prompt.txt",
+     "efekty_plik": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/efekty.json",
+     "odtworzenie": {
+      "model": "unsloth/muse-glimmer-30b",
+      "quantization": {
+       "value": "Q4_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 131072,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 124960,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/12-muse-glimmer-30b/rules/karpathy/AGENTS.md"
+     }
+    }
+   ],
+   "measurements": [
+    {
+     "bieg": "muse-glimmer-30b_bare_r1",
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 197.08,
+     "tokeny": 7988,
+     "myslenie_pct": 32.31,
+     "tok_s": 40.53,
+     "linie": 275,
+     "tokeny_myslenia": 2581,
+     "efekty": 38,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "medium",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "medium",
+      "zrodlo": "metrics.json",
+      "zgodny": true
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "muse-glimmer-30b-r1_muse-glimmer-30b_bare_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/index.html",
+     "zrzut": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/preview-390.png",
+     "metrics": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/metrics.json",
+     "prompt": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/prompt.txt",
+     "efekty_plik": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r1/efekty.json",
+     "odtworzenie": {
+      "model": "unsloth/muse-glimmer-30b",
+      "quantization": {
+       "value": "Q4_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 131072,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 125548,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "muse-glimmer-30b_bare_r2",
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 213.94,
+     "tokeny": 8606,
+     "myslenie_pct": 36.93,
+     "tok_s": 40.23,
+     "linie": 279,
+     "tokeny_myslenia": 3178,
+     "efekty": 28,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "medium",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "medium",
+      "zrodlo": "metrics.json",
+      "zgodny": true
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "muse-glimmer-30b-r2_muse-glimmer-30b_bare_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r2/index.html",
+     "zrzut": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r2/preview-390.png",
+     "metrics": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r2/metrics.json",
+     "prompt": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r2/prompt.txt",
+     "efekty_plik": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r2/efekty.json",
+     "odtworzenie": {
+      "model": "unsloth/muse-glimmer-30b",
+      "quantization": {
+       "value": "Q4_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 131072,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 125548,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "muse-glimmer-30b_bare_r3",
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 180.11,
+     "tokeny": 7264,
+     "myslenie_pct": 31.55,
+     "tok_s": 40.33,
+     "linie": 325,
+     "tokeny_myslenia": 2292,
+     "efekty": 42,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "medium",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "medium",
+      "zrodlo": "metrics.json",
+      "zgodny": true
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "muse-glimmer-30b-r3_muse-glimmer-30b_bare_pi_emedium",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r3/index.html",
+     "zrzut": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r3/preview-390.png",
+     "metrics": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r3/metrics.json",
+     "prompt": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r3/prompt.txt",
+     "efekty_plik": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_bare_r3/efekty.json",
+     "odtworzenie": {
+      "model": "unsloth/muse-glimmer-30b",
+      "quantization": {
+       "value": "Q4_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 131072,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 125548,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     }
+    },
+    {
+     "bieg": "muse-glimmer-30b_karpathy_r1",
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 199.68,
+     "tokeny": 7973,
+     "myslenie_pct": 19.21,
+     "tok_s": 39.93,
+     "linie": 324,
+     "tokeny_myslenia": 1532,
+     "efekty": 38,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "medium",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "medium",
+      "zrodlo": "metrics.json",
+      "zgodny": true
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "muse-glimmer-30b-r1_muse-glimmer-30b_karpathy_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/index.html",
+     "zrzut": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/preview-390.png",
+     "metrics": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/metrics.json",
+     "prompt": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/prompt.txt",
+     "efekty_plik": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r1/efekty.json",
+     "odtworzenie": {
+      "model": "unsloth/muse-glimmer-30b",
+      "quantization": {
+       "value": "Q4_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 131072,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 124960,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/12-muse-glimmer-30b/rules/karpathy/AGENTS.md"
+     }
+    },
+    {
+     "bieg": "muse-glimmer-30b_karpathy_r2",
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 200.05,
+     "tokeny": 7971,
+     "myslenie_pct": 31.95,
+     "tok_s": 39.84,
+     "linie": 309,
+     "tokeny_myslenia": 2547,
+     "efekty": 35,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "medium",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "medium",
+      "zrodlo": "metrics.json",
+      "zgodny": true
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "muse-glimmer-30b-r2_muse-glimmer-30b_karpathy_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r2/index.html",
+     "zrzut": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r2/preview-390.png",
+     "metrics": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r2/metrics.json",
+     "prompt": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r2/prompt.txt",
+     "efekty_plik": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r2/efekty.json",
+     "odtworzenie": {
+      "model": "unsloth/muse-glimmer-30b",
+      "quantization": {
+       "value": "Q4_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 131072,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 124960,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/12-muse-glimmer-30b/rules/karpathy/AGENTS.md"
+     }
+    },
+    {
+     "bieg": "muse-glimmer-30b_karpathy_r3",
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "karpathy",
+     "harness": "pi",
+     "sekundy": 182.0,
+     "tokeny": 7345,
+     "myslenie_pct": 23.92,
+     "tok_s": 40.36,
+     "linie": 334,
+     "tokeny_myslenia": 1757,
+     "efekty": 49,
+     "effort_zadany": "medium",
+     "effort_otrzymany": "medium",
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": "medium",
+      "zrodlo": "metrics.json",
+      "zgodny": true
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "muse-glimmer-30b-r3_muse-glimmer-30b_karpathy_pi_emedium",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "strona": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r3/index.html",
+     "zrzut": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r3/preview-390.png",
+     "metrics": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r3/metrics.json",
+     "prompt": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r3/prompt.txt",
+     "efekty_plik": "episodes/12-muse-glimmer-30b/muse-glimmer-30b_karpathy_r3/efekty.json",
+     "odtworzenie": {
+      "model": "unsloth/muse-glimmer-30b",
+      "quantization": {
+       "value": "Q4_K_XL",
+       "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+      },
+      "context_window": 131072,
+      "kv_cache": {
+       "value": "K f16 / V f16 (LM Studio default)",
+       "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+      },
+      "max_tokens": 124960,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": "episodes/12-muse-glimmer-30b/rules/karpathy/AGENTS.md"
+     }
+    }
+   ],
+   "cohorts": [
+    {
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "bare",
+     "n": 3,
+     "kod": "E12-BARE",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "muse-glimmer-30b_bare_r1",
+     "reprezentant_powod": null
+    },
+    {
+     "model": "unsloth/muse-glimmer-30b",
+     "wariant": "karpathy",
+     "n": 3,
+     "kod": "E12-KARP",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "muse-glimmer-30b_karpathy_r1",
+     "reprezentant_powod": null
+    }
+   ],
+   "date": "2026-09-20",
+   "social_card": "episodes/12-muse-glimmer-30b/card.jpg"
+  },
   {
    "published": "2026-10-18",
    "slug": "11-ornith-1.0-35b",

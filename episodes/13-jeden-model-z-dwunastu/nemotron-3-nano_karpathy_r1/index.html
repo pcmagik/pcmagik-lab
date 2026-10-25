@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PC Magik Lab</title>
+<style>
+:root{
+  --bg:#0d0d0d;
+  --glass:#1a1a1a;
+  --neon:#00ff99;
+  --text:#e0e0e0;
+  --muted:#aaaaaa;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  scroll-behavior:smooth;
+}
+header{
+  background:rgba(0,0,0,0.8);
+  padding:4rem 2rem;
+  text-align:center;
+  border-bottom:2px solid var(--neon);
+}
+h1{
+  font-size:2.5rem;
+  color:var(--neon);
+  margin-bottom:0.5rem;
+}
+p.tagline{
+  font-size:1.2rem;
+  color:var(--muted);
+}
+main{
+  max-width:1200px;
+  margin:auto;
+  padding:2rem;
+}
+section{
+  margin:4rem 0;
+}
+section h2{
+  font-size:1.8rem;
+  color:var(--neon);
+  margin-bottom:1rem;
+  border-bottom:1px solid var(--muted);
+  padding-bottom:0.5rem;
+}
+.card{
+  background:var(--glass);
+  border:1px solid var(--neon);
+  border-radius:8px;
+  padding:1.5rem;
+  margin-bottom:1.5rem;
+  transition:transform 0.2s, box-shadow 0.2s;
+}
+.card:hover{
+  transform:scale(1.02);
+  box-shadow:0 0 12px var(--neon);
+}
+.card ul{
+  list-style:none;
+}
+.card li{
+  margin-bottom:0.5rem;
+}
+footer{
+  background:var(--bg);
+  text-align:center;
+  padding:2rem;
+  font-size:0.9rem;
+  color:var(--muted);
+  border-top:1px solid var(--muted);
+}
+a{
+  color:var(--neon);
+  text-decoration:none;
+}
+a:hover{
+  text-decoration:underline;
+}
+.nav-links{
+  margin-top:1rem;
+}
+.nav-links a{
+  margin-right:1rem;
+}
+@media(max-width:768px){
+  h1{font-size:2rem;}
+  p.tagline{font-size:1rem;}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>PC Magik Lab</h1>
+  <p class="tagline">Local models, real GPUs.</p>
+  <div class="nav-links">
+    <a href="#how-we-measure">How We Measure</a>
+    <a href="#hardware">Hardware</a>
+    <a href="#about">About</a>
+  </div>
+</header>
+
+<main>
+  <section id="how-we-measure">
+    <h2>How We Measure</h2>
+    <div class="card">
+      <p>We run the exact same prompt on the same rig, changing only one variable per test.</p>
+      <p>The model is reloaded before every run.</p>
+      <p>Every prompt and its result file is published.</p>
+    </div>
+  </section>
+
+  <section id="hardware">
+    <h2>Hardware</h2>
+    <div class="card">
+      <p>One rig: NVIDIA RTX 3090 24 GB.</p>
+      <p>Model server: LM Studio.</p>
+    </div>
+  </section>
+
+  <section id="about">
+    <h2>About</h2>
+    <div class="card">
+      <p>PC Magik Lab explores running AI models locally on real GPUs.</p>
+      <p>Hosted by PC Magik, a computer service and homelab operator from Poland.</p>
+    </div>
+  </section>
+
+  <section id="links">
+    <h2>Links</h2>
+    <div class="card">
+      <ul>
+        <li><a href="https://www.youtube.com/@PCMagikLab">YouTube Channel</a></li>
+        <li><a href="https://github.com/pcmagik/pcmagik-lab">Repository with prompts and result files</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>© PC Magik (Mateusz Piekut) – computer service and homelab operator from Poland.</p>
+</footer>
+
+<script>
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+</script>
+</body>
+</html>

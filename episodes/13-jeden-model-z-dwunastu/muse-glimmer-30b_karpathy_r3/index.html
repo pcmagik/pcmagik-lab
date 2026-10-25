@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PC Magik Lab — Local models, real GPUs</title>
+<style>
+:root{
+  --bg:#05070f;
+  --bg2:#0a0f1c;
+  --glass:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.08);
+  --text:#e8eefc;
+  --muted:#9fb0d0;
+  --neon-cyan:#00e5ff;
+  --neon-magenta:#ff2d92;
+  --neon-green:#39ffca;
+  --radius:18px;
+  --shadow:0 10px 40px rgba(0,0,0,0.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;
+  background:radial-gradient(1200px 800px at 80% -10%, rgba(0,229,255,0.08), transparent 60%),
+             radial-gradient(1000px 600px at -10% 20%, rgba(255,45,146,0.07), transparent 55%),
+             var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+.container{width:min(1100px,92%);margin-inline:auto}
+header{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(14px);
+  background:linear-gradient(to bottom, rgba(5,7,15,0.8), rgba(5,7,15,0.4));
+  border-bottom:1px solid var(--border);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.3px}
+.logo{
+  width:36px;height:36px;border-radius:10px;
+  background:conic-gradient(from 210deg,var(--neon-cyan),var(--neon-magenta),var(--neon-green),var(--neon-cyan));
+  box-shadow:0 0 20px rgba(0,229,255,0.35), inset 0 0 12px rgba(255,255,255,0.15);
+  display:grid;place-items:center;
+}
+.logo svg{width:22px;height:22px;filter:brightness(0) invert(1)}
+.navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+.navlinks a:hover{color:var(--text)}
+.menu-btn{display:none}
+.hero{
+  padding:110px 0 70px;
+  position:relative;
+  overflow:hidden;
+}
+.grid-bg{
+  position:absolute;inset:-20%;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse at center, black 40%, transparent 70%);
+  opacity:.35;
+  pointer-events:none;
+}
+.eyebrow{
+  display:inline-block;
+  font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--neon-cyan);
+  border:1px solid rgba(0,229,255,0.35);
+  padding:6px 10px;border-radius:999px;
+  background:rgba(0,229,255,0.06);
+  box-shadow:0 0 20px rgba(0,229,255,0.15);
+}
+h1{
+  font-size:clamp(40px,7vw,72px);
+  line-height:1.05;margin:18px 0 10px;
+  background:linear-gradient(90deg,#fff, #bcd6ff 30%, var(--neon-cyan) 70%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.tagline{
+  font-size:clamp(18px,2.5vw,26px);
+  color:var(--text);
+  margin-bottom:18px;
+}
+.subtitle{color:var(--muted);max-width:680px}
+.cta{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:12px 18px;border-radius:12px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  backdrop-filter:blur(10px);
+  transition:.25s transform,.25s box-shadow,.25s background;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,0.15)}
+.btn.primary{
+  background:linear-gradient(135deg, rgba(0,229,255,0.18), rgba(255,45,146,0.18));
+  border-color:rgba(0,229,255,0.4);
+  box-shadow:0 0 30px rgba(0,229,255,0.2);
+}
+section{padding:70px 0}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:34px;gap:20px;flex-wrap:wrap}
+h2{font-size:clamp(28px,4vw,40px)}
+.muted{color:var(--muted)}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:18px;
+}
+.card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px;
+  backdrop-filter:blur(14px);
+  box-shadow:var(--shadow);
+  transition:.3s transform,.3s box-shadow,.3s border-color;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;inset:-2px;
+  background:linear-gradient(120deg,transparent,rgba(0,229,255,0.15),transparent);
+  opacity:0;transition:.3s opacity;
+}
+.card:hover{transform:translateY(-4px);border-color:rgba(0,229,255,0.35);box-shadow:0 12px 50px rgba(0,229,255,0.12)}
+.card:hover::before{opacity:1}
+.card h3{margin-bottom:8px;font-size:18px}
+.card p{color:var(--muted);font-size:14px}
+.badge{
+  display:inline-block;font-size:11px;padding:4px 8px;border-radius:999px;
+  background:rgba(57,255,202,0.12);border:1px solid rgba(57,255,202,0.35);color:#bfffe9;margin-bottom:10px
+}
+.hardware-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.rig{
+  background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border:1px solid var(--border);border-radius:var(--radius);padding:26px;
+  backdrop-filter:blur(14px);
+}
+.rig .icon{
+  width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg, rgba(0,229,255,0.25), rgba(255,45,146,0.25));
+  display:grid;place-items:center;margin-bottom:14px;
+  box-shadow:0 0 30px rgba(0,229,255,0.2);
+}
+.about{
+  background:linear-gradient(180deg, transparent, rgba(255,255,255,0.02));
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.about-inner{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:start}
+@media(max-width:900px){.about-inner{grid-template-columns:1fr}}
+.links{display:flex;flex-direction:column;gap:12px}
+.link{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-radius:12px;
+  background:var(--glass);border:1px solid var(--border);
+  transition:.2s transform,.2s box-shadow;
+}
+.link:hover{transform:translateX(4px);box-shadow:0 6px 24px rgba(255,45,146,0.15)}
+footer{
+  padding:40px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--border);
+  background:rgba(0,0,0,0.2)
+}
+.foot-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.neon-text{color:var(--neon-cyan);text-shadow:0 0 12px rgba(0,229,255,0.5)}
+.glow-dot{
+  position:absolute;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle, rgba(0,229,255,0.18), transparent 60%);
+  filter:blur(20px);pointer-events:none;z-index:-1;
+}
+@media(max-width:720px){
+  .navlinks{display:none}
+  .menu-btn{display:block}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+      </div>
+      <span>PC Magik Lab</span>
+    </div>
+    <nav class="navlinks">
+      <a href="#measure">How we measure</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#about">About</a>
+      <a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">Repo</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="grid-bg"></div>
+    <div class="glow-dot" style="top:10%;left:10%"></div>
+    <div class="glow-dot" style="bottom:-80px;right:5%;background:radial-gradient(circle, rgba(255,45,146,0.18), transparent 60%)"></div>
+    <div class="container">
+      <span class="eyebrow">YouTube Series</span>
+      <h1>PC Magik Lab</h1>
+      <p class="tagline">Local models, real GPUs.</p>
+      <p class="subtitle">A series about running AI models on real, local GPUs. No cloud, no hype — just measurable performance on hardware you can build.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.8 15.5V8.5l6.4 3.5-6.4 3.5z"/></svg>
+          Watch on YouTube
+        </a>
+        <a class="btn" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          Prompts & Results
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="measure">
+    <div class="container">
+      <div class="section-head">
+        <h2>How We Measure</h2>
+        <p class="muted">Consistent methodology, published data.</p>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <span class="badge">Control</span>
+          <h3>Same prompt</h3>
+          <p>Every test uses the identical prompt text to eliminate input variance.</p>
+        </div>
+        <div class="card">
+          <span class="badge">Rig</span>
+          <h3>Same rig</h3>
+          <p>All runs are performed on the same hardware configuration.</p>
+        </div>
+        <div class="card">
+          <span class="badge">Variable</span>
+          <h3>One variable changed</h3>
+          <p>Each test changes only one parameter to isolate its effect.</p>
+        </div>
+        <div class="card">
+          <span class="badge">Clean state</span>
+          <h3>Model reloaded</h3>
+          <p>The model is reloaded before every run for a fair comparison.</p>
+        </div>
+        <div class="card">
+          <span class="badge">Open</span>
+          <h3>Published files</h3>
+          <p>Every prompt and result file is published for reproducibility.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="hardware">
+    <div class="container">
+      <div class="section-head">
+        <h2>Hardware</h2>
+        <p class="muted">One rig, transparent specs.</p>
+      </div>
+      <div class="hardware-grid">
+        <div class="rig card">
+          <div class="icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 20h10"/></svg>
+          </div>
+          <h3>Test Rig</h3>
+          <p><strong>GPU:</strong> NVIDIA RTX 3090 24 GB</p>
+          <p><strong>Model server:</strong> LM Studio</p>
+          <p class="muted">All measurements in this series are performed on this single configuration to keep comparisons valid.</p>
+        </div>
+        <div class="rig card">
+          <div class="icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 9h6v6"/></svg>
+          </div>
+          <h3>Principles</h3>
+          <p>No cloud inference. Local execution only.</p>
+          <p>Real GPUs, real thermals, real power.</p>
+          <p class="muted">The goal is practical guidance for local AI workloads.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <div class="container about-inner">
+      <div>
+        <h2>About</h2>
+        <p class="muted" style="margin-top:8px">PC Magik Lab is a YouTube series focused on running AI models locally. The channel documents hands-on tests, setup guides, and comparisons using real hardware.</p>
+        <div class="links" style="margin-top:22px">
+          <a class="link" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.8 15.5V8.5l6.4 3.5-6.4 3.5z"/></svg>
+            YouTube Channel
+          </a>
+          <a class="link" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            Repository with prompts and result files
+          </a>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Series focus</h3>
+        <p class="muted">Local models, real GPUs.</p>
+        <p style="margin-top:10px;font-size:14px;color:var(--muted)">The series measures performance with a strict protocol: same prompt, same rig, one variable changed per test, model reloaded before every run, and full publication of prompts and results.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container foot-grid">
+    <div>© PC Magik Lab — Local models, real GPUs.</div>
+    <div>Author: PC Magik (Mateusz Piekut), computer service and homelab operator from Poland.</div>
+  </div>
+</footer>
+
+<script>
+/* Subtle interactive card tilt */
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('mousemove', e=>{
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    const rx = ((y / r.height) - 0.5) * -6;
+    const ry = ((x / r.width) - 0.5) * 6;
+    card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+  });
+  card.addEventListener('mouseleave', ()=>{
+    card.style.transform = '';
+  });
+});
+</script>
+</body>
+</html>

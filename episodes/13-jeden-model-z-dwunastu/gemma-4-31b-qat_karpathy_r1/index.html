@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Magik Lab | Local models, real GPUs.</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --accent-color: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.5);
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --neon-border: 1px solid rgba(0, 242, 255, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Background effects */
+        .bg-glow {
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            filter: blur(60px);
+            z-index: -1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .glow-1 { top: -10%; left: -10%; }
+        .glow-2 { bottom: -10%; right: -10%; }
+
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 1rem;
+            background: linear-gradient(to bottom, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+        }
+
+        .hero-content p {
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-weight: 300;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-color);
+            margin: 1rem auto;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: var(--neon-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.15);
+        }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1.5rem;
+            stroke: var(--accent-color);
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .glass-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .glass-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .methodology-list {
+            list-style: none;
+            text-align: left;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .methodology-list li {
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+        }
+
+        .methodology-list li::before {
+            content: '→';
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .about-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: var(--neon-border);
+            border-radius: 30px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .links-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--accent-color);
+            background: transparent;
+        }
+
+        .btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-name {
+            color: #fff;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <header>
+        <div class="hero-content">
+            <h1>PC Magik Lab</h1>
+            <p>Local models, real GPUs.</p>
+        </div>
+        <a href="#about" class="scroll-indicator">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+            </svg>
+        </a>
+    </header>
+
+    <section id="about">
+        <h2 class="section-title">About</h2>
+        <div class="about-container">
+            <p>Welcome to PC Magik Lab, a dedicated exploration of the cutting edge of local AI. This series focuses on the practical performance of Large Language Models (LLMs) when run on enthusiast-grade hardware, providing transparent and reproducible benchmarks for the community.</p>
+        </div>
+    </section>
+
+    <section id="methodology">
+        <h2 class="section-title">Lab Standards</h2>
+        <div class="grid">
+            <div class="glass-card">
+                <svg class="card-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <h3>Precision Testing</h3>
+                <ul class="methodology-list">
+                    <li>Same prompt for every test</li>
+                    <li>Same hardware rig throughout</li>
+                    <li>One variable changed per test</li>
+                </ul>
+            </div>
+            <div class="glass-card">
+                <svg class="card-icon" viewBox="0 0 24 24">
+                    <path d="M21 2v20H3V2"/>
+                    <path d="M7 7h10M7 12h10M7 17h10"/>
+                </svg>
+                <h3>Strict Isolation</h3>
+                <ul class="methodology-list">
+                    <li>Model reloaded before every run</li>
+                    <li>Clean state for every measurement</li>
+                    <li>Zero interference from other apps</li>
+                </ul>
+            </div>
+            <div class="glass-card">
+                <svg class="card-icon" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <h3>Full Transparency</h3>
+                <ul class="methodology-list">
+                    <li>Every prompt published</li>
+                    <li>Every result file published</li>
+                    <li>Open for community verification</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="hardware">
+        <h2 class="section-title">The Rig</h2>
+        <div class="grid">
+            <div class="glass-card">
+                <svg class="card-icon" viewBox="0 0 24 24">
+                    <rect x="2" y="6" width="20" height="12" rx="2"/>
+                    <path d="M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/>
+                    <line x1="8" y1="10" x2="16" y2="10"/>
+                    <line x1="8" y1="14" x2="16" y2="14"/>
+                </svg>
+                <h3>GPU</h3>
+                <p>NVIDIA RTX 3090 24 GB</p>
+            </div>
+            <div class="glass-card">
+                <svg class="card-icon" viewBox="0 0 24 24">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <h3>Model Server</h3>
+                <p>LM Studio</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="links" style="text-align: center;">
+        <h2 class="section-title">Explore More</h2>
+        <div class="links-container">
+            <a href="https://www.youtube.com/@PCMagikLab" target="_blank" class="btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.017 3.017 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                YouTube Channel
+            </a>
+            <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" class="btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v3M14 4a3 3 0 0 0-3 3h-1a3 3 0 0 0-3-3M14 11a3 3 0 0 0-3-3h-1a3 3 0 0 0-3 3"/>
+                </svg>
+                Prompts & Results
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <span class="footer-name">PC Magik (Mateusz Piekut)</span>
+        Computer service and homelab operator from Poland.
+    </footer>
+
+    <script>
+        // Simple smooth scroll implementation for the indicator
+        document.querySelector('.scroll-indicator').addEventListener('click', () => {
+            document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

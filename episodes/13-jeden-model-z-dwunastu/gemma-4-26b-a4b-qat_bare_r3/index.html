@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Magik Lab | Local Models, Real GPUs</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --card-bg: rgba(25, 25, 30, 0.7);
+            --accent-color: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.5);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background effects */
+        .bg-glow {
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(80px);
+            opacity: 0.2;
+        }
+
+        .glow-1 { top: -10%; left: -10%; }
+        .glow-2 { bottom: -10%; right: -10%; }
+
+        /* Layout */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        section {
+            padding: 100px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        h1, h2, h3 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            margin-bottom: 10px;
+            background: linear-gradient(to bottom, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        /* Cards & Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 255, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 20px var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 242, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* Hardware Section Icon */
+        .hw-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+            fill: var(--accent-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer span {
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            section { padding: 60px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <header>
+        <div class="reveal">
+            <h1>PC Magik Lab</h1>
+            <p class="tagline">Local models, real GPUs.</p>
+            <p class="subtitle">A YouTube series exploring the performance and nuances of running cutting-edge AI models on local hardware.</p>
+            <div class="btn-group">
+                <a href="https://www.youtube.com/@PCMagikLab" class="btn btn-primary" target="_blank">Watch Series</a>
+                <a href="https://github.com/pcmagik/pcmagik-lab" class="btn btn-outline" target="_blank">GitHub Repo</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="methodology">
+        <div class="container reveal">
+            <h2 style="text-align: center; margin-bottom: 50px;">Methodology</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 40px auto; color: var(--text-secondary);">
+                To ensure scientific integrity and repeatable results, every test follows a strict protocol.
+            </p>
+            <div class="grid">
+                <div class="card">
+                    <h3>Controlled Environment</h3>
+                    <p>Same prompt, same rig. We isolate variables to ensure that any change in performance is due to the model or hardware settings being tested.</p>
+                </div>
+                <div class="card">
+                    <h3>One Variable</h3>
+                    <p>Only one thing changes per test run. This allows for precise benchmarking and clear understanding of performance bottlenecks.</p>
+                </div>
+                <div class="card">
+                    <h3>Clean State</h3>
+                    <p>The model is reloaded before every single run to prevent VRAM fragmentation or memory leaks from affecting subsequent results.</p>
+                </div>
+                <div class="card">
+                    <h3>Transparency</h3>
+                    <p>Full accountability. Every prompt used and every resulting file is published to our repository for anyone to verify.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="hardware">
+        <div class="container reveal">
+            <h2 style="text-align: center; margin-bottom: 50px;">The Rig</h2>
+            <div class="card" style="max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
+                <svg class="hw-icon" viewBox="0 0 24 24">
+                    <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5Z" />
+                </svg>
+                <div style="flex: 1; min-width: 250px;">
+                    <h3>NVIDIA RTX 3090</h3>
+                    <p>24 GB VRAM</p>
+                    <p style="margin-top: 10px; font-size: 0.85rem;">Model Server: LM Studio</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container reveal">
+            <h2 style="text-align: center; margin-bottom: 30px;">About the Series</h2>
+            <div style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto;">
+                <p>PC Magik Lab is a deep dive into the practical side of local AI. We strip away the hype to see how these models actually behave on consumer hardware, providing a transparent look at the performance of LLMs in a real-world setting.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 PC Magik Lab. Created by <span>PC Magik (Mateusz Piekut)</span></p>
+        <p style="font-size: 0.8rem; margin-top: 10px;">Computer service and homelab operator from Poland.</p>
+    </footer>
+
+    <script>
+        // Simple scroll reveal animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        window.addEventListener("scroll", reveal);
+
+        // Trigger once on load
+        window.addEventListener("load", reveal);
+    </script>
+</body>
+</html>

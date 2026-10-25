@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PC Magik Lab — Local models, real GPUs.</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0a0f;
+      --bg2:#12121a;
+      --glass:rgba(255,255,255,.04);
+      --glass-border:rgba(255,255,255,.08);
+      --neon-cyan:#00e5ff;
+      --neon-purple:#b388ff;
+      --neon-pink:#ff4081;
+      --neon-green:#69f0ae;
+      --text:#e0e0e8;
+      --text-dim:#8888a0;
+      --font-main:'Segoe UI',system-ui,-apple-system,sans-serif;
+      --font-mono:'Cascadia Code','Fira Code','JetBrains Mono','Consolas',monospace;
+    }
+    html{scroll-behavior:smooth;scroll-padding-top:80px}
+    body{
+      font-family:var(--font-main);
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.6;
+      overflow-x:hidden;
+    }
+    a{color:var(--neon-cyan);text-decoration:none;transition:color .25s}
+    a:hover{color:var(--neon-green)}
+
+    /* ── Nav ── */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:.9rem 2rem;
+      background:rgba(10,10,15,.75);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--glass-border);
+    }
+    .nav-logo{
+      font-weight:700;font-size:1.15rem;letter-spacing:.5px;
+      background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .nav-links{display:flex;gap:1.6rem;list-style:none}
+    .nav-links a{
+      color:var(--text-dim);font-size:.9rem;font-weight:500;
+      position:relative;padding:.2rem 0;
+    }
+    .nav-links a::after{
+      content:'';position:absolute;bottom:0;left:0;width:0;height:2px;
+      background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));
+      transition:width .3s ease;
+    }
+    .nav-links a:hover{color:var(--text)}
+    .nav-links a:hover::after{width:100%}
+    .nav-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
+    .nav-toggle span{display:block;width:24px;height:2px;background:var(--text);border-radius:2px;transition:transform .3s,opacity .3s}
+
+    /* ── Hero ── */
+    .hero{
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden;
+    }
+    .hero-bg{
+      position:absolute;inset:0;z-index:0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 40%,rgba(0,229,255,.07),transparent),
+        radial-gradient(ellipse 40% 40% at 30% 70%,rgba(179,136,255,.06),transparent),
+        radial-gradient(ellipse 40% 40% at 70% 60%,rgba(255,64,129,.05),transparent);
+    }
+    .hero-grid{
+      position:absolute;inset:0;z-index:0;opacity:.06;
+      background-image:
+        linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+      background-size:60px 60px;
+      mask-image:radial-gradient(ellipse 70% 60% at 50% 50%,black,transparent);
+      -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 50%,black,transparent);
+    }
+    .hero-content{position:relative;z-index:1;max-width:780px}
+    .hero-badge{
+      display:inline-block;padding:.35rem 1rem;border-radius:999px;
+      font-size:.75rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+      background:var(--glass);border:1px solid var(--glass-border);
+      color:var(--neon-cyan);margin-bottom:1.8rem;
+    }
+    .hero h1{
+      font-size:clamp(2.4rem,6vw,4.2rem);font-weight:800;line-height:1.15;
+      margin-bottom:1.2rem;
+      background:linear-gradient(135deg,#fff 0%,#c0c0d0 50%,var(--neon-cyan) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .hero-tagline{
+      font-size:clamp(1.1rem,2.8vw,1.55rem);color:var(--text-dim);
+      margin-bottom:2.5rem;font-weight:400;
+    }
+    .hero-tagline strong{color:var(--text);font-weight:600}
+    .hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+    .btn{
+      display:inline-flex;align-items:center;gap:.5rem;
+      padding:.8rem 1.8rem;border-radius:8px;font-size:.95rem;font-weight:600;
+      border:none;cursor:pointer;transition:all .3s ease;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,var(--neon-cyan),#0091ea);
+      color:#0a0a0f;box-shadow:0 0 20px rgba(0,229,255,.25);
+    }
+    .btn-primary:hover{
+      transform:translateY(-2px);
+      box-shadow:0 0 35px rgba(0,229,255,.45);
+      color:#0a0a0f;
+    }
+    .btn-secondary{
+      background:var(--glass);color:var(--text);
+      border:1px solid var(--glass-border);
+    }
+    .btn-secondary:hover{
+      background:rgba(255,255,255,.08);transform:translateY(-2px);
+      color:var(--text);
+    }
+    .btn svg{width:18px;height:18px;fill:currentColor}
+
+    /* ── Sections ── */
+    section{padding:5rem 2rem}
+    .section-inner{max-width:1100px;margin:0 auto}
+    .section-label{
+      display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:1.5px;
+      text-transform:uppercase;color:var(--neon-cyan);margin-bottom:.6rem;
+    }
+    .section-title{
+      font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;margin-bottom:.6rem;
+      color:#fff;
+    }
+    .section-subtitle{color:var(--text-dim);font-size:1.05rem;margin-bottom:3rem;max-width:600px}
+
+    /* ── Method Cards ── */
+    .method-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;
+    }
+    .method-card{
+      background:var(--glass);border:1px solid var(--glass-border);
+      border-radius:14px;padding:2rem;position:relative;overflow:hidden;
+      transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease;
+    }
+    .method-card:hover{
+      transform:translateY(-6px);
+      border-color:rgba(0,229,255,.25);
+      box-shadow:0 12px 40px rgba(0,229,255,.08);
+    }
+    .method-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));
+      opacity:0;transition:opacity .35s;
+    }
+    .method-card:hover::before{opacity:1}
+    .method-icon{
+      width:48px;height:48px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      margin-bottom:1.2rem;
+      background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.15);
+    }
+    .method-icon svg{width:24px;height:24px;stroke:var(--neon-cyan);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .method-card h3{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:.6rem}
+    .method-card p{color:var(--text-dim);font-size:.92rem;line-height:1.65}
+
+    /* ── Hardware ── */
+    .hardware-section{background:var(--bg2)}
+    .hardware-showcase{
+      display:flex;gap:2.5rem;align-items:center;flex-wrap:wrap;
+    }
+    .hardware-visual{
+      flex:0 0 280px;aspect-ratio:1;position:relative;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .gpu-chip{
+      width:200px;height:200px;border-radius:20px;position:relative;
+      background:linear-gradient(145deg,#1a1a2e,#0f0f1a);
+      border:2px solid rgba(0,229,255,.15);
+      box-shadow:0 0 60px rgba(0,229,255,.08),inset 0 0 30px rgba(0,0,0,.5);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .gpu-chip::before{
+      content:'';position:absolute;inset:12px;border-radius:14px;
+      border:1px solid rgba(0,229,255,.1);
+    }
+    .gpu-chip-label{
+      font-family:var(--font-mono);font-size:.7rem;color:var(--neon-cyan);
+      letter-spacing:1px;text-align:center;
+    }
+    .gpu-chip-label span{display:block;font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:.2rem}
+    .gpu-pins{
+      position:absolute;inset:-8px;
+      display:grid;grid-template-columns:repeat(11,1fr);gap:3px;
+    }
+    .gpu-pin{
+      width:3px;height:8px;border-radius:1px;
+      background:rgba(0,229,255,.12);
+    }
+    .gpu-pin.top,.gpu-pin.bottom{width:8px;height:3px}
+    .gpu-pin.left,.gpu-pin.right{width:3px;height:8px}
+    .gpu-glow{
+      position:absolute;width:260px;height:260px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,229,255,.08),transparent 70%);
+      animation:pulse-glow 4s ease-in-out infinite;
+    }
+    @keyframes pulse-glow{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+    .hardware-details{flex:1;min-width:280px}
+    .hardware-details h3{font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:.5rem}
+    .hardware-details .hw-subtitle{color:var(--neon-cyan);font-size:.95rem;font-weight:500;margin-bottom:1.5rem}
+    .hw-specs{display:flex;flex-direction:column;gap:1rem}
+    .hw-spec{
+      display:flex;align-items:flex-start;gap:.8rem;
+      padding:1rem 1.2rem;border-radius:10px;
+      background:var(--glass);border:1px solid var(--glass-border);
+      transition:border-color .3s;
+    }
+    .hw-spec:hover{border-color:rgba(0,229,255,.2)}
+    .hw-spec-dot{
+      width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;
+      background:var(--neon-cyan);box-shadow:0 0 8px rgba(0,229,255,.5);
+    }
+    .hw-spec-label{font-size:.78rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+    .hw-spec-value{font-size:1.05rem;color:#fff;font-weight:500;margin-top:.15rem}
+
+    /* ── About ── */
+    .about-content{
+      display:flex;gap:3rem;align-items:center;flex-wrap:wrap;
+    }
+    .about-text{flex:1;min-width:300px}
+    .about-text p{color:var(--text-dim);font-size:1rem;margin-bottom:1rem;line-height:1.75}
+    .about-text p strong{color:var(--text)}
+    .about-visual{
+      flex:0 0 260px;aspect-ratio:1;border-radius:20px;position:relative;overflow:hidden;
+      background:linear-gradient(145deg,var(--bg2),var(--bg));
+      border:1px solid var(--glass-border);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .about-avatar{
+      width:140px;height:140px;border-radius:50%;
+      background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 0 40px rgba(0,229,255,.15);
+    }
+    .about-avatar svg{width:60px;height:60px;stroke:#0a0a0f;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .about-visual::after{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(circle at 50% 50%,transparent 40%,var(--bg) 100%);
+    }
+
+    /* ── Links ── */
+    .links-section{background:var(--bg2)}
+    .links-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+    .link-card{
+      display:flex;align-items:center;gap:1.5rem;
+      padding:2rem;border-radius:14px;
+      background:var(--glass);border:1px solid var(--glass-border);
+      transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease;
+      text-decoration:none;color:inherit;
+    }
+    .link-card:hover{
+      transform:translateY(-6px);
+      color:inherit;
+    }
+    .link-card.youtube:hover{border-color:rgba(255,64,129,.3);box-shadow:0 12px 40px rgba(255,64,129,.08)}
+    .link-card.github:hover{border-color:rgba(179,136,255,.3);box-shadow:0 12px 40px rgba(179,136,255,.08)}
+    .link-icon{
+      width:56px;height:56px;border-radius:14px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .link-icon svg{width:28px;height:28px}
+    .link-icon.yt{background:rgba(255,64,129,.1);border:1px solid rgba(255,64,129,.15)}
+    .link-icon.yt svg{fill:var(--neon-pink);stroke:none}
+    .link-icon.gh{background:rgba(179,136,255,.1);border:1px solid rgba(179,136,255,.15)}
+    .link-icon.gh svg{fill:var(--neon-purple)}
+    .link-info h3{font-size:1.15rem;font-weight:600;color:#fff;margin-bottom:.25rem}
+    .link-info p{color:var(--text-dim);font-size:.88rem}
+
+    /* ── Footer ── */
+    footer{
+      padding:3rem 2rem;text-align:center;
+      border-top:1px solid var(--glass-border);
+      background:var(--bg);
+    }
+    .footer-logo{
+      font-weight:700;font-size:1.1rem;margin-bottom:.6rem;
+      background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    footer p{color:var(--text-dim);font-size:.88rem}
+    footer p a{color:var(--neon-cyan)}
+
+    /* ── Animations ── */
+    .fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+    .fade-in.visible{opacity:1;transform:translateY(0)}
+
+    /* ── Responsive ── */
+    @media(max-width:768px){
+      nav{padding:.8rem 1.2rem}
+      .nav-links{
+        display:none;position:absolute;top:100%;left:0;right:0;
+        flex-direction:column;padding:1rem 1.2rem;gap:0;
+        background:rgba(10,10,15,.95);backdrop-filter:blur(16px);
+        border-bottom:1px solid var(--glass-border);
+      }
+      .nav-links.open{display:flex}
+      .nav-links li{border-bottom:1px solid var(--glass-border)}
+      .nav-links li:last-child{border-bottom:none}
+      .nav-links a{display:block;padding:.8rem 0}
+      .nav-toggle{display:flex}
+      .hardware-visual{flex:0 0 220px}
+      .gpu-chip{width:160px;height:160px}
+      .gpu-glow{width:200px;height:200px}
+      .about-visual{flex:0 0 200px}
+      section{padding:3.5rem 1.2rem}
+    }
+    @media(max-width:480px){
+      .hero-cta{flex-direction:column;width:100%}
+      .hero-cta .btn{width:100%;justify-content:center}
+      .hardware-showcase{flex-direction:column;align-items:center}
+      .about-content{flex-direction:column-reverse;align-items:center}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">PC Magik Lab</div>
+    <button class="nav-toggle" aria-label="Toggle menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="#method">Method</a></li>
+      <li><a href="#hardware">Hardware</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#links">Links</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <span class="hero-badge fade-in">YouTube Series</span>
+      <h1 class="fade-in">PC Magik Lab</h1>
+      <p class="hero-tagline fade-in"><strong>Local models, real GPUs.</strong></p>
+      <div class="hero-cta fade-in">
+        <a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.5 15.1V8.9l6.3 3.1-6.3 3.1z"/></svg>
+          Watch on YouTube
+        </a>
+        <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.01.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          View Repository
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Method -->
+  <section id="method">
+    <div class="section-inner">
+      <span class="section-label fade-in">How we measure</span>
+      <h2 class="section-title fade-in">Rigorous, Transparent Testing</h2>
+      <p class="section-subtitle fade-in">Every test is designed to isolate a single variable so results are comparable and meaningful.</p>
+      <div class="method-grid">
+        <div class="method-card fade-in">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h3>Same Prompt</h3>
+          <p>Every model is tested with the identical prompt, ensuring a fair and apples-to-apples comparison across all runs.</p>
+        </div>
+        <div class="method-card fade-in">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>
+          </div>
+          <h3>Same Rig</h3>
+          <p>All tests run on the exact same hardware configuration, eliminating hardware variance as a confounding factor.</p>
+        </div>
+        <div class="method-card fade-in">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <h3>One Variable at a Time</h3>
+          <p>Each test changes exactly one variable — typically the model — so any difference in results can be clearly attributed.</p>
+        </div>
+        <div class="method-card fade-in">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </div>
+          <h3>Model Reloaded Every Run</h3>
+          <p>The model is reloaded from scratch before every benchmark, ensuring no residual state skews the results.</p>
+        </div>
+        <div class="method-card fade-in">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="16 6 16 16 8 16"/></svg>
+          </div>
+          <h3>Published Prompts &amp; Results</h3>
+          <p>Every prompt and every result file is published openly, so anyone can verify, replicate, or extend the tests.</p>
+        </div>
+        <div class="method-card fade-in">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>LM Studio Server</h3>
+          <p>All models are served through LM Studio, providing a consistent and reliable inference backend for every test.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hardware -->
+  <section class="hardware-section" id="hardware">
+    <div class="section-inner">
+      <span class="section-label fade-in">Test rig</span>
+      <h2 class="section-title fade-in">Hardware &amp; Software</h2>
+      <p class="section-subtitle fade-in">Everything runs on a single local machine — no cloud, no abstractions.</p>
+      <div class="hardware-showcase">
+        <div class="hardware-visual fade-in">
+          <div class="gpu-glow"></div>
+          <div class="gpu-chip">
+            <div class="gpu-pins">
+              <div class="gpu-pin top"></div><div class="gpu-pin top"></div><div class="gpu-pin top"></div>
+              <div class="gpu-pin top"></div><div class="gpu-pin top"></div><div class="gpu-pin top"></div>
+              <div class="gpu-pin top"></div><div class="gpu-pin top"></div><div class="gpu-pin top"></div>
+              <div class="gpu-pin top"></div><div class="gpu-pin top"></div>
+              <div class="gpu-pin bottom"></div><div class="gpu-pin bottom"></div><div class="gpu-pin bottom"></div>
+              <div class="gpu-pin bottom"></div><div class="gpu-pin bottom"></div><div class="gpu-pin bottom"></div>
+              <div class="gpu-pin bottom"></div><div class="gpu-pin bottom"></div><div class="gpu-pin bottom"></div>
+              <div class="gpu-pin bottom"></div><div class="gpu-pin bottom"></div><div class="gpu-pin bottom"></div>
+              <div class="gpu-pin left"></div><div class="gpu-pin left"></div><div class="gpu-pin left"></div>
+              <div class="gpu-pin left"></div><div class="gpu-pin left"></div><div class="gpu-pin left"></div>
+              <div class="gpu-pin left"></div><div class="gpu-pin left"></div><div class="gpu-pin left"></div>
+              <div class="gpu-pin left"></div><div class="gpu-pin left"></div><div class="gpu-pin left"></div>
+              <div class="gpu-pin right"></div><div class="gpu-pin right"></div><div class="gpu-pin right"></div>
+              <div class="gpu-pin right"></div><div class="gpu-pin right"></div><div class="gpu-pin right"></div>
+              <div class="gpu-pin right"></div><div class="gpu-pin right"></div><div class="gpu-pin right"></div>
+              <div class="gpu-pin right"></div><div class="gpu-pin right"></div><div class="gpu-pin right"></div>
+            </div>
+            <div class="gpu-chip-label">
+              <span>RTX 3090</span>
+              NVIDIA
+            </div>
+          </div>
+        </div>
+        <div class="hardware-details fade-in">
+          <h3>Single Rig Setup</h3>
+          <div class="hw-subtitle">Consistent hardware for every benchmark</div>
+          <div class="hw-specs">
+            <div class="hw-spec">
+              <div class="hw-spec-dot"></div>
+              <div>
+                <div class="hw-spec-label">GPU</div>
+                <div class="hw-spec-value">NVIDIA RTX 3090 · 24 GB</div>
+              </div>
+            </div>
+            <div class="hw-spec">
+              <div class="hw-spec-dot" style="background:var(--neon-purple);box-shadow:0 0 8px rgba(179,136,255,.5)"></div>
+              <div>
+                <div class="hw-spec-label">Model Server</div>
+                <div class="hw-spec-value">LM Studio</div>
+              </div>
+            </div>
+            <div class="hw-spec">
+              <div class="hw-spec-dot" style="background:var(--neon-pink);box-shadow:0 0 8px rgba(255,64,129,.5)"></div>
+              <div>
+                <div class="hw-spec-label">Environment</div>
+                <div class="hw-spec-value">Local machine, no cloud</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="section-inner">
+      <span class="section-label fade-in">About</span>
+      <h2 class="section-title fade-in">The Person Behind the Lab</h2>
+      <div class="about-content">
+        <div class="about-text fade-in">
+          <p><strong>PC Magik Lab</strong> is a YouTube series exploring the practical side of running large AI models locally. The focus is on real hardware, real benchmarks, and transparent methodology — no cloud APIs, no synthetic benchmarks.</p>
+          <p>Each episode tests a different model, measuring how it performs on a <strong>single, consistent rig</strong>. The goal is to help developers and enthusiasts understand what local inference looks like on consumer-grade hardware.</p>
+          <p>Every prompt used in testing and every result file is published openly in the <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">pcmagik-lab repository</a>.</p>
+        </div>
+        <div class="about-visual fade-in">
+          <div class="about-avatar">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Links -->
+  <section class="links-section" id="links">
+    <div class="section-inner">
+      <span class="section-label fade-in">Connect</span>
+      <h2 class="section-title fade-in">Links</h2>
+      <p class="section-subtitle fade-in">Watch episodes, explore the data, and follow along.</p>
+      <div class="links-grid">
+        <a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener" class="link-card youtube fade-in">
+          <div class="link-icon yt">
+            <svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.5 15.1V8.9l6.3 3.1-6.3 3.1z"/></svg>
+          </div>
+          <div class="link-info">
+            <h3>YouTube Channel</h3>
+            <p>@PCMagikLab — Watch the latest episodes</p>
+          </div>
+        </a>
+        <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener" class="link-card github fade-in">
+          <div class="link-icon gh">
+            <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.01.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </div>
+          <div class="link-info">
+            <h3>GitHub Repository</h3>
+            <p>pcmagik-lab — Prompts, results &amp; methodology</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">PC Magik Lab</div>
+    <p>Created by <strong>PC Magik (Mateusz Piekut)</strong> — computer service and homelab operator from Poland.</p>
+    <p style="margin-top:.8rem;font-size:.78rem;color:rgba(136,136,160,.5)">© 2025 PC Magik Lab. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Intersection Observer for fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Close mobile nav on link click
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('.nav-links').classList.remove('open');
+      });
+    });
+  </script>
+</body>
+</html>

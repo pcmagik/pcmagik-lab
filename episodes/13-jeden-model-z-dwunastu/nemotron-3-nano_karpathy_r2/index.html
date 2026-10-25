@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PC Magik Lab</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --neon: #00ffcc;
+    --text: #e0e0e0;
+    --max-width: 900px;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(0,0,0,0.05) 0%, transparent 20%),
+      radial-gradient(circle at 20% 80%, rgba(0,0,0,0.05) 0%, transparent 20%),
+      radial-gradient(circle at 80% 40%, rgba(0,0,0,0.05) 0%, transparent 20%),
+      radial-gradient(circle at 70% 90%, rgba(0,0,0,0.05) 0%, transparent 20%);
+  }
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  section {
+    padding: 80px 0;
+    text-align: center;
+  }
+  h1, h2 {
+    color: var(--neon);
+    text-shadow: 0 0 10px var(--neon);
+  }
+  p {
+    margin: 1rem 0;
+    line-height: 1.5;
+  }
+  .hero {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 60px 20px;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+  }
+  .section {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 40px 20px;
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+  }
+  .cards {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  .card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    width: 150px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--neon);
+  }
+  .card a {
+    color: var(--neon);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  footer {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 30px 20px;
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #aaa;
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    .card { width: 120px; padding: 15px; }
+    section { padding: 60px 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero -->
+    <section id="hero" class="hero">
+      <h1>Local models, real GPUs.</h1>
+      <p>Welcome to PC Magik Lab</p>
+    </section>
+
+    <!-- Measuring -->
+    <section id="measuring" class="section">
+      <h2>How we measure</h2>
+      <ul>
+        <li>Same prompt, same rig, one variable changed per test</li>
+        <li>Model reloaded before every run</li>
+        <li>Every prompt and result file published</li>
+      </ul>
+    </section>
+
+    <!-- Hardware -->
+    <section id="hardware" class="section">
+      <h2>Hardware</h2>
+      <p>One rig: NVIDIA RTX 3090 24 GB, LM Studio as the model server</p>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section">
+      <h2>About</h2>
+      <p>PC Magik Lab is a YouTube series about running AI models on real, local GPUs.</p>
+    </section>
+
+    <!-- Links -->
+    <section id="links" class="section">
+      <h2>Links</h2>
+      <div class="cards">
+        <div class="card"><a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">YouTube</a></div>
+        <div class="card"><a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">GitHub</a></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      Created by PC Magik (Mateusz Piekut), computer service and homelab operator from Poland.
+    </footer>
+  </div>
+
+  <!-- Simple SVG decorative element -->
+  <svg style="position:fixed;bottom:0;width:100%;height:40px;background:transparent" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <path fill="none" stroke="var(--neon)" stroke-width="0.5" d="M0 5 Q25 0 50 5 T100 5"/>
+  </svg>
+
+  <script>
+    // Add click ripple effect to cards (optional enhancement)
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const span = document.createElement('span');
+        span.style.position = 'absolute';
+        span.style.left = `${x}px`;
+        span.style.top = `${y}px`;
+        span.style.width = '10px';
+        span.style.height = '10px';
+        span.style.background = 'var(--neon)';
+        span.style.borderRadius = '50%';
+        span.style.opacity = '0';
+        span.style.transform = 'scale(0)';
+        card.style.position = 'relative';
+        card.appendChild(span);
+        setTimeout(() => {
+          span.style.opacity = '1';
+          span.style.transform = 'scale(20)';
+        }, 10);
+        setTimeout(() => {
+          span.remove();
+        }, 300);
+      });
+    });
+  </script>
+</body>
+</html>

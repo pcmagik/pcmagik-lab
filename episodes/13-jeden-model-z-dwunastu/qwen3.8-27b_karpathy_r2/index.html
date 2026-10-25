@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Magik Lab — Local models, real GPUs.</title>
+<meta name="description" content="PC Magik Lab is a YouTube series about running AI models on real, local GPUs. Local models, real GPUs.">
+<style>
+  /* ============ Reset & tokens ============ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-0: #05070d;
+    --bg-1: #0a0f1c;
+    --bg-2: #101828;
+    --ink: #e8edf7;
+    --ink-dim: #9aa7c0;
+    --ink-faint: #5f6c88;
+    --neon-cyan: #22d3ee;
+    --neon-green: #4ade80;
+    --neon-violet: #a78bfa;
+    --neon-pink: #f472b6;
+    --glass: rgba(255, 255, 255, 0.045);
+    --glass-strong: rgba(255, 255, 255, 0.08);
+    --stroke: rgba(255, 255, 255, 0.10);
+    --stroke-bright: rgba(103, 232, 249, 0.45);
+    --radius: 18px;
+    --max-w: 1120px;
+    --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: "Cascadia Code", "SF Mono", "Fira Code", Consolas, "Liberation Mono", monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg-0);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: rgba(34, 211, 238, 0.35); color: #fff; }
+
+  a { color: var(--neon-cyan); text-decoration: none; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--neon-cyan);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+  /* ============ Ambient background ============ */
+  .bg-fx {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background:
+      radial-gradient(900px 500px at 15% -5%, rgba(34, 211, 238, 0.14), transparent 60%),
+      radial-gradient(800px 520px at 90% 10%, rgba(167, 139, 250, 0.12), transparent 60%),
+      radial-gradient(700px 600px at 50% 110%, rgba(74, 222, 128, 0.07), transparent 60%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1) 40%, var(--bg-0));
+  }
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgba(120, 160, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120, 160, 255, 0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 30%, transparent 75%);
+    pointer-events: none;
+  }
+
+  /* ============ Nav ============ */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: rgba(6, 9, 16, 0.72);
+    border-bottom: 1px solid var(--stroke);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 24px;
+    max-width: var(--max-w);
+    margin: 0 auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(167, 139, 250, 0.25));
+    border: 1px solid var(--stroke-bright);
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.25);
+  }
+  .brand small {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .nav-links { display: flex; gap: 6px; align-items: center; }
+  .nav-links a {
+    color: var(--ink-dim);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+  .nav-links a:hover {
+    color: var(--ink);
+    background: var(--glass);
+    box-shadow: inset 0 0 0 1px var(--stroke);
+  }
+  .nav-cta {
+    border: 1px solid var(--stroke-bright) !important;
+    color: var(--neon-cyan) !important;
+    background: rgba(34, 211, 238, 0.08);
+  }
+  .nav-cta:hover {
+    background: rgba(34, 211, 238, 0.18) !important;
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.35) !important;
+  }
+
+  /* ============ Hero ============ */
+  .hero { position: relative; padding: 96px 0 88px; text-align: center; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--neon-green);
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    padding: 7px 14px;
+    border-radius: 999px;
+    margin-bottom: 28px;
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.15);
+  }
+  .pulse-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.8); }
+  }
+  .hero h1 {
+    font-size: clamp(40px, 7.2vw, 76px);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 .line1 { color: var(--ink); display: block; }
+  .hero h1 .line2 {
+    display: block;
+    background: linear-gradient(92deg, var(--neon-cyan) 10%, var(--neon-violet) 55%, var(--neon-pink) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 60px rgba(34, 211, 238, 0.25);
+  }
+  .hero-sub {
+    max-width: 620px;
+    margin: 0 auto 40px;
+    color: var(--ink-dim);
+    font-size: 17px;
+  }
+  .hero-sub strong { color: var(--ink); font-weight: 600; }
+  .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 13px 24px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.25s ease, background 0.2s, border-color 0.2s;
+  }
+  .btn:active { transform: translateY(1px) scale(0.99); }
+  .btn-primary {
+    color: #04121a;
+    background: linear-gradient(135deg, var(--neon-cyan), #67e8f9 60%, var(--neon-violet));
+    box-shadow: 0 0 26px rgba(34, 211, 238, 0.45), 0 4px 14px rgba(0, 0, 0, 0.4);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(34, 211, 238, 0.65), 0 8px 20px rgba(0, 0, 0, 0.45);
+  }
+  .btn-ghost {
+    color: var(--ink);
+    background: var(--glass);
+    border-color: var(--stroke);
+    backdrop-filter: blur(8px);
+  }
+  .btn-ghost:hover {
+    transform: translateY(-2px);
+    border-color: var(--stroke-bright);
+    background: var(--glass-strong);
+    box-shadow: 0 0 22px rgba(167, 139, 250, 0.3);
+  }
+  .btn svg { flex: none; }
+
+  /* Hero visual */
+  .hero-visual {
+    margin: 64px auto 0;
+    max-width: 780px;
+    position: relative;
+  }
+  .term {
+    text-align: left;
+    background: rgba(8, 12, 22, 0.85);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(34, 211, 238, 0.06), 0 0 60px rgba(34, 211, 238, 0.08);
+    overflow: hidden;
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .term-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .term-dot.r { background: #ff5f57; }
+  .term-dot.y { background: #febc2e; }
+  .term-dot.g { background: #28c840; }
+  .term-title {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+  }
+  .term-body {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.85;
+    padding: 20px 22px 24px;
+    min-height: 172px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .term-body .p { color: var(--neon-green); }
+  .term-body .cmd { color: var(--ink); }
+  .term-body .dim { color: var(--ink-faint); }
+  .term-body .ok { color: var(--neon-cyan); }
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 1.05em;
+    vertical-align: text-bottom;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 8px var(--neon-cyan);
+    animation: blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .float-chip {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(12, 18, 32, 0.88);
+    border: 1px solid var(--stroke);
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 24px rgba(167, 139, 250, 0.15);
+    font-size: 13px;
+    font-weight: 600;
+    animation: floaty 6s ease-in-out infinite;
+  }
+  .float-chip small { display: block; font-weight: 400; color: var(--ink-faint); font-size: 11px; }
+  .chip-a { top: -26px; left: -6%; }
+  .chip-b { bottom: -22px; right: -5%; animation-delay: -3s; }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+  }
+  @media (max-width: 860px) {
+    .float-chip { position: static; margin-top: 14px; animation: none; }
+    .hero-visual { max-width: 560px; }
+  }
+
+  /* ============ Sections ============ */
+  section { padding: 88px 0; position: relative; }
+  .sec-head { max-width: 640px; margin-bottom: 44px; }
+  .sec-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--neon-cyan);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .sec-tag::before {
+    content: "";
+    width: 28px; height: 1px;
+    background: linear-gradient(90deg, var(--neon-cyan), transparent);
+  }
+  .sec-head h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 750;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .sec-head p { color: var(--ink-dim); font-size: 16px; }
+
+  /* Glass card base */
+  .glass {
+    background: var(--glass);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.3s ease;
+  }
+
+  /* ============ Method ============ */
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    position: relative;
+    padding: 26px 24px;
+    overflow: hidden;
+    cursor: default;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(340px 160px at var(--mx, 50%) var(--my, -20%), rgba(34, 211, 238, 0.12), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    border-color: var(--stroke-bright);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 30px rgba(34, 211, 238, 0.12);
+  }
+  .card:hover::before { opacity: 1; }
+  .card-icon {
+    width: 46px; height: 46px;
+    display: grid; place-items: center;
+    border-radius: 13px;
+    margin-bottom: 18px;
+    background: rgba(34, 211, 238, 0.10);
+    border: 1px solid var(--stroke);
+    color: var(--neon-cyan);
+    transition: box-shadow 0.3s, transform 0.3s;
+  }
+  .card:hover .card-icon {
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.35);
+    transform: scale(1.06);
+  }
+  .card h3 { font-size: 17px; font-weight: 650; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .card p { color: var(--ink-dim); font-size: 14.5px; }
+  .card .num {
+    position: absolute;
+    top: 18px; right: 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  /* Method steps strip */
+  .method-steps {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--stroke);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .step {
+    background: rgba(10, 15, 26, 0.8);
+    padding: 20px;
+    transition: background 0.25s;
+  }
+  .step:hover { background: rgba(34, 211, 238, 0.07); }
+  .step .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--neon-cyan);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .step .t { font-size: 14px; font-weight: 600; }
+  .step .d { font-size: 12.5px; color: var(--ink-faint); margin-top: 4px; }
+  @media (max-width: 720px) { .method-steps { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ============ Hardware ============ */
+  .hw-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+  @media (max-width: 860px) { .hw-layout { grid-template-columns: 1fr; } }
+
+  .hw-panel { padding: 30px; position: relative; overflow: hidden; }
+  .hw-panel h3 {
+    font-size: 20px; font-weight: 700;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 6px;
+  }
+  .hw-panel .sub { color: var(--ink-faint); font-size: 13.5px; margin-bottom: 22px; }
+  .hw-rows { display: flex; flex-direction: column; gap: 12px; }
+  .hw-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--stroke);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: border-color 0.25s, background 0.25s, transform 0.25s;
+  }
+  .hw-row:hover {
+    border-color: var(--stroke-bright);
+    background: rgba(34, 211, 238, 0.06);
+    transform: translateX(4px);
+  }
+  .hw-row .k { color: var(--ink-dim); font-size: 13.5px; }
+  .hw-row .v { font-weight: 650; font-size: 15px; text-align: right; }
+  .hw-row .v small { display: block; font-weight: 400; font-size: 11.5px; color: var(--ink-faint); }
+
+  .hw-visual {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 18px;
+    padding: 34px 26px;
+    background:
+      radial-gradient(300px 200px at 50% 40%, rgba(34, 211, 238, 0.10), transparent 70%),
+      var(--glass);
+  }
+  .gpu-svg { width: 100%; max-width: 320px; filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.35)); }
+  .hw-caption { font-family: var(--mono); font-size: 12px; color: var(--ink-dim); text-align: center; }
+  .hw-caption b { color: var(--neon-cyan); font-weight: 600; }
+
+  .mem-bar {
+    width: 100%; max-width: 320px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--stroke);
+    overflow: hidden;
+  }
+  .mem-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-violet), var(--neon-pink));
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.6);
+  }
+  .mem-labels { width: 100%; max-width: 320px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-top: -8px; }
+
+  /* ============ About ============ */
+  .about-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 24px; }
+  @media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; } }
+  .about-card { padding: 30px; }
+  .avatar {
+    width: 92px; height: 92px;
+    border-radius: 24px;
+    display: grid; place-items: center;
+    font-size: 34px; font-weight: 800;
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(244, 114, 182, 0.25));
+    border: 1px solid var(--stroke-bright);
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.25);
+    color: var(--ink);
+  }
+  .about-card .name { font-size: 22px; font-weight: 750; letter-spacing: -0.01em; }
+  .about-card .role { color: var(--neon-cyan); font-size: 13.5px; font-family: var(--mono); margin: 4px 0 14px; }
+  .about-card .bio { color: var(--ink-dim); font-size: 14.5px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .tag {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--stroke);
+    color: var(--ink-dim);
+  }
+  .about-text { padding: 30px; display: flex; flex-direction: column; gap: 14px; }
+  .about-text p { color: var(--ink-dim); font-size: 15.5px; }
+  .about-text p strong { color: var(--ink); }
+  .link-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+  @media (max-width: 560px) { .link-cards { grid-template-columns: 1fr; } }
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--ink);
+    transition: transform 0.2s, border-color 0.25s, box-shadow 0.3s, background 0.2s;
+  }
+  .link-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--stroke-bright);
+    background: rgba(34, 211, 238, 0.07);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4), 0 0 26px rgba(34, 211, 238, 0.18);
+  }
+  .link-card .ic {
+    width: 42px; height: 42px; flex: none;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--stroke);
+  }
+  .link-card .lb { font-size: 11.5px; color: var(--ink-faint); font-family: var(--mono); }
+  .link-card .tt { font-weight: 650; font-size: 14.5px; }
+  .link-card .arrow { margin-left: auto; color: var(--ink-faint); transition: transform 0.2s, color 0.2s; }
+  .link-card:hover .arrow { transform: translateX(4px); color: var(--neon-cyan); }
+
+  /* ============ CTA band ============ */
+  .cta-band {
+    margin: 20px 0 0;
+    padding: 56px 32px;
+    text-align: center;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(500px 240px at 50% -20%, rgba(34, 211, 238, 0.18), transparent 70%),
+      radial-gradient(400px 220px at 85% 120%, rgba(167, 139, 250, 0.14), transparent 70%),
+      var(--glass);
+    border: 1px solid var(--stroke);
+  }
+  .cta-band h2 { font-size: clamp(24px, 3.6vw, 34px); font-weight: 750; letter-spacing: -0.015em; margin-bottom: 10px; }
+  .cta-band p { color: var(--ink-dim); max-width: 480px; margin: 0 auto 26px; }
+
+  /* ============ Footer ============ */
+  footer {
+    border-top: 1px solid var(--stroke);
+    background: rgba(5, 8, 14, 0.85);
+    padding: 40px 0 34px;
+    margin-top: 40px;
+  }
+  .foot-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 22px;
+  }
+  .foot-brand { max-width: 340px; }
+  .foot-brand .name { font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .foot-brand p { color: var(--ink-faint); font-size: 13.5px; }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .foot-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--stroke);
+    color: var(--ink-dim);
+    font-size: 13.5px;
+    background: var(--glass);
+    transition: color 0.2s, border-color 0.2s, box-shadow 0.25s, transform 0.2s;
+  }
+  .foot-link:hover {
+    color: var(--ink);
+    border-color: var(--stroke-bright);
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.2);
+    transform: translateY(-2px);
+  }
+  .foot-bottom {
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--ink-faint);
+    font-size: 12.5px;
+  }
+  .foot-bottom .mono { font-family: var(--mono); }
+
+  /* ============ Reveal on scroll ============ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: 0.08s; }
+  .reveal.d2 { transition-delay: 0.16s; }
+  .reveal.d3 { transition-delay: 0.24s; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .float-chip, .pulse-dot, .cursor { animation: none; }
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 8px;
+    z-index: 100;
+    background: var(--neon-cyan);
+    color: #04121a;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .skip-link:focus { left: 12px; }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="PC Magik Lab home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 17V7l5 5 5-5v10" stroke="#22d3ee" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 17V7" stroke="#a78bfa" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span>PC Magik Lab<small>local ai · real gpus</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#method">Method</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#about">About</a>
+      <a class="nav-cta" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+        YouTube
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div class="hero-badge reveal">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        A YouTube series · running locally
+      </div>
+      <h1 class="reveal d1">
+        <span class="line1">Local models,</span>
+        <span class="line2"> real GPUs.</span>
+      </h1>
+      <p class="hero-sub reveal d2">
+        <strong>PC Magik Lab</strong> is a series about running AI models on real, local GPUs —
+        no cloud, no hand-waving. Same prompt, same rig, one variable changed at a time,
+        and every prompt and result file published so you can see exactly what happened.
+      </p>
+      <div class="hero-actions reveal d3">
+        <a class="btn btn-primary" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/>
+          </svg>
+          Watch the series
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.9 10.9c.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.4-1.3-1.8-1.3-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .4.2.7.8.6A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/>
+          </svg>
+          Prompts &amp; results
+        </a>
+      </div>
+
+      <!-- Hero visual: terminal + floating chips -->
+      <div class="hero-visual reveal d3">
+        <div class="float-chip chip-a" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="5" y="5" width="14" height="14" rx="2" stroke="#4ade80" stroke-width="1.8"/>
+            <rect x="9" y="9" width="6" height="6" fill="#4ade80" opacity="0.7"/>
+            <path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3" stroke="#4ade80" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span>NVIDIA RTX 3090<small>24 GB VRAM · the whole rig</small></span>
+        </div>
+
+        <div class="term" role="img" aria-label="Stylized terminal showing a local model run with LM Studio">
+          <div class="term-bar">
+            <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+            <span class="term-title">lmstudio · local run</span>
+          </div>
+          <div class="term-body" id="termBody">
+<span class="dim"># one variable per test · model reloaded before every run</span>
+<span class="p">$</span> <span class="cmd">run --prompt ./prompt.txt --server lmstudio</span>
+<span class="ok">✓ model reloaded</span>
+<span class="ok">✓ prompt loaded</span>
+<span class="dim">→ writing result file… done</span>
+<span class="p">$</span> <span class="cursor" aria-hidden="true"></span></div>
+        </div>
+
+        <div class="float-chip chip-b" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="#a78bfa" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M14 3v6h6" stroke="#a78bfa" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M9 14h6M9 17h4" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>Every result file published<small>prompts + outputs on GitHub</small></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ METHOD ============ -->
+  <section id="method">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-tag">The method</span>
+        <h2>How the series measures things</h2>
+        <p>No vibes-based benchmarks. Every test follows the same rules, so comparisons across models are actually fair.</p>
+      </div>
+
+      <div class="method-grid">
+        <article class="glass card reveal">
+          <span class="num" aria-hidden="true">01</span>
+          <div class="card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M4 5h16M4 12h16M4 19h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="19" cy="19" r="3" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3>Same prompt</h3>
+          <p>Every model in a test answers the exact same prompt. If the input changes, the comparison is over.</p>
+        </article>
+
+        <article class="glass card reveal d1">
+          <span class="num" aria-hidden="true">02</span>
+          <div class="card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M9 2v2M15 2v2M9 20v2M15 20v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <rect x="9" y="9" width="6" height="6" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3>Same rig</h3>
+          <p>One machine, one GPU: the same hardware is behind every single run in the series.</p>
+        </article>
+
+        <article class="glass card reveal d2">
+          <span class="num" aria-hidden="true">03</span>
+          <div class="card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M8 7a5 5 0 0 1 9.6 0M16 17a5 5 0 0 1-9.6 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M18 7v4M6 13v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M18.5 9.5L18 11l-.5-1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h3>One variable changed per test</h3>
+          <p>Each test changes exactly one thing — so you can attribute any difference in the output to that one change.</p>
+        </article>
+
+        <article class="glass card reveal d3">
+          <span class="num" aria-hidden="true">04</span>
+          <div class="card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M21 12a9 9 0 1 1-2.6-6.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M21 3v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 8v4l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Model reloaded before every run</h3>
+          <p>The model is reloaded before every run, so no run inherits state from the one before it.</p>
+        </article>
+      </div>
+
+      <div class="method-steps reveal" aria-label="The per-run protocol">
+        <div class="step"><span class="n">step 01</span><span class="t">Load the prompt</span><span class="d">identical across the test</span></div>
+        <div class="step"><span class="n">step 02</span><span class="t">Reload the model</span><span class="d">fresh state, every run</span></div>
+        <div class="step"><span class="n">step 03</span><span class="t">Run on the same rig</span><span class="d">RTX 3090 · LM Studio</span></div>
+        <div class="step"><span class="n">step 04</span><span class="t">Publish the files</span><span class="d">prompt + result, on GitHub</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HARDWARE ============ -->
+  <section id="hardware">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-tag">The hardware</span>
+        <h2>One rig. That's it.</h2>
+        <p>Keeping the hardware constant is what makes the results comparable — every model in the series runs on the same box.</p>
+      </div>
+
+      <div class="hw-layout">
+        <div class="glass hw-panel reveal">
+          <h3>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="6" width="18" height="12" rx="2" stroke="#22d3ee" stroke-width="2"/>
+              <circle cx="9" cy="12" r="2.6" stroke="#22d3ee" stroke-width="2"/>
+              <path d="M15 9.5v5M18 9.5v5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            The rig
+          </h3>
+          <p class="sub">Single machine, single GPU — the same setup behind every test.</p>
+
+          <div class="hw-rows">
+            <div class="hw-row">
+              <span class="k">GPU</span>
+              <span class="v">NVIDIA RTX 3090<small>24 GB VRAM</small></span>
+            </div>
+            <div class="hw-row">
+              <span class="k">Model server</span>
+              <span class="v">LM Studio<small>serves the models locally</small></span>
+            </div>
+            <div class="hw-row">
+              <span class="k">Rig count</span>
+              <span class="v">One<small>one variable changed per test</small></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass hw-visual reveal d1">
+          <svg class="gpu-svg" viewBox="0 0 320 200" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="casing" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#1b2437"/>
+                <stop offset="1" stop-color="#0d1322"/>
+              </linearGradient>
+              <linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#22d3ee"/>
+                <stop offset="1" stop-color="#a78bfa"/>
+              </linearGradient>
+            </defs>
+            <!-- backplate -->
+            <rect x="14" y="38" width="292" height="112" rx="14" fill="url(#casing)" stroke="#2b3a58" stroke-width="2"/>
+            <rect x="30" y="52" width="150" height="84" rx="10" fill="#0a0f1c" stroke="#22314e" stroke-width="1.5"/>
+            <!-- fan 1 -->
+            <g transform="translate(105 94)">
+              <circle r="36" fill="none" stroke="#22d3ee" stroke-opacity="0.35" stroke-width="2"/>
+              <g class="fan-spin" style="transform-box: fill-box; transform-origin: center; animation: spinslow 9s linear infinite;">
+                <path d="M0 0C10 -8 26 -8 30 2 20 6 6 6 0 0Z" fill="#22d3ee" fill-opacity="0.55"/>
+                <path d="M0 0C10 -8 26 -8 30 2 20 6 6 6 0 0Z" fill="#22d3ee" fill-opacity="0.55" transform="rotate(120)"/>
+                <path d="M0 0C10 -8 26 -8 30 2 20 6 6 6 0 0Z" fill="#22d3ee" fill-opacity="0.55" transform="rotate(240)"/>
+                <circle r="7" fill="#0d1322" stroke="#22d3ee" stroke-width="2"/>
+              </g>
+            </g>
+            <!-- fan 2 -->
+            <g transform="translate(230 94)">
+              <circle r="36" fill="none" stroke="#a78bfa" stroke-opacity="0.35" stroke-width="2"/>
+              <g class="fan-spin" style="transform-box: fill-box; transform-origin: center; animation: spinslow 7s linear infinite reverse;">
+                <path d="M0 0C10 -8 26 -8 30 2 20 6 6 6 0 0Z" fill="#a78bfa" fill-opacity="0.5"/>
+                <path d="M0 0C10 -8 26 -8 30 2 20 6 6 6 0 0Z" fill="#a78bfa" fill-opacity="0.5" transform="rotate(120)"/>
+                <path d="M0 0C10 -8 26 -8 30 2 20 6 6 6 0 0Z" fill="#a78bfa" fill-opacity="0.5" transform="rotate(240)"/>
+                <circle r="7" fill="#0d1322" stroke="#a78bfa" stroke-width="2"/>
+              </g>
+            </g>
+            <!-- neon edge light -->
+            <rect x="14" y="148" width="292" height="4" rx="2" fill="url(#blade)"/>
+            <rect x="14" y="146" width="292" height="8" rx="4" fill="url(#blade)" opacity="0.25"/>
+            <!-- PCIe connector -->
+            <rect x="60" y="156" width="200" height="10" rx="2" fill="#131c30" stroke="#22314e" stroke-width="1.5"/>
+            <rect x="270" y="156" width="34" height="10" rx="2" fill="#131c30" stroke="#22314e" stroke-width="1.5"/>
+            <!-- label -->
+            <text x="296" y="70" text-anchor="end" font-family="monospace" font-size="13" fill="#9aa7c0">RTX 3090</text>
+          </svg>
+          <div class="mem-bar" role="img" aria-label="Memory bar: 24 gigabytes of VRAM">
+            <div class="mem-fill"></div>
+          </div>
+          <div class="mem-labels" aria-hidden="true"><span>VRAM</span><span><b>24 GB</b></span></div>
+          <p class="hw-caption">served locally via <b>LM Studio</b></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-tag">About</span>
+        <h2>Who runs the lab</h2>
+        <p>PC Magik Lab is the work of one operator, one GPU, and a habit of publishing everything.</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="glass about-card reveal">
+          <div class="avatar" aria-hidden="true">
+            <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
+              <path d="M4 17V7l5 5 5-5v10" stroke="#22d3ee" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M18 17V7" stroke="#f472b6" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="name">PC Magik</div>
+          <div class="role">Mateusz Piekut</div>
+          <p class="bio">Computer service and homelab operator from Poland. The person behind the rig, the prompts, and the published results.</p>
+          <div class="tag-list" aria-hidden="true">
+            <span class="tag">Poland 🇵🇱</span>
+            <span class="tag">computer service</span>
+            <span class="tag">homelab</span>
+            <span class="tag">local AI</span>
+          </div>
+        </div>
+
+        <div class="glass about-text reveal d1">
+          <p><strong>PC Magik Lab</strong> is a YouTube series about running AI models on real, local GPUs. The premise is deliberately boring: one machine, one GPU, and a strict method that keeps the tests honest.</p>
+          <p>Everything the series produces is public — the exact prompts, and the result files for every run — so anyone can re-run the tests or inspect what actually came out of the model.</p>
+
+          <div class="link-cards">
+            <a class="link-card" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+              <span class="ic" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#f472b6">
+                  <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/>
+                </svg>
+              </span>
+              <span><span class="lb">youtube.com</span><br><span class="tt">The series</span></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="link-card" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+              <span class="ic" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#4ade80">
+                  <path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.9 10.9c.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.4-1.3-1.8-1.3-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .4.2.7.8.6A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/>
+                </svg>
+              </span>
+              <span><span class="lb">github.com</span><br><span class="tt">Prompts &amp; result files</span></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section id="cta" style="padding-top: 20px;">
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>See it run on real silicon</h2>
+        <p>Local models, real GPUs. Watch the series on YouTube and dig through the prompts and result files on GitHub.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/>
+            </svg>
+            Watch on YouTube
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.9 10.9c.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.4-1.3-1.8-1.3-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .4.2.7.8.6A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/>
+            </svg>
+            Open the repository
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="name">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 17V7l5 5 5-5v10" stroke="#22d3ee" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 17V7" stroke="#a78bfa" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+          PC Magik Lab
+        </div>
+        <p>A YouTube series about running AI models on real, local GPUs. Local models, real GPUs.</p>
+      </div>
+      <nav class="foot-links" aria-label="Footer links">
+        <a class="foot-link" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/></svg>
+          YouTube
+        </a>
+        <a class="foot-link" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.9 10.9c.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.4-1.3-1.8-1.3-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .4.2.7.8.6A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+          GitHub
+        </a>
+        <a class="foot-link" href="#method">Method</a>
+        <a class="foot-link" href="#hardware">Hardware</a>
+        <a class="foot-link" href="#about">About</a>
+      </nav>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="year">2025</span> PC Magik (Mateusz Piekut) · computer service &amp; homelab operator, Poland</span>
+      <span class="mono">local models, real gpus.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* Current year */
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  /* Reveal on scroll */
+  var revealEls = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* Spotlight follow on method cards */
+  var cards = document.querySelectorAll(".card");
+  cards.forEach(function (card) {
+    card.addEventListener("pointermove", function (e) {
+      var r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+      card.style.setProperty("--my", (e.clientY - r.top) + "px");
+    });
+  });
+
+  /* Typing effect in the hero terminal (decorative, pure JS, no network) */
+  var body = document.getElementById("termBody");
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (body && !reduce) {
+    var lines = [
+      { html: '<span class="dim"># one variable per test · model reloaded before every run</span>', delay: 300 },
+      { html: '<span class="p">$</span> <span class="cmd">run --prompt ./prompt.txt --server lmstudio</span>', delay: 900 },
+      { html: '<span class="ok">✓ model reloaded</span>', delay: 500 },
+      { html: '<span class="ok">✓ prompt loaded</span>', delay: 400 },
+      { html: '<span class="dim">→ writing result file… done</span>', delay: 500 }
+    ];
+    var finalLine = '<span class="p">$</span> <span class="cursor" aria-hidden="true"></span>';
+
+    function render(upto) {
+      var out = lines.slice(0, upto).map(function (l) { return l.html; }).join("\n");
+      if (upto < lines.length) out += "\n<span class=\"cursor\" aria-hidden=\"true\"></span>";
+      else out += "\n" + finalLine;
+      return out;
+    }
+    function play() {
+      var i = 0;
+      (function next() {
+        body.innerHTML = render(i);
+        if (i >= lines.length) return;
+        i += 1;
+        setTimeout(next, lines[i - 1].delay);
+      })();
+    }
+    /* Start typing when the hero terminal scrolls into view, and replay on re-entry */
+    if ("IntersectionObserver" in window) {
+      var started = false;
+      var io2 = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && !started) {
+            started = true;
+            play();
+            io2.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      io2.observe(body);
+    } else {
+      play();
+    }
+  }
+})();
+</script>
+
+<style>
+  @keyframes spinslow { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .fan-spin, [style*="spinslow"] { animation: none !important; }
+  }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Magik Lab | Local Models, Real GPUs</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.5);
+            --secondary-accent: #bc13fe;
+            --secondary-glow: rgba(188, 19, 254, 0.5);
+            --text-color: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background Accents */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(188, 19, 254, 0.05) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            background: linear-gradient(to right, var(--accent-color), var(--secondary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 1rem;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        .hero .tagline {
+            font-weight: 300;
+            letter-spacing: 5px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 35px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 242, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Sections Layout */
+        section {
+            padding: 100px 10%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+            font-size: 2.5rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--secondary-accent);
+            border-radius: 2px;
+        }
+
+        /* Cards & Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 2rem;
+            border-radius: 16px;
+            backdrop-filter: blur(5px);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 255, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .card p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Methodology List */
+        .methodology-list {
+            list-style: none;
+        }
+
+        .methodology-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary-accent);
+        }
+
+        .methodology-icon {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            color: var(--accent-color);
+        }
+
+        /* Hardware Section Specifics */
+        .hardware-specs {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .spec-item {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .spec-sub {
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 10% 2rem;
+            text-align: center;
+            border-top: 1px solid var(--card-border);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .footer-content p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .social-links {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .social-icon {
+            width: 32px;
+            height: 32px;
+            fill: var(--text-dim);
+            transition: 0.3s;
+        }
+
+        .social-icon:hover {
+            fill: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            section {
+                padding: 60px 5%;
+            }
+        }
+
+        /* Scroll Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">PC MAGIK LAB</div>
+        <div class="nav-links">
+            <a href="#methodology">Methodology</a>
+            <a href="#hardware">Hardware</a>
+            <a href="#about">About</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>PC MAGIK LAB</h1>
+        <p class="tagline">Local models, real GPUs.</p>
+        <div class="cta-buttons">
+            <a href="https://www.youtube.com/@PCMagikLab" target="_blank" class="btn btn-primary">Watch on YouTube</a>
+            <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" class="btn btn-secondary">GitHub Repo</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="methodology">
+            <h2 class="section-title">Methodology</h2>
+            <div class="methodology-list">
+                <div class="methodology-item reveal">
+                    <div class="methodology-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 12 1"></polyline><polyline points="2 22 12 12"></polyline></svg>
+                    </div>
+                    <div>
+                        <h3>Controlled Variables</h3>
+                        <p>We ensure consistent results by using the same prompt and the same hardware rig for every single test.</p>
+                    </div>
+                </div>
+                <div class="methodology-item reveal">
+                    <div class="methodology-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </div>
+                    <div>
+                        <h3>One Variable at a Time</h3>
+                        <p>Only one parameter or model is changed per test, allowing for precise measurement of impact.</p>
+                    </div>
+                </div>
+                <div class="methodology-item reveal">
+                    <div class="methodology-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    </div>
+                    <div>
+                        <h3>Fresh Environment</h3>
+                        <p>The model is reloaded from scratch before every run to prevent caching biases.</p>
+                    </div>
+                </div>
+                <div class="methodology-item reveal">
+                    <div class="methodology-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="16 2 16 6 10 6 10 2"></polyline><line x1="16" y1="14" x2="14" y2="14"></line><line x1="14" y1="16" x2="14" y2="14"></line></svg>
+                    </div>
+                    <div>
+                        <h3>Full Transparency</h3>
+                        <p>Every prompt used and every result file generated is published for community inspection.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hardware">
+            <h2 class="section-title">Hardware Rig</h2>
+            <div class="hardware-specs reveal">
+                <div class="card">
+                    <h3>The Setup</h3>
+                    <div class="spec-item">NVIDIA RTX 3090</div>
+                    <div class="spec-sub">24 GB VRAM</div>
+                    <hr style="border: 0; height: 1px; background: var(--card-border); margin: 2rem 0;">
+                    <div class="spec-item" style="font-size: 1.1rem; color: var(--accent-color);">LM Studio</div>
+                    <div class="spec-sub">Model Server</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2 class="section-title">About the Series</h2>
+            <div class="grid">
+                <div class="card reveal">
+                    <h3>The Goal</h3>
+                    <p>Exploring the real-world performance of local AI models on consumer-grade, high-VRAM hardware.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>The Focus</h3>
+                    <p>Quantifying how different models, quantization levels, and prompts perform in local environments.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>The Data</h3>
+                    <p>Open results and reproducible workflows for the AI enthusiast and developer community.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://www.youtube.com/@PCMagikLab" target="_blank" aria-label="YouTube">
+                <svg class="social-icon" viewBox="0 0 24 24"><path d="M22.54 6.42a2.85 2.85 0 0 0-1.94-2.04C18.88 3.84 10 4.44 10 4.44M2.06 11.31c.42 2.36 2.6 4.46 4.9 4.89 2.3.37 5.2 0 7.4-1.13a2.85 2.85 0 0 0 1.94-2.04c.5-2.36-1.6-4.46-3.9-4.89-2.3-.37-5.2.4-7.4 1.13a2.85 2.85 0 0 0-1.94 2.04z"></path><rect x="6" y="12" width="12" height="12" rx="1" ry="1"></rect></svg>
+            </a>
+            <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" aria-label="GitHub">
+                <svg class="social-icon" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12c0 4.61 3.59 8.34 8 8.97V18.5h3V12.99h2.56c3.91 0 3.61-2.02 3.61-2.02l-.29-1.53C18.22 12.54 17 10.54 17 9c0-2.21-1.79-4-4-4-3.31 0-5.4 2.29-5.4 5 0 .53.04 1.04.15 1.52l.15.63c-.38.14-.77.23-1.17.23-2.14 0-4-1.66-4-3.73s1.86-3.73 4-3.73c.3 0 .58.03.84.09.12.44.5 1.8 5.12 1.8 3.1 0 5.21-2.13 5.21-4.9 0-2.61-1.95-4.73-4.5-4.73-2.77 0-4.63 2.11-4.63 4.7 0 1.18.42 2.28 1.12 3.02.06.07.07.18.01.25-.09.1-1.15 5.05-1.15 5.05s-.1 1.08.5 1.5c.4.38 1.1 1.1 1.1 1.1s.3.2 1.2.2h10c.55 0 1-.45 1-1V10c0-4.41-3.59-8-8-8z"></path></svg>
+            </a>
+        </div>
+        <div class="footer-content">
+            <p>&copy; 2024 PC Magik (Mateusz Piekut). Computer service and homelab operator from Poland.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Reveal Animation
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('active');
+                }
+            }
+        }
+
+        window.addEventListener('scroll', reveal);
+
+        // Initial check to show elements already in view
+        window.onload = reveal;
+    </script>
+</body>
+</html>

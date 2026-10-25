@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PC Magik Lab</title>
+<style
+:root {
+  --bg: #0d0d0d;
+  --glass: rgba(0,0,0,0.6);
+  --glass-border: #00ffcc33;
+  --neon: #00ffcc;
+  --text: #e0e0e0;
+}
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+html {
+  scroll-behavior: smooth;
+}
+header, section {
+  max-width: 1200px;
+  margin: auto;
+  padding: 2rem;
+}
+header {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  text-align: center;
+}
+h1 {
+  font-size: 2.5rem;
+  color: var(--neon);
+  text-shadow: 0 0 10px var(--neon);
+}
+h2 {
+  color: var(--neon);
+  margin-bottom: 1rem;
+}
+section {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+.card {
+  background: var(--bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  transition: transform .2s, box-shadow .2s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 15px var(--neon);
+}
+a {
+  color: var(--neon);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+footer {
+  text-align: center;
+  font-size: 0.9rem;
+  margin: 2rem 0;
+}
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+}
+</style>
+</head>
+<body>
+<header id="hero">
+  <h1>Local models, real GPUs.</h1>
+  <p>PC Magik Lab</p>
+</header>
+
+<section id="cards">
+  <div class="card"><a href="#measure">How we measure</a></div>
+  <div class="card"><a href="#hardware">Hardware</a></div>
+  <div class="card"><a href="#about">About</a></div>
+</section>
+
+<section id="measure">
+  <h2>How we measure</h2>
+  <p>We test with the same prompt, the same rig, one variable changed per test, the model reloaded before every run, and every prompt and result file is published.</p>
+</section>
+
+<section id="hardware">
+  <h2>Hardware</h2>
+  <p>One rig: NVIDIA RTX 3090 24 GB, LM Studio as the model server.</p>
+</section>
+
+<section id="about">
+  <h2>About</h2>
+  <p>PC Magik Lab is a YouTube series about running AI models on real, local GPUs. The creator is PC Magik (Mateusz Piekut), a computer service and homelab operator from Poland.</p>
+</section>
+
+<footer>
+  <p>© PC Magik Lab – PC Magik (Mateusz Piekut), computer service and homelab operator from Poland</p>
+  <a href="https://www.youtube.com/@PCMagikLab">YouTube</a> |
+  <a href="https://github.com/pcmagik/pcmagik-lab">Repository</a>
+</footer>
+</body>
+</html>

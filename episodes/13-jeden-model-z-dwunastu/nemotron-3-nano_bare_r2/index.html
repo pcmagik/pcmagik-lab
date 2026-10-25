@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PC Magik Lab</title>
+<style>
+:root {
+  --bg: #0d0d0d;
+  --glass-bg: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.1);
+  --primary: #00fff;
+  --text: #e0e0e0;
+  --neon: 0 0 10px #00fff, 0 0 20px #00fff;
+}
+body {
+  margin:0;
+  font-family:'Segoe UI', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  scroll-behavior:smooth;
+}
+nav {
+  padding:1rem;
+  display:flex;
+  justify-content:center;
+  gap:2rem;
+}
+section {
+  padding:4rem 1rem;
+  max-width:1200px;
+  margin:auto;
+}
+h1, h2 {
+  text-align:center;
+}
+.hero {
+  background:linear-gradient(135deg, #111 0%, #222 100%);
+  padding:5rem 1rem;
+  text-align:center;
+}
+.hero h1 {
+  font-size:3rem;
+  color:#00fff;
+  text-shadow:var(--neon);
+  margin:0;
+}
+.tagline {
+  font-size:1.5rem;
+  color:#fff;
+  margin-top:0.5rem;
+}
+.cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.5rem;
+  margin-top:2rem;
+}
+.card {
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:12px;
+  padding:1.5rem;
+  backdrop-filter:blur(10px);
+  transition:transform 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+  transform:translateY(-5px);
+  box-shadow:0 0 20px var(--neon);
+}
+.card h3 {
+  margin-top:0;
+  color:#00fff;
+}
+.card p {
+  margin:0.5rem 0 0;
+  line-height:1.4;
+}
+footer {
+  text-align:center;
+  padding:2rem 1rem;
+  background:#111;
+  font-size:0.9rem;
+}
+a {
+  color:#00fff;
+  text-decoration:none;
+}
+a:hover {
+  text-decoration:underline;
+}
+</style>
+</head>
+<body>
+<nav>
+<a href="#hero">Home</a>
+<a href="#measure">How We Measure</a>
+<a href="#hardware">Hardware</a>
+<a href="#about">About</a>
+<a href="#contact">Contact</a>
+</nav>
+
+<section id="hero" class="hero">
+<h1>Local models, real GPUs.</h1>
+<div class="tagline">Local models, real GPUs.</div>
+</section>
+
+<section id="measure">
+<h2>How the series measures things</h2>
+<div class="card">
+<h3>Consistent Testing</h3>
+<p>Each test uses the same prompt and the same rig. One variable is changed per test. The model is reloaded before every run. Every prompt and result file is published.</p>
+</div>
+<div class="card">
+<h3>Transparent Results</h3>
+<p>All prompts and their corresponding result files are made publicly available for verification.</p>
+</div>
+</section>
+
+<section id="hardware">
+<h2>Hardware</h2>
+<div class="card">
+<h3>Test Rig</h3>
+<p>One rig: NVIDIA RTX 3090 24 GB</p>
+<p>Model server: LM Studio</p>
+</div>
+</section>
+
+<section id="about">
+<h2>About</h2>
+<div class="card">
+<h3>PC Magik Lab</h3>
+<p>PC Magik Lab is a YouTube series exploring AI model performance on local GPUs. The channel shares transparent testing methodology and openly publishes all prompts and results.</p>
+</div>
+</section>
+
+<section id="contact">
+<h2>Connect</h2>
+<div class="card">
+<a href="https://www.youtube.com/@PCMagikLab" target="_blank">YouTube Channel</a>
+</div>
+<div class="card">
+<a href="https://github.com/pcmagik/pcmagik-lab" target="_blank">Repository with Prompts & Results</a>
+</div>
+</section>
+
+<footer>
+<p>Created by PC Magik (Mateusz Piekut), computer service and homelab operator from Poland.</p>
+</footer>
+
+<script>
+document.querySelectorAll('.card').forEach(card => {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) card.style.opacity = 1;
+    });
+  }, {threshold: 0.1});
+  observer.observe(card);
+});
+</script>
+</body>
+</html>

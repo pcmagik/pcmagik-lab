@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Magik Lab - Local models, real GPUs.</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --accent-primary: #00f2ff;
+            --accent-secondary: #bc13fe;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neon-glow: 0 0 15px var(--accent-primary), 0 0 30px rgba(0, 242, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Background Decoration */
+        .bg-glow {
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
+            filter: blur(60px);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-1 { top: -10%; right: -10%; }
+        .glow-2 { bottom: -10%; left: -10%; background: radial-gradient(circle, rgba(188, 19, 254, 0.1) 0%, transparent 70%); }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: background 0.3s;
+        }
+        nav.scrolled {
+            background: rgba(10, 10, 12, 0.9);
+            padding: 1rem 2rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: -1px;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span {
+            color: var(--accent-primary);
+            text-shadow: var(--neon-glow);
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+        .nav-links a:hover {
+            color: #fff;
+            text-shadow: 0 0 8px var(--accent-primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 2rem;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInDown 1s ease-out;
+        }
+        .hero p {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            animation: fadeInUp 1s ease-out 0.3s backwards;
+        }
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
+            animation: fadeInUp 1s ease-out 0.6s backwards;
+        }
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--accent-primary);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.6);
+            filter: brightness(1.1);
+        }
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: #fff;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            border-color: var(--accent-primary);
+        }
+
+        /* Sections General */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-primary);
+            margin: 1rem auto 0;
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        /* Methodology Section */
+        .methodology-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .method-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .method-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .method-card svg {
+            width: 48px;
+            height: 48px;
+            color: var(--accent-primary);
+            filter: drop-shadow(0 0 5px var(--accent-primary));
+        }
+        .method-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .method-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Hardware Section */
+        .hardware-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4rem;
+            background: radial-gradient(circle at center, rgba(188, 19, 254, 0.05) 0%, transparent 70%);
+            padding: 4rem 2rem;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+        }
+        .hardware-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--accent-secondary);
+            padding: 3rem;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(188, 19, 254, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .hardware-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent 45%, rgba(188, 19, 254, 0.1) 50%, transparent 55%);
+            background-size: 200% 200%;
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+        .hardware-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        .hardware-card p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+        .highlight-text {
+            color: var(--accent-secondary);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(188, 19, 254, 0.5);
+        }
+
+        /* About Section */
+        .about {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .about-content {
+            background: var(--glass-bg);
+            padding: 3rem;
+            border-radius: 24px;
+            border-left: 4px solid var(--accent-primary);
+            text-align: left;
+        }
+        .about-content p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 4rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        footer .author {
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1.1rem; }
+            .nav-links { display: none; }
+            .hardware-container { flex-direction: column; gap: 2rem; }
+            .cta-group { flex-direction: column; width: 100%; }
+            .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <nav id="navbar">
+        <a href="#" class="logo">PC Magik <span>Lab</span></a>
+        <ul class="nav-links">
+            <li><a href="#methodology">Methodology</a></li>
+            <li><a href="#hardware">Hardware</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="https://www.youtube.com/@PCMagikLab" target="_blank">YouTube</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>PC Magik Lab</h1>
+        <p>Local models, real GPUs.</p>
+        <div class="cta-group">
+            <a href="https://www.youtube.com/@PCMagikLab" target="_blank" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.186-2.01C20.96 4.014 20.366 3 19.53 3c-1.108 0-2.144.582-2.866 1.582C16.32 4.582 14.938 3 13.5 3c-1.438 0-2.82.582-3.364 1.582C10.144 3.582 9.108 3 8.216 3c-1.134 0-2.17.582-2.866 1.582C5.144 3.582 3.762 3 2.32 3C1.484 3 .88 4.014 .306 4.176A3.016 3.016 0 0 0 0 6.186v11.628C0 20.42 2.34 22.76 4.68 22.76h14.64c2.34 0 4.68-2.34 4.68-4.68V6.186zM10 15.5v-4l4.5 2.25-4.5 2.25z"/></svg>
+                Watch on YouTube
+            </a>
+            <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" class="btn btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.627 0-12 5.373-12 12 0 5.084 3.468 9.459 8.627 11.914C10.553 21.63 11.103 21.5 11.5 21.31c.443-.19 1.446-.74 1.732-.74.32 0 .69.18 1.732.74.404.19 1.147.3 1.868.3 5.159-2.455 8.627-6.83 8.627-11.914C24 5.373 18.627 0 12 0zm-4.5 8.25c0 .69.56 1.245 1.255 1.245.695 0 1.255-.555 1.255-1.245-.002-.69-.56-1.245-1.255-1.245-.69 0-1.253.555-1.253 1.245zM12 14.25c-.69 0-1.25-.555-1.25-1.245 0-.69.56-1.245 1.25-1.245 1.245 0 2.245.555 2.245 1.245 0 .69-.56 1.245-1.25 1.245z"/></svg>
+                Prompts & Results
+            </a>
+        </div>
+    </header>
+
+    <section id="methodology">
+        <h2 class="section-title">Methodology</h2>
+        <div class="methodology-grid">
+            <div class="method-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4z"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="21"/></svg>
+                <h3>Consistent Prompts</h3>
+                <p>Every test uses the exact same prompt to ensure apples-to-apples comparisons.</p>
+            </div>
+            <div class="method-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="22" y2="7"/><line x1="2" y1="17" x2="22" y2="17"/></svg>
+                <h3>Fixed Rig</h3>
+                <p>Tests are performed on the same hardware rig to eliminate environment variables.</p>
+            </div>
+            <div class="method-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <h3>Single Variable</h3>
+                <p>Only one variable is changed per test to isolate the impact of specific changes.</p>
+            </div>
+            <div class="method-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.87 0 5.5 1.17 7.43 3.03C21 5.54 21 8.25 21 12z"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <h3>Fresh State</h3>
+                <p>The model is reloaded before every single run to ensure no state leakage.</p>
+            </div>
+            <div class="method-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <h3>Open Data</h3>
+                <p>Every prompt and result file is published for full transparency and verification.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="hardware">
+        <h2 class="section-title">Hardware</h2>
+        <div class="hardware-container">
+            <div class="hardware-card">
+                <h3>The Testing Rig</h3>
+                <p>GPU: <span class="highlight-text">NVIDIA RTX 3090 24 GB</span></p>
+                <p>Server: <span class="highlight-text">LM Studio</span></p>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <h2 class="section-title">About</h2>
+        <div class="about">
+            <div class="about-content">
+                <p>PC Magik Lab is a dedicated exploration of artificial intelligence performance in a local environment. The series focuses on the practical realities of running LLMs on consumer-grade hardware, moving beyond theoretical benchmarks to real-world execution.</p>
+                <p>By utilizing local GPUs and open-source tools, the lab aims to provide a clear, verifiable look at how different models and configurations perform under controlled conditions.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <span class="author">PC Magik (Mateusz Piekut)</span>
+        <p>Computer service and homelab operator from Poland</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.method-card, .hardware-card, .about-content').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

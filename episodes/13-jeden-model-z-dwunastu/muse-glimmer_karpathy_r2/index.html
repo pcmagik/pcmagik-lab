@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Magik Lab — Local models, real GPUs</title>
+<style>
+:root{
+  --bg:#020208;
+  --bg-soft:#0a0f1c;
+  --glass:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.12);
+  --text:#e8eefc;
+  --muted:#9bb0d0;
+  --neon-cyan:#00e5ff;
+  --neon-magenta:#ff2d92;
+  --neon-violet:#a855f7;
+  --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,sans-serif;
+  background:radial-gradient(1200px 600px at 70% -10%, #0b1224 0%, transparent 60%), radial-gradient(800px 500px at -10% 20%, #0b0f1a 0%, transparent 60%), var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  line-height:1.6;
+}
+a{color:inherit;text-decoration:none}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+header{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(14px);
+  background:linear-gradient(to bottom, rgba(2,2,8,0.8), rgba(2,2,8,0.4));
+  border-bottom:1px solid var(--border);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.3px}
+.brand-mark{
+  width:34px;height:34px;border-radius:10px;
+  background:conic-gradient(from 210deg, var(--neon-cyan), var(--neon-violet), var(--neon-magenta), var(--neon-cyan));
+  box-shadow:0 0 20px rgba(0,229,255,.35), inset 0 0 12px rgba(255,255,255,.2);
+  display:grid;place-items:center;
+}
+.brand-mark svg{filter:drop-shadow(0 0 6px rgba(0,0,0,.6))}
+.nav-links{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.hero{
+  padding:120px 0 80px;
+  position:relative;overflow:hidden;
+}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--neon-cyan);
+  background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);
+  padding:6px 10px;border-radius:999px;box-shadow:0 0 24px rgba(0,229,255,.15);
+}
+h1{
+  font-size:clamp(36px,6vw,64px);line-height:1.05;margin:18px 0 12px;
+  font-weight:800;letter-spacing:-.02em;
+}
+.tagline{font-size:clamp(18px,2.5vw,26px);color:var(--muted);margin-bottom:28px}
+.tagline span{color:var(--text)}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 20px;border-radius:12px;font-weight:600;
+  border:1px solid var(--border);background:var(--glass);
+  backdrop-filter:blur(10px);transition:.25s ease;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,.15)}
+.btn-primary{
+  background:linear-gradient(135deg, rgba(0,229,255,.18), rgba(168,85,247,.18));
+  border-color:rgba(0,229,255,.4);box-shadow:0 0 30px rgba(0,229,255,.2);
+}
+.glass-card{
+  background:var(--glass);border:1px solid var(--border);
+  backdrop-filter:blur(16px);border-radius:var(--radius);
+  padding:22px;box-shadow:0 10px 40px rgba(0,0,0,.35);
+}
+.hero-visual{
+  position:relative;height:380px;border-radius:24px;overflow:hidden;
+  background:linear-gradient(160deg, rgba(0,229,255,.08), rgba(168,85,247,.08));
+  border:1px solid var(--border);
+}
+.hero-visual::before{
+  content:"";position:absolute;inset:-20%;
+  background:
+    radial-gradient(200px 200px at 20% 30%, rgba(0,229,255,.25), transparent 60%),
+    radial-gradient(180px 180px at 80% 70%, rgba(255,45,146,.22), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0px, transparent 2px, transparent 3px);
+  animation:drift 18s linear infinite;
+}
+@keyframes drift{to{transform:translateY(-10%)}}
+.grid{
+  display:grid;grid-template-columns:repeat(12,1fr);gap:22px;margin:80px 0;
+}
+.section-title{grid-column:1/-1;font-size:32px;margin-bottom:10px}
+.section-sub{grid-column:1/-1;color:var(--muted);margin-bottom:28px}
+.card{
+  grid-column:span 4;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid var(--border);border-radius:16px;padding:20px;
+  transition:.3s ease;position:relative;overflow:hidden;
+}
+@media(max-width:900px){.card{grid-column:span 6}}
+@media(max-width:600px){.card{grid-column:span 12}}
+.card:hover{transform:translateY(-4px);box-shadow:0 0 40px rgba(168,85,247,.18)}
+.card h3{margin-bottom:8px;font-size:18px}
+.card p{color:var(--muted);font-size:14px}
+.measure-grid .card{grid-column:span 4}
+.hardware{
+  display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:40px 0 80px;
+}
+@media(max-width:900px){.hardware{grid-template-columns:1fr}}
+.hw-card{
+  background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:26px;
+  backdrop-filter:blur(16px);min-height:200px;
+}
+.hw-card h3{margin-bottom:12px}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;
+  background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--neon-cyan);margin-right:8px;margin-bottom:8px}
+.about{
+  margin:80px 0;padding:40px;border-radius:24px;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid var(--border);
+}
+.links{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px}
+.link{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border-radius:12px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);transition:.2s;
+}
+.link:hover{border-color:rgba(0,229,255,.5);box-shadow:0 0 20px rgba(0,229,255,.15)}
+footer{
+  border-top:1px solid var(--border);margin-top:80px;padding:30px 0;color:var(--muted);font-size:14px;
+}
+footer .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.neon-text{background:linear-gradient(90deg,var(--neon-cyan),var(--neon-violet),var(--neon-magenta));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="18" height="18" rx="4" stroke="white" stroke-opacity=".9"/>
+          <path d="M7 9h10M7 13h6" stroke="white" stroke-opacity=".9" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span>PC Magik Lab</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#measure">Method</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#about">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">YouTube Series • Real GPUs</div>
+        <h1>PC Magik Lab</h1>
+        <div class="tagline"><span>Local models, real GPUs.</span></div>
+        <p style="color:var(--muted);max-width:520px">A hands-on series about running AI models locally on real hardware. No cloud, no marketing. Just measurements on one rig with full transparency.</p>
+        <div class="cta" style="margin-top:24px">
+          <a class="btn btn-primary" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">Watch on YouTube</a>
+          <a class="btn" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">Prompts & Results</a>
+        </div>
+      </div>
+      <div class="hero-visual glass-card">
+        <svg width="100%" height="100%" viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;opacity:.6">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1">
+              <stop offset="0%" stop-color="#00e5ff"/>
+              <stop offset="100%" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+          <rect x="40" y="60" width="320" height="200" rx="20" fill="none" stroke="url(#g)" stroke-width="2"/>
+          <rect x="60" y="90" width="280" height="140" rx="12" fill="rgba(255,255,255,.04)"/>
+          <rect x="80" y="120" width="240" height="10" rx="5" fill="rgba(255,255,255,.15)"/>
+          <rect x="80" y="145" width="180" height="10" rx="5" fill="rgba(255,255,255,.1)"/>
+          <rect x="80" y="170" width="200" height="10" rx="5" fill="rgba(255,255,255,.1)"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="measure" class="grid">
+    <h2 class="section-title neon-text">How we measure</h2>
+    <p class="section-sub">Consistent, repeatable testing with one variable changed per test. Full data published.</p>
+
+    <div class="card">
+      <h3>Same prompt</h3>
+      <p>Every run uses the identical prompt to ensure comparability across models and settings.</p>
+    </div>
+    <div class="card">
+      <h3>Same rig</h3>
+      <p>All tests are performed on the same hardware to eliminate system differences.</p>
+    </div>
+    <div class="card">
+      <h3>One variable</h3>
+      <p>Only one variable is changed per test, keeping the experiment clean and interpretable.</p>
+    </div>
+    <div class="card">
+      <h3>Model reloaded</h3>
+      <p>The model is reloaded before every run to avoid state carry-over and ensure fair starts.</p>
+    </div>
+    <div class="card">
+      <h3>Published data</h3>
+      <p>Every prompt and result file is published in the repository for independent verification.</p>
+    </div>
+  </section>
+
+  <section id="hardware">
+    <h2 class="section-title neon-text">Hardware</h2>
+    <div class="hardware">
+      <div class="hw-card">
+        <h3>One rig</h3>
+        <div style="margin:12px 0">
+          <span class="badge">NVIDIA RTX 3090 24 GB</span>
+        </div>
+        <p style="color:var(--muted)">All tests in the series are run on this single GPU to keep comparisons fair and reproducible.</p>
+      </div>
+      <div class="hw-card">
+        <h3>Model server</h3>
+        <div style="margin:12px 0">
+          <span class="badge">LM Studio</span>
+        </div>
+        <p style="color:var(--muted)">Models are served locally with LM Studio. No cloud services, no hidden optimizations.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <h2 class="section-title">About PC Magik Lab</h2>
+    <p>PC Magik Lab is a YouTube series about running AI models on real, local GPUs. The focus is on measurable performance, practical setup, and transparent methodology.</p>
+    <div class="links">
+      <a class="link" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.8 15.5V8.5l6.5 3.5-6.5 3.5z"/></svg>
+        YouTube Channel
+      </a>
+      <a class="link" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.4-1.34-1.78-1.34-1.78-1.09-.75.08-.73.08-.73 1.21.09 1.85 1.25 1.85 1.25 1.08 1.85 2.83 1.32 3.52 1.01.11-.79.42-1.32.76-1.62-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.62-2.8 5.64-5.48 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .5z"/></svg>
+        Repository with prompts and results
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <div>© <span id="y"></span> PC Magik Lab</div>
+    <div>Created by PC Magik (Mateusz Piekut), computer service and homelab operator from Poland.</div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

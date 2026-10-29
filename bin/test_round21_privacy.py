@@ -61,7 +61,7 @@ EXPECTED_POLICY = f"""Privacy policy
 
 Last updated: 27 September 2026.
 
-Who runs this site. lab.pcmagik.pl is run by PC Magik Mateusz Piekut, Elizy Orzeszkowej 12b, 05-660 Warka, Poland, NIP 797-197-26-95. Contact: {CONTACT_EMAIL}. We are the data controller for this site.
+Who runs this site. lab.pcmagik.pl is run by PC Magik Mateusz Piekut, ul. Piotra Wysockiego 29b/19, 05-660 Warka, Poland (registered seat; correspondence address: ul. Spoldzielcza 1 lok. 85, 05-660 Warka), NIP 797-197-26-95. Contact: {CONTACT_EMAIL}. We are the data controller for this site.
 
 No accounts, no forms, no tracking cookies. This site has no sign-up and no contact form, and it sets no advertising or analytics cookies. Two things may be stored in your browser. Cloudflare, which delivers the site, sets a security cookie, cf_clearance, to protect the site from bots; it is strictly necessary and is not used to track you. The site itself stores only your choice of the “Pause motion” button (localStorage key lab-motion-paused), and only after you press it; it never leaves your browser.
 

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pixel Art Editor</title>
+<style>
+  body {font-family:Arial,Helvetica,sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;}
+  #toolbar {
+    background:#f5f5f5;
+    padding:8px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+  }
+  #toolbar > * {font-size:14px;}
+  #sizeSelect {padding:4px;}
+  #gridToggle {margin-left:8px;}
+  #colorPicker {margin-right:4px;}
+  #palette {
+    display:flex;
+    gap:4px;
+    margin-left:auto;
+  }
+  #presetPalette {
+    margin-left:auto;
+    display:flex;
+    gap:4px;
+    align-items:center;
+  }
+  .swatch {
+    width:20px;height:20px;border:1px solid #ccc;cursor:pointer;
+  }
+  .swatch.active{border:2px solid #000;}
+  canvas {
+    display:block;
+    margin:auto;
+    background:#fff;
+    image-rendering:pixelated;
+  }
+  #overlayToggle {
+    position:absolute;
+    top:8px;right:8px;
+    background:#fff8;
+    border:1px solid #999;
+    padding:4px 8px;
+    cursor:pointer;
+    font-size:13px;
+  }
+</style>
+</head>
+<body>
+<div id="toolbar">
+  <label for="sizeSelect">Size:</label>
+  <select id="sizeSelect">
+    <option value="16">16×16</option>
+    <option value="32">32×32</option>
+    <option value="64">64×64</option>
+  </select>
+  <button id="clearBtn">Clear</button>
+  <label for="gridToggle">Grid overlay</label>
+  <input type="checkbox" id="gridToggle">
+  <label for="gridColorPicker">Grid color</label>
+  <input type="color" id="gridColorPicker" value="#cccccc">
+  <label for="colorPicker">Color</label>
+  <input type="color" id="colorPicker" value="#ff0000">
+  <div id="palette"></div>
+  <div id="presetPalette"><span>Presets:</span></div>
+  <div style="margin-left:auto;">
+    <button id="undoBtn">Undo</button>
+    <button id="redoBtn">Redo</button>
+    <button id="downloadBtn">Download PNG</button>
+  </div>
+  <div style="margin-left:auto;">
+    <input type="file" id="eyedropper" accept="image/*" style="display:none">
+    <button id="eyedropperBtn">Eyedropper</button>
+  </div>
+</div>
+<canvas id="pixelCanvas"></canvas>
+<div id="overlayToggle" style="display:none;">Toggle grid overlay</div>
+
+<script>
+/* ---------- Configuration ---------- */
+const MAX_HISTORY = 20;
+const PIXEL_SCALE = 10; // each logical pixel becomes 10×10 screen pixels
+
+/* ---------- State ---------- */
+let currentSize = 16;
+let currentColor = '#ff0000';
+let gridOverlay = true;
+let currentTool = 'pencil';
+let snapshots = [];      // ImageData snapshots for undo/redo
+let historyIndex = -1;   // points to current snapshot
+let recentColors = [];
+
+/* ---------- DOM References ---------- */
+const sizeSelect = document.getElementById('sizeSelect');
+const clearBtn = document.getElementById('clearBtn');
+const gridToggle = document.getElementById('gridToggle');
+const gridColorPicker = document.getElementById('gridColorPicker');
+const colorPicker = document.getElementById('colorPicker');
+const paletteDiv = document.getElementById('palette');
+const presetPaletteDiv = document.getElementById('presetPalette');
+const undoBtn = document.getElementById('undoBtn');
+const redoBtn = document.getElementById('redoBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const eyedropperBtn = document.getElementById('eyedropperBtn');
+const eyedropperInput = document.getElementById('eyedropper');
+const canvas = document.getElementById('pixelCanvas');
+const ctx = canvas.getContext('2d');
+const overlayToggle = document.getElementById('overlayToggle');
+
+/* ---------- Checkerboard pattern for transparent pixels ---------- */
+let checkerPattern = null;
+function createCheckerPattern() {
+  const patCanvas = document.createElement('canvas');
+  patCanvas.width = PIXEL_SCALE;
+  patCanvas.height = PIXEL_SCALE;
+  const pctx = patCanvas.getContext('2d');
+  pctx.fillStyle = '#ffffff';
+  pctx.fillRect(0,0,PIXEL_SCALE/2,PIXEL_SCALE/2);
+  pctx.fillStyle = '#f0f0f0';
+  pctx.fillRect(PIXEL_SCALE/2,0,PIXEL_SCALE/2,PIXEL_SCALE/2);
+  pctx.fillRect(0,PIXEL_SCALE/2,PIXEL_SCALE/2,PIXEL_SCALE/2);
+  pctx.fillStyle = '#f0f0f0';
+  pctx.fillRect(PIXEL_SCALE/2,PIXEL_SCALE/2,PIXEL_SCALE/2,PIXEL_SCALE/2);
+  checkerPattern = ctx.createPattern(patCanvas, 'repeat');
+}
+createCheckerPattern();
+
+/* ---------- Initialization ---------- */
+function init() {
+  // size options
+  const sizes = {16:1,32:1,64:1};
+  Object.keys(sizes).forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = `${s}×${s}`;
+    sizeSelect.appendChild(opt);
+  });
+  sizeSelect.value = currentSize;
+
+  // preset colors (~16)
+  const presetColors = [
+    '#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff',
+    '#ff1100','#11ff00','#0011ff','#1100ff','#ff0011','#11ff00',
+    '#00ff11','#1100ff','#0011ff','#1111ff','#333333'
+  ];
+  presetColors.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch';
+    sw.style.background = c;
+    sw.dataset.color = c;
+    sw.title = c;
+    sw.addEventListener('click', () => setCurrentColor(c));
+    presetPaletteDiv.appendChild(sw);
+  });
+
+  // tool swatches
+  const tools = ['pencil','eraser','fill','eyedropper'];
+  tools.forEach(t => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch';
+    sw.dataset.tool = t;
+    sw.style.background = getDefaultColorForTool(t);
+    sw.title = t;
+    sw.addEventListener('click', () => setCurrentTool(t));
+    paletteDiv.appendChild(sw);
+  });
+
+  // event listeners
+  sizeSelect.addEventListener('change', e => changeSize(parseInt(e.target.value)));
+  clearBtn.addEventListener('click', clearCanvas);
+  gridToggle.addEventListener('change', e => { gridOverlay = e.target.checked; drawGridOverlay(); });
+  gridColorPicker.addEventListener('input', e => drawGridOverlay());
+  colorPicker.addEventListener('input', e => setCurrentColor(e.target.value));
+  undoBtn.addEventListener('click', undo);
+  redoBtn.addEventListener('click', redo);
+  downloadBtn.addEventListener('click', downloadPNG);
+  eyedropperBtn.addEventListener('click', () => eyedropperInput.click());
+  eyedropperInput.addEventListener('change', handleEyedropperFile);
+  canvas.addEventListener('mousedown', e => startDraw(e));
+  window.addEventListener('keydown', handleKeyboard);
+  // load persisted state
+  loadFromStorage();
+
+  // initial draw
+  resizeCanvas();
+  drawGridOverlay();
+  renderPalette();
+  renderPresetPalette();
+}
+function getDefaultColorForTool(t) {
+  const map = {pencil:'#000000', eraser:'transparent', fill:'#ff0000', eyedropper:'#000000'};
+  return map[t];
+}
+function setCurrentTool(tool) {
+  currentTool = tool;
+  document.querySelectorAll('.swatch[data-tool]').forEach(s => s.classList.remove('active'));
+  const active = document.querySelector(`.swatch[data-tool="${tool}"]`);
+  if (active) active.classList.add('active');
+}
+function setCurrentColor(col) {
+  currentColor = col;
+  if (!recentColors.includes(col)) {
+    recentColors.unshift(col);
+    if (recentColors.length > 8) recentColors.pop();
+  }
+  renderPalette();
+}
+function renderPalette() {
+  paletteDiv.innerHTML = '';
+  recentColors.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch';
+    sw.style.background = c;
+    sw.dataset.color = c;
+    sw.title = c;
+    sw.addEventListener('click', () => setCurrentColor(c));
+    paletteDiv.appendChild(sw);
+  });
+}
+function renderPresetPalette() {
+  // already rendered in init; no need to rewrite
+}
+function resizeCanvas() {
+  const w = currentSize * PIXEL_SCALE;
+  const h = currentSize * PIXEL_SCALE;
+  canvas.width = w;
+  canvas.height = h;
+}
+function clearCanvas() {
+  if (!confirm('Clear the entire canvas?')) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawGridOverlay();
+  pushState();
+}
+function drawGridOverlay() {
+  if (!gridOverlay) return;
+  const color = gridColorPicker.value;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 0.5;
+  for (let x=0; x<=currentSize; x++) {
+    ctx.beginPath();
+    ctx.moveTo(x*PIXEL_SCALE,0);
+    ctx.lineTo(x*PIXEL_SCALE, currentSize*PIXEL_SCALE);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0,x*PIXEL_SCALE);
+    ctx.lineTo(currentSize*PIXEL_SCALE, x*PIXEL_SCALE);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function pushState() {
+  const data = ctx.getImageData(0,0,canvas.width,canvas.height);
+  snapshots.push(data);
+  if (snapshots.length > MAX_HISTORY) snapshots.shift();
+  historyIndex = snapshots.length - 1;
+}
+function loadState(idx) {
+  const img = snapshots[idx];
+  if (!img) return;
+  ctx.putImageData(img,0,0);
+}
+function undo() {
+  if (historyIndex > 0) {
+    historyIndex--;
+    loadState(historyIndex);
+  }
+}
+function redo() {
+  if (historyIndex < snapshots.length - 1) {
+    historyIndex++;
+    loadState(historyIndex);
+  }
+}
+function downloadPNG() {
+  const scale = PIXEL_SCALE;
+  const w = currentSize * scale;
+  const h = currentSize * scale;
+  const tmp = document.createElement('canvas');
+  tmp.width = w; tmp.height = h;
+  const tmpCtx = tmp.getContext('2d');
+  tmpCtx.drawImage(canvas,0,0,w,h);
+  const url = tmp.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'pixel-art.png';
+  a.click();
+}
+function handleKeyboard(e) {
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') {
+    undo(); e.preventDefault();
+  } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z') {
+    redo(); e.preventDefault();
+  }
+}
+function changeSize(newSize) {
+  if (sizesMap[newSize] && confirm(`Change size from ${currentSize}×${currentSize} to ${newSize}×${newSize}? This will clear the canvas.`)) {
+    currentSize = newSize;
+    resizeCanvas();
+    clearCanvas();
+    drawGridOverlay();
+  }
+  sizeSelect.value = currentSize;
+}
+const sizesMap = {16:1,32:1,64:1};
+function startDraw(e) {
+  const x = Math.floor(e.offsetX / PIXEL_SCALE);
+  const y = Math.floor(e.offsetY / PIXEL_SCALE);
+  if (x<0||x>=currentSize||y<0||y>=currentSize) return;
+  pushState(); // snapshot before drawing
+  switch (currentTool) {
+    case 'pencil':
+    case 'eraser':
+      drawPixel(x,y,currentColor, currentTool==='eraser');
+      document.addEventListener('mousemove', moveHandler);
+      break;
+    case 'fill':
+      floodFill(x,y,currentColor);
+      pushState();
+      break;
+    case 'eyedropper':
+      // handled elsewhere
+      break;
+  }
+  function moveHandler(ev) {
+    const nx = Math.floor(ev.offsetX / PIXEL_SCALE);
+    const ny = Math.floor(ev.offsetY / PIXEL_SCALE);
+    if (nx<0||nx>=currentSize||ny<0||ny>=currentSize) return;
+    if (nx!==x||ny!==y) {
+      if (currentTool==='pencil'||currentTool==='eraser') {
+        drawPixel(nx,ny,currentColor, currentTool==='eraser');
+      }
+    }
+  }
+  function endHandler() {
+    document.removeEventListener('mousemove', moveHandler);
+    pushState(); // finalize stroke as one undo step
+  }
+  document.addEventListener('mouseup', endHandler);
+}
+function drawPixel(x,y,col,trans) {
+  if (checkerPattern && trans) {
+    ctx.fillStyle = checkerPattern;
+  } else {
+    ctx.fillStyle = trans ? 'transparent' : col;
+  }
+  ctx.fillRect(x*PIXEL_SCALE, y*PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE);
+}
+function floodFill(sx,sy,fillCol) {
+  const w = currentSize, h = currentSize;
+  const startCol = getPixelColor(sx,sy);
+  if (startCol === fillCol) return;
+  const visited = new Uint8Array(w*h);
+  const queue = [[sx,sy]];
+  visited[sx + sy*w] = 1;
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  while (queue.length) {
+    const [x,y] = queue.shift();
+    setPixelColor(x,y,fillCol);
+    for (const [dx,dy] of dirs) {
+      const nx = x+dx, ny = y+dy;
+      if (nx>=0&&nx<w&&ny>=0&&ny<h&&!visited[nx+ny*w]&&getPixelColor(nx,ny)===startCol) {
+        visited[nx+ny*w]=1;
+        queue.push([nx,ny]);
+      }
+    }
+  }
+}
+function getPixelColor(x,y) {
+  const data = ctx.getImageData(x*PIXEL_SCALE, y*PIXEL_SCALE, 1,1);
+  const [r,g,b,a] = data.data;
+  if (a===0) return 'transparent';
+  return `rgb(${r},${g},${b})`;
+}
+function setPixelColor(x,y,col) {
+  const trans = (col === 'transparent');
+  if (checkerPattern && trans) {
+    ctx.fillStyle = checkerPattern;
+  } else {
+    ctx.fillStyle = trans ? 'transparent' : col;
+  }
+  ctx.fillRect(x*PIXEL_SCALE, y*PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE);
+}
+function handleEyedropperFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+  img.onload = () => {
+    const data = ctx.getImageData(0,0,1,1);
+    const [r,g,b,a] = data.data;
+    if (a>0) {
+      const col = `rgb(${r},${g},${b})`;
+      setCurrentColor(col);
+    }
+  };
+}
+function loadFromStorage() {
+  const raw = localStorage.getItem('pixelArtState');
+  if (!raw) return;
+  try {
+    const {size,color,gridOverlay,recent} = JSON.parse(raw);
+    if (size && sizesMap[size]) currentSize = size;
+    if (color) currentColor = color;
+    if (gridOverlay !== undefined) gridOverlay = gridOverlay;
+    if (Array.isArray(recent)) recentColors = recent.slice();
+    sizeSelect.value = currentSize;
+    gridToggle.checked = gridOverlay !== false;
+    gridColorPicker.value = '#cccccc';
+    colorPicker.value = currentColor;
+    renderPalette();
+    renderPresetPalette();
+    drawGridOverlay();
+  } catch(e){}
+}
+function saveToStorage() {
+  const state = {
+    size: currentSize,
+    color: currentColor,
+    gridOverlay: gridOverlay,
+    recent: recentColors
+  };
+  localStorage.setItem('pixelArtState', JSON.stringify(state));
+}
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
+</function>
+</tool_call>
+<tool_call>
+<function=write>
+<parameter=path>
+index.html

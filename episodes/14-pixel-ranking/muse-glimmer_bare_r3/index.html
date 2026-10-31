@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pixel Art Editor</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg:#1e1e1e; --panel:#2a2a2a; --text:#eee; --accent:#4a90e2;
+    --grid:#444; --checker1:#f0f0f0; --checker2:#e0e0e0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh}
+  header{padding:8px 12px;background:#222;display:flex;gap:12px;align-items:center}
+  header h1{font-size:16px;margin:0;flex:1}
+  main{flex:1;display:flex;gap:12px;padding:12px;overflow:hidden}
+  .toolbar{background:var(--panel);padding:10px;border-radius:8px;display:flex;flex-direction:column;gap:8px;width:140px}
+  .toolbar button{background:#333;color:var(--text);border:1px solid #444;padding:6px 8px;border-radius:6px;cursor:pointer}
+  .toolbar button.active{background:var(--accent);border-color:var(--accent)}
+  .canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative}
+  #canvasContainer{background:#fff;border-radius:8px;box-shadow:0 0 0 1px #555;overflow:hidden}
+  canvas{display:block;image-rendering:pixelated}
+  .side{background:var(--panel);padding:10px;border-radius:8px;width:260px;display:flex;flex-direction:column;gap:12px}
+  .color-row{display:flex;gap:6px;align-items:center}
+  input[type=color]{width:48px;height:36px;border:none;background:none}
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .swatch{width:100%;aspect-ratio:1;border:2px solid #444;border-radius:4px;cursor:pointer}
+  .swatch.selected{border-color:#fff;outline:2px solid var(--accent)}
+  .recent{display:flex;gap:6px;flex-wrap:wrap}
+  .recent span{width:28px;height:28px;border:1px solid #444;border-radius:4px;display:inline-block;cursor:pointer}
+  .controls{display:flex;gap:6px;flex-wrap:wrap}
+  .controls button{background:#333;color:var(--text);border:1px solid #444;padding:6px 10px;border-radius:6px;cursor:pointer}
+  select, label{display:flex;align-items:center;gap:6px}
+  footer{padding:6px 12px;background:#222;font-size:12px;opacity:.8}
+</style>
+</head>
+<body>
+<header>
+  <h1>Pixel Art Editor</h1>
+  <div class="controls">
+    <button id="undoBtn">Undo</button>
+    <button id="redoBtn">Redo</button>
+  </div>
+</header>
+<main>
+  <div class="toolbar" id="toolbar">
+    <button data-tool="pencil" class="active">✏️ Pencil</button>
+    <button data-tool="eraser">🧽 Eraser</button>
+    <button data-tool="fill">🪣 Fill</button>
+    <button data-tool="eyedropper">💧 Eyedropper</button>
+  </div>
+  <div class="canvas-wrap">
+    <div id="canvasContainer">
+      <canvas id="canvas" width="640" height="640"></canvas>
+    </div>
+  </div>
+  <div class="side">
+    <div>
+      <div class="color-row">
+        <input type="color" id="colorPicker" value="#ff0000">
+        <span>Current</span>
+      </div>
+      <div class="swatches" id="swatches"></div>
+      <div class="recent" id="recentColors"></div>
+    </div>
+    <div>
+      <label>Size:
+        <select id="sizeSelect">
+          <option value="16">16×16</option>
+          <option value="32" selected>32×32</option>
+          <option value="64">64×64</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="gridToggle" checked> Show grid</label>
+    </div>
+    <div class="controls">
+      <button id="clearBtn">Clear</button>
+      <button id="downloadBtn">Download PNG</button>
+    </div>
+  </div>
+</main>
+<footer>Auto-saved to localStorage • Drag to paint • Ctrl/Cmd+Z undo</footer>
+
+<script>
+(() => {
+  // ----- State -----
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  let gridSize = 32;
+  let pixelSize = 20; // display size per cell
+  let gridVisible = true;
+  let currentTool = 'pencil';
+  let currentColor = '#ff0000';
+  let pixels = [];
+  let history = [];
+  let historyIndex = -1;
+  const MAX_HISTORY = 20;
+  let recentColors = [];
+  let isDrawing = false;
+  let tempPixels = null;
+
+  // Preset swatches ~16
+  const presets = [
+    '#000000','#ffffff','#ff0000','#ff7f00','#ffff00','#00ff00','#00ffff','#0000ff',
+    '#7f00ff','#ff00ff','#800000','#808000','#008000','#008080','#000080','#800080'
+  ];
+
+  // ----- Helpers -----
+  function createEmptyGrid(size) {
+    return Array.from({length:size},()=>Array(size).fill(null));
+  }
+  function cloneGrid(grid){
+    return grid.map(row=>row.slice());
+  }
+  function gridsEqual(a,b){
+    if(a.length!==b.length) return false;
+    for(let i=0;i<a.length;i++){
+      for(let j=0;j<a[i].length;j++){
+        if(a[i][j]!==b[i][j]) return false;
+      }
+    }
+    return true;
+  }
+  function resizeCanvas(){
+    const displaySize = gridSize * pixelSize;
+    canvas.width = displaySize;
+    canvas.height = displaySize;
+    // keep pixelSize responsive?
+    // adjust pixelSize to fit container ~640
+    const max = 640;
+    pixelSize = Math.floor(max / gridSize);
+    canvas.width = gridSize * pixelSize;
+    canvas.height = gridSize * pixelSize;
+    render();
+  }
+
+  function pushHistory(state){
+    // truncate future
+    history = history.slice(0, historyIndex+1);
+    history.push(cloneGrid(state));
+    if(history.length > MAX_HISTORY){
+      history.shift();
+      // adjust index
+      historyIndex = history.length-1;
+    } else {
+      historyIndex = history.length-1;
+    }
+    saveToStorage();
+  }
+
+  function loadHistoryState(idx){
+    historyIndex = idx;
+    pixels = cloneGrid(history[historyIndex]);
+    render();
+  }
+
+  function saveToStorage(){
+    const data = {
+      gridSize,
+      pixels,
+      currentColor,
+      currentTool,
+      gridVisible,
+      recentColors
+    };
+    localStorage.setItem('pixelEditorSave', JSON.stringify(data));
+  }
+
+  function loadFromStorage(){
+    const raw = localStorage.getItem('pixelEditorSave');
+    if(!raw) return false;
+    try{
+      const data = JSON.parse(raw);
+      gridSize = data.gridSize || 32;
+      currentColor = data.currentColor || '#ff0000';
+      currentTool = data.currentTool || 'pencil';
+      gridVisible = data.gridVisible !== undefined ? data.gridVisible : true;
+      recentColors = data.recentColors || [];
+      // ensure pixels match size
+      if(Array.isArray(data.pixels) && data.pixels.length===gridSize){
+        pixels = data.pixels;
+      }else{
+        pixels = createEmptyGrid(gridSize);
+      }
+      document.getElementById('colorPicker').value = currentColor;
+      document.getElementById('sizeSelect').value = String(gridSize);
+      document.getElementById('gridToggle').checked = gridVisible;
+      updateToolUI();
+      updateRecentUI();
+      return true;
+    }catch(e){console.warn('load fail',e); return false;}
+  }
+
+  // ----- Rendering -----
+  function render(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // draw checkerboard background
+    const light = '#f0f0f0', dark = '#e0e0e0';
+    for(let y=0;y<gridSize;y++){
+      for(let x=0;x<gridSize;x++){
+        const isDark = (x+y)%2===1;
+        ctx.fillStyle = isDark ? dark : light;
+        ctx.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+      }
+    }
+    // draw pixels
+    for(let y=0;y<gridSize;y++){
+      for(let x=0;x<gridSize;x++){
+        const col = pixels[y][x];
+        if(col){
+          ctx.fillStyle = col;
+          ctx.fillRect(x*pixelSize+0.5, y*pixelSize+0.5, pixelSize-1, pixelSize-1);
+        }
+      }
+    }
+    // grid overlay
+    if(gridVisible){
+      ctx.strokeStyle = '#bbbbbb';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for(let i=1;i<gridSize;i++){
+        const p = i*pixelSize;
+        ctx.moveTo(p+0.5,0); ctx.lineTo(p+0.5,canvas.height);
+        ctx.moveTo(0,p+0.5); ctx.lineTo(canvas.width,p+0.5);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // ----- Input mapping -----
+  function getCellFromEvent(e){
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = Math.floor(((e.clientX - rect.left)*scaleX)/pixelSize);
+    const y = Math.floor(((e.clientY - rect.top)*scaleY)/pixelSize);
+    if(x<0||y<0||x>=gridSize||y>=gridSize) return null;
+    return {x,y};
+  }
+
+  function paintCell(grid, x,y, tool){
+    if(tool==='pencil'){
+      grid[y][x]=currentColor;
+      addRecent(currentColor);
+    }else if(tool==='eraser'){
+      grid[y][x]=null;
+    }
+  }
+
+  function addRecent(col){
+    recentColors = recentColors.filter(c=>c!==col);
+    recentColors.unshift(col);
+    if(recentColors.length>8) recentColors.pop();
+    updateRecentUI();
+  }
+
+  function updateRecentUI(){
+    const el = document.getElementById('recentColors');
+    el.innerHTML='';
+    recentColors.forEach(c=>{
+      const s=document.createElement('span');
+      s.style.background=c;
+      s.title=c;
+      s.onclick=()=>{currentColor=c; document.getElementById('colorPicker').value=c; addRecent(c);};
+      el.appendChild(s);
+    });
+  }
+
+  // ----- Tools -----
+  function floodFill(startX,startY){
+    const target = pixels[startY][startX];
+    const fill = currentColor;
+    if(target===fill) return;
+    const stack = [[startX,startY]];
+    // BFS using manual queue
+    while(stack.length){
+      const [x,y]=stack.pop();
+      if(x<0||y<0||x>=gridSize||y>=gridSize) continue;
+      if(pixels[y][x]!==target) continue;
+      pixels[y][x]=fill;
+      stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+    }
+    addRecent(fill);
+  }
+
+  // ----- Event Handlers -----
+  canvas.addEventListener('mousedown', e=>{
+    const cell = getCellFromEvent(e);
+    if(!cell) return;
+    if(currentTool==='eyedropper'){
+      const col = pixels[cell.y][cell.x];
+      if(col){
+        currentColor = col;
+        document.getElementById('colorPicker').value = col;
+        addRecent(col);
+      }
+      return;
+    }
+    if(currentTool==='fill'){
+      const before = cloneGrid(pixels);
+      floodFill(cell.x, cell.y);
+      if(!gridsEqual(before,pixels)){
+        pushHistory(pixels);
+      }
+      render();
+      return;
+    }
+    // pencil / eraser start stroke
+    isDrawing = true;
+    tempPixels = cloneGrid(pixels);
+    paintCell(tempPixels, cell.x, cell.y, currentTool);
+    renderTemp();
+  });
+
+  canvas.addEventListener('mousemove', e=>{
+    if(!isDrawing) return;
+    const cell = getCellFromEvent(e);
+    if(!cell) return;
+    paintCell(tempPixels, cell.x, cell.y, currentTool);
+    renderTemp();
+  });
+
+  function renderTemp(){
+    // render tempPixels instead of pixels
+    const saved = pixels;
+    pixels = tempPixels;
+    render();
+    pixels = saved;
+  }
+
+  window.addEventListener('mouseup', ()=>{
+    if(!isDrawing) return;
+    isDrawing = false;
+    // commit
+    if(!gridsEqual(pixels, tempPixels)){
+      pixels = tempPixels;
+      pushHistory(pixels);
+      render();
+    }
+    tempPixels = null;
+  });
+
+  // Toolbar
+  document.querySelectorAll('#toolbar button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#toolbar button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTool = btn.dataset.tool;
+      saveToStorage();
+    });
+  });
+  function updateToolUI(){
+    document.querySelectorAll('#toolbar button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.tool===currentTool);
+    });
+  }
+
+  // Color picker
+  document.getElementById('colorPicker').addEventListener('input', e=>{
+    currentColor = e.target.value;
+    addRecent(currentColor);
+    saveToStorage();
+  });
+
+  // Swatches
+  const swEl = document.getElementById('swatches');
+  presets.forEach(c=>{
+    const s=document.createElement('div');
+    s.className='swatch';
+    s.style.background=c;
+    s.title=c;
+    s.onclick=()=>{
+      currentColor=c;
+      document.getElementById('colorPicker').value=c;
+      addRecent(c);
+      document.querySelectorAll('.swatch').forEach(el=>el.classList.remove('selected'));
+      s.classList.add('selected');
+    };
+    swEl.appendChild(s);
+  });
+  function updateSwatchSelection(){
+    document.querySelectorAll('.swatch').forEach(el=>{
+      el.classList.toggle('selected', el.style.background===currentColor);
+    });
+  }
+
+  // Size change
+  document.getElementById('sizeSelect').addEventListener('change', e=>{
+    const newSize = parseInt(e.target.value,10);
+    if(confirm('Changing size will clear the drawing. Continue?')){
+      gridSize = newSize;
+      pixels = createEmptyGrid(gridSize);
+      history = [cloneGrid(pixels)];
+      historyIndex = 0;
+      resizeCanvas();
+      saveToStorage();
+    }else{
+      e.target.value = String(gridSize);
+    }
+  });
+
+  // Grid toggle
+  document.getElementById('gridToggle').addEventListener('change', e=>{
+    gridVisible = e.target.checked;
+    render();
+    saveToStorage();
+  });
+
+  // Clear
+  document.getElementById('clearBtn').addEventListener('click', ()=>{
+    if(confirm('Clear the canvas?')){
+      pixels = createEmptyGrid(gridSize);
+      pushHistory(pixels);
+      render();
+    }
+  });
+
+  // Undo / Redo
+  function undo(){
+    if(historyIndex>0){
+      loadHistoryState(historyIndex-1);
+    }
+  }
+  function redo(){
+    if(historyIndex < history.length-1){
+      loadHistoryState(historyIndex+1);
+    }
+  }
+  document.getElementById('undoBtn').addEventListener('click', undo);
+  document.getElementById('redoBtn').addEventListener('click', redo);
+  window.addEventListener('keydown', e=>{
+    const meta = e.metaKey || e.ctrlKey;
+    if(meta && e.key.toLowerCase()==='z'){
+      e.preventDefault();
+      if(e.shiftKey) redo(); else undo();
+    }
+  });
+
+  // Download PNG
+  document.getElementById('downloadBtn').addEventListener('click', ()=>{
+    const scale = 10;
+    const out = document.createElement('canvas');
+    out.width = gridSize * scale;
+    out.height = gridSize * scale;
+    const octx = out.getContext('2d');
+    octx.imageSmoothingEnabled = false;
+    for(let y=0;y<gridSize;y++){
+      for(let x=0;x<gridSize;x++){
+        const col = pixels[y][x];
+        if(col){
+          octx.fillStyle = col;
+          octx.fillRect(x*scale, y*scale, scale, scale);
+        }
+      }
+    }
+    const url = out.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pixelart_${gridSize}x${gridSize}.png`;
+    a.click();
+  });
+
+  // Init
+  if(!loadFromStorage()){
+    pixels = createEmptyGrid(gridSize);
+    history = [cloneGrid(pixels)];
+    historyIndex = 0;
+  }
+  // ensure history initialized
+  if(history.length===0){
+    history = [cloneGrid(pixels)];
+    historyIndex = 0;
+  }
+  resizeCanvas();
+  updateToolUI();
+  updateSwatchSelection();
+  updateRecentUI();
+})();
+</script>
+</body>
+</html>

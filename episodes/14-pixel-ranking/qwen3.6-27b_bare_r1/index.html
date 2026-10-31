@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Art Editor</title>
+<style>
+/* ============================================================
+   GLOBAL STYLES & LAYOUT
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 16px;
+  user-select: none;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin-bottom: 12px;
+  color: #f8d860;
+  text-shadow: 0 0 12px rgba(248, 216, 96, 0.3);
+  letter-spacing: 2px;
+}
+
+/* Main layout: toolbar on left, canvas in center */
+.app-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ============================================================
+   TOOLBAR PANEL
+   ============================================================ */
+.toolbar {
+  background: #16213e;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid #0f3460;
+  min-width: 180px;
+}
+
+.toolbar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toolbar-section label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #8888aa;
+  font-weight: 600;
+}
+
+/* Tool buttons */
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.tool-btn {
+  background: #1a1a3e;
+  border: 2px solid #333366;
+  border-radius: 8px;
+  color: #ccc;
+  padding: 10px 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-align: center;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tool-btn:hover { background: #252560; border-color: #5555aa; }
+.tool-btn.active {
+  background: #0f3460;
+  border-color: #f8d860;
+  color: #f8d860;
+  box-shadow: 0 0 8px rgba(248, 216, 96, 0.25);
+}
+
+.tool-btn .icon { font-size: 1.3rem; }
+
+/* Size selector */
+.size-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.size-btn {
+  flex: 1;
+  background: #1a1a3e;
+  border: 2px solid #333366;
+  border-radius: 6px;
+  color: #ccc;
+  padding: 6px 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.size-btn:hover { background: #252560; }
+.size-btn.active {
+  background: #0f3460;
+  border-color: #f8d860;
+  color: #f8d860;
+}
+
+/* Color picker + palette */
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#colorPicker {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+}
+
+#currentColorDisplay {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 2px solid #555;
+  flex-shrink: 0;
+}
+
+.preset-palette {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+}
+
+.swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.1s, transform 0.1s;
+}
+
+.swatch:hover { transform: scale(1.15); }
+.swatch.active { border-color: #fff; box-shadow: 0 0 6px rgba(255,255,255,0.4); }
+
+/* Recent colors strip */
+.recent-strip {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.recent-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 2px solid #444;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.recent-swatch:hover { transform: scale(1.2); }
+
+/* Action buttons */
+.action-btn {
+  background: #1a1a3e;
+  border: 2px solid #333366;
+  border-radius: 6px;
+  color: #ccc;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.action-btn:hover { background: #252560; border-color: #5555aa; }
+.action-btn.danger { border-color: #8b3a3a; }
+.action-btn.danger:hover { background: #5a2020; border-color: #cc4444; }
+
+/* ============================================================
+   CANVAS AREA
+   ============================================================ */
+.canvas-wrapper {
+  position: relative;
+  background: #16213e;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid #0f3460;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.canvas-container {
+  position: relative;
+  line-height: 0;
+}
+
+#pixelCanvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: crosshair;
+  border-radius: 4px;
+}
+
+.canvas-info {
+  font-size: 0.7rem;
+  color: #666;
+  text-align: center;
+}
+
+/* Grid toggle checkbox */
+.grid-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.grid-toggle input { cursor: pointer; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 700px) {
+  .app-layout { flex-direction: column; align-items: center; }
+  .toolbar { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<h1>🎨 Pixel Art Editor</h1>
+
+<div class="app-layout">
+  <!-- ===================== TOOLBAR ===================== -->
+  <div class="toolbar">
+
+    <!-- Tools -->
+    <div class="toolbar-section">
+      <label>Tools</label>
+      <div class="tool-grid">
+        <button class="tool-btn active" data-tool="pencil">
+          <span class="icon">✏️</span>Pencil
+        </button>
+        <button class="tool-btn" data-tool="eraser">
+          <span class="icon">🧹</span>Eraser
+        </button>
+        <button class="tool-btn" data-tool="fill">
+          <span class="icon">🪣</span>Fill
+        </button>
+        <button class="tool-btn" data-tool="eyedropper">
+          <span class="icon">💉</span>Eyedropper
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas Size -->
+    <div class="toolbar-section">
+      <label>Canvas Size</label>
+      <div class="size-selector">
+        <button class="size-btn" data-size="16">16×16</button>
+        <button class="size-btn active" data-size="32">32×32</button>
+        <button class="size-btn" data-size="64">64×64</button>
+      </div>
+    </div>
+
+    <!-- Current Color -->
+    <div class="toolbar-section">
+      <label>Color</label>
+      <div class="color-picker-row">
+        <input type="color" id="colorPicker" value="#ff0000">
+        <div id="currentColorDisplay" style="background-color: #ff0000;"></div>
+      </div>
+    </div>
+
+    <!-- Preset Palette (~16 colors) -->
+    <div class="toolbar-section">
+      <label>Palette</label>
+      <div class="preset-palette" id="presetPalette"></div>
+    </div>
+
+    <!-- Recently Used Colors -->
+    <div class="toolbar-section">
+      <label>Recent Colors</label>
+      <div class="recent-strip" id="recentStrip"></div>
+    </div>
+
+    <!-- Grid Toggle -->
+    <div class="toolbar-section">
+      <label class="grid-toggle">
+        <input type="checkbox" id="gridToggle" checked>
+        Show Grid
+      </label>
+    </div>
+
+    <!-- Undo / Redo -->
+    <div class="toolbar-section">
+      <label>History</label>
+      <div style="display:flex; gap:6px;">
+        <button class="action-btn" id="undoBtn" title="Undo (Ctrl+Z)">↩ Undo</button>
+        <button class="action-btn" id="redoBtn" title="Redo (Ctrl+Shift+Z)">↪ Redo</button>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="toolbar-section">
+      <label>Actions</label>
+      <button class="action-btn" id="downloadBtn">📥 Download PNG</button>
+      <button class="action-btn danger" id="clearBtn">🗑 Clear Canvas</button>
+    </div>
+  </div>
+
+  <!-- ===================== CANVAS ===================== -->
+  <div class="canvas-wrapper">
+    <div class="canvas-container">
+      <canvas id="pixelCanvas"></canvas>
+    </div>
+    <div class="canvas-info" id="canvasInfo">32 × 32 pixels</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT — ALL LOGIC
+     ============================================================ -->
+<script>
+/* ============================================================
+   CONFIGURATION & STATE
+   ============================================================ */
+
+// Maximum number of undo/redo history steps
+const MAX_HISTORY = 30;
+
+// Pixel scale: how many CSS pixels each art pixel occupies on screen
+const PIXEL_SCALE = 16;
+
+// The preset palette colors (~16 classic palette)
+const PALETTE_COLORS = [
+  '#000000', '#555555', '#aaaaaa', '#ffffff',
+  '#ff0000', '#ff7777', '#00ff00', '#77ff77',
+  '#0000ff', '#7777ff', '#ffff00', '#ffff77',
+  '#ff00ff', '#ff77ff', '#00ffff', '#77ffff'
+];
+
+// Application state
+const state = {
+  gridSize: 32,           // current grid dimension (NxN)
+  currentTool: 'pencil',  // active tool
+  currentColor: '#ff0000',// current drawing color
+  showGrid: true,         // grid overlay visibility
+  isDrawing: false,       // mouse-down flag
+  recentColors: [],       // up to 8 recently used colors
+};
+
+// The pixel grid: 2D array of "RRGGBB" strings or null (transparent)
+let pixelGrid = [];
+
+// Undo / redo stacks — each entry is a deep copy of the grid
+let undoStack = [];
+let redoStack = [];
+
+/* ============================================================
+   DOM REFERENCES
+   ============================================================ */
+const canvas       = document.getElementById('pixelCanvas');
+const ctx          = canvas.getContext('2d');
+const colorPicker  = document.getElementById('colorPicker');
+const colorDisplay = document.getElementById('currentColorDisplay');
+const presetPal    = document.getElementById('presetPalette');
+const recentStrip  = document.getElementById('recentStrip');
+const gridToggle   = document.getElementById('gridToggle');
+const canvasInfo   = document.getElementById('canvasInfo');
+const undoBtn      = document.getElementById('undoBtn');
+const redoBtn      = document.getElementById('redoBtn');
+const downloadBtn  = document.getElementById('downloadBtn');
+const clearBtn     = document.getElementById('clearBtn');
+
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
+
+/**
+ * Initialize the editor: create palette swatches, set up event listeners,
+ * restore from localStorage or create a fresh grid.
+ */
+function init() {
+  buildPresetPalette();
+  bindToolButtons();
+  bindSizeButtons();
+  bindColorPicker();
+  bindCanvasEvents();
+  bindGridToggle();
+  bindActionButtons();
+  bindKeyboard();
+
+  // Try restoring from localStorage
+  const saved = loadFromStorage();
+  if (saved) {
+    state.gridSize = saved.gridSize;
+    pixelGrid = saved.grid;
+    state.recentColors = saved.recentColors || [];
+  } else {
+    createEmptyGrid(state.gridSize);
+  }
+
+  updateUI();
+  render();
+}
+
+/* ============================================================
+   GRID MANAGEMENT
+   ============================================================ */
+
+/** Create an empty NxN grid (all null = transparent). */
+function createEmptyGrid(n) {
+  pixelGrid = Array.from({ length: n }, () => Array(n).fill(null));
+}
+
+/** Deep-clone the entire grid for undo/redo snapshots. */
+function cloneGrid(grid) {
+  return grid.map(row => [...row]);
+}
+
+/** Push the current grid onto the undo stack (cap at MAX_HISTORY). */
+function pushUndo() {
+  undoStack.push(cloneGrid(pixelGrid));
+  if (undoStack.length > MAX_HISTORY) undoStack.shift();
+  // Starting a new stroke invalidates redo
+  redoStack.length = 0;
+}
+
+/** Perform one undo step. Returns false if nothing to undo. */
+function undo() {
+  if (undoStack.length === 0) return false;
+  redoStack.push(cloneGrid(pixelGrid));
+  pixelGrid = undoStack.pop();
+  saveToStorage();
+  render();
+  return true;
+}
+
+/** Perform one redo step. Returns false if nothing to redo. */
+function redo() {
+  if (redoStack.length === 0) return false;
+  undoStack.push(cloneGrid(pixelGrid));
+  pixelGrid = redoStack.pop();
+  saveToStorage();
+  render();
+  return true;
+}
+
+/* ============================================================
+   RENDERING — draw the pixel grid onto the canvas
+   ============================================================ */
+
+/**
+ * Full re-render: draw checkerboard background, pixel colors,
+ * and optional grid lines.
+ */
+function render() {
+  const n = state.gridSize;
+  const px = PIXEL_SCALE;
+  canvas.width  = n * px;
+  canvas.height = n * px;
+
+  // Disable anti-aliasing for crisp pixel edges
+  ctx.imageSmoothingEnabled = false;
+
+  // --- Draw checkerboard for transparent areas ---
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      const isLight = (x + y) % 2 === 0;
+      ctx.fillStyle = isLight ? '#e8e8e8' : '#d0d0d0';
+      ctx.fillRect(x * px, y * px, px, px);
+    }
+  }
+
+  // --- Draw colored pixels ---
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      if (pixelGrid[y][x]) {
+        ctx.fillStyle = pixelGrid[y][x];
+        ctx.fillRect(x * px, y * px, px, px);
+      }
+    }
+  }
+
+  // --- Draw grid overlay ---
+  if (state.showGrid) {
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      // vertical lines
+      ctx.moveTo(i * px + 0.5, 0);
+      ctx.lineTo(i * px + 0.5, n * px);
+      // horizontal lines
+      ctx.moveTo(0, i * px + 0.5);
+      ctx.lineTo(n * px, i * px + 0.5);
+    }
+    ctx.stroke();
+  }
+}
+
+/* ============================================================
+   TOOL LOGIC
+   ============================================================ */
+
+/**
+ * Set the active tool. Updates the toolbar visual state.
+ */
+function setTool(toolName) {
+  state.currentTool = toolName;
+  document.querySelectorAll('.tool-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tool === toolName);
+  });
+}
+
+/**
+ * Paint a single pixel at (gx, gy) in grid coordinates.
+ * @param {number} gx - column index
+ * @param {number} gy - row index
+ */
+function paintPixel(gx, gy) {
+  if (gx < 0 || gx >= state.gridSize || gy < 0 || gy >= state.gridSize) return;
+  pixelGrid[gy][gx] = state.currentColor;
+}
+
+/**
+ * Erase a single pixel at (gx, gy) in grid coordinates.
+ */
+function erasePixel(gx, gy) {
+  if (gx < 0 || gx >= state.gridSize || gy < 0 || gy >= state.gridSize) return;
+  pixelGrid[gy][gx] = null;
+}
+
+/**
+ * Flood-fill starting at (gx, gy) using BFS (iterative, no stack overflow).
+ * Replaces all contiguous same-color pixels with the current color.
+ */
+function floodFill(startX, startY) {
+  const n = state.gridSize;
+  if (startX < 0 || startX >= n || startY < 0 || startY >= n) return;
+
+  const targetColor = pixelGrid[startY][startX];
+  const fillColor = state.currentColor;
+
+  // Nothing to do if the target is already the fill color
+  if (targetColor === fillColor) return;
+
+  // BFS queue
+  const queue = [[startX, startY]];
+  // Track visited pixels to avoid re-processing
+  const visited = new Uint8Array(n * n);
+  visited[startY * n + startX] = 1;
+
+  // 4-directional neighbors
+  const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+  while (queue.length > 0) {
+    const [cx, cy] = queue.shift();
+
+    // Paint current pixel
+    pixelGrid[cy][cx] = fillColor;
+
+    // Enqueue unvisited neighbors that match target color
+    for (const [dx, dy] of dirs) {
+      const nx = cx + dx;
+      const ny = cy + dy;
+      if (nx >= 0 && nx < n && ny >= 0 && ny < n) {
+        const idx = ny * n + nx;
+        if (!visited[idx] && pixelGrid[ny][nx] === targetColor) {
+          visited[idx] = 1;
+          queue.push([nx, ny]);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Eyedropper: pick the color at (gx, gy) and set it as current color.
+ * If the pixel is transparent, do nothing.
+ */
+function pickColor(gx, gy) {
+  if (gx < 0 || gx >= state.gridSize || gy < 0 || gy >= state.gridSize) return;
+  const picked = pixelGrid[gy][gx];
+  if (picked) {
+    setColor(picked);
+  }
+}
+
+/* ============================================================
+   RECENT COLORS
+   ============================================================ */
+
+/**
+ * Add a color to the recent-colors list (max 8).
+ * Avoids duplicates by moving the color to the front.
+ */
+function addRecentColor(color) {
+  state.recentColors = state.recentColors.filter(c => c !== color);
+  state.recentColors.unshift(color);
+  if (state.recentColors.length > 8) state.recentColors.pop();
+  renderRecentStrip();
+}
+
+/** Render the recent-colors strip in the toolbar. */
+function renderRecentStrip() {
+  recentStrip.innerHTML = '';
+  state.recentColors.forEach(color => {
+    const div = document.createElement('div');
+    div.className = 'recent-swatch';
+    div.style.backgroundColor = color;
+    div.title = color;
+    div.addEventListener('click', () => setColor(color));
+    recentStrip.appendChild(div);
+  });
+}
+
+/* ============================================================
+   COLOR MANAGEMENT
+   ============================================================ */
+
+/**
+ * Set the current drawing color. Updates picker, display, and palette highlight.
+ */
+function setColor(color) {
+  state.currentColor = color;
+  colorPicker.value = color;
+  colorDisplay.style.backgroundColor = color;
+  highlightActiveSwatch(color);
+}
+
+/** Highlight the matching swatch in the preset palette. */
+function highlightActiveSwatch(color) {
+  document.querySelectorAll('.swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.color === color);
+  });
+}
+
+/* ============================================================
+   STORAGE (localStorage)
+   ============================================================ */
+
+const STORAGE_KEY = 'pixelArtEditor_data';
+
+/** Save current grid, size, and recent colors to localStorage. */
+function saveToStorage() {
+  try {
+    const data = {
+      gridSize: state.gridSize,
+      grid: pixelGrid,
+      recentColors: state.recentColors,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    // localStorage might be full or unavailable — silently ignore
+  }
+}
+
+/** Load from localStorage. Returns the parsed data or null. */
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+/* ============================================================
+   EXPORT — Download PNG
+   ============================================================ */
+
+/**
+ * Export the artwork as a PNG file.
+ * Each pixel is scaled up to 10×10 blocks for a crisp, enlarged image.
+ */
+function downloadPNG() {
+  const n = state.gridSize;
+  const scale = 10;
+  const exportCanvas = document.createElement('canvas');
+  exportCanvas.width  = n * scale;
+  exportCanvas.height = n * scale;
+  const ectx = exportCanvas.getContext('2d');
+  ectx.imageSmoothingEnabled = false;
+
+  // Draw each pixel as a block (transparent pixels stay transparent)
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      if (pixelGrid[y][x]) {
+        ectx.fillStyle = pixelGrid[y][x];
+        ectx.fillRect(x * scale, y * scale, scale, scale);
+      }
+    }
+  }
+
+  // Trigger download
+  const link = document.createElement('a');
+  link.download = `pixel-art-${n}x${n}.png`;
+  link.href = exportCanvas.toDataURL('image/png');
+  link.click();
+}
+
+/* ============================================================
+   UI HELPERS
+   ============================================================ */
+
+/** Update all UI elements to reflect current state. */
+function updateUI() {
+  canvasInfo.textContent = `${state.gridSize} × ${state.gridSize} pixels`;
+  setColor(state.currentColor);
+  renderRecentStrip();
+
+  // Update size buttons
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.size) === state.gridSize);
+  });
+}
+
+/** Build the preset palette swatches. */
+function buildPresetPalette() {
+  presetPal.innerHTML = '';
+  PALETTE_COLORS.forEach(color => {
+    const div = document.createElement('div');
+    div.className = 'swatch';
+    div.style.backgroundColor = color;
+    div.dataset.color = color;
+    div.title = color;
+    div.addEventListener('click', () => setColor(color));
+    presetPal.appendChild(div);
+  });
+}
+
+/* ============================================================
+   EVENT BINDING — TOOL BUTTONS
+   ============================================================ */
+function bindToolButtons() {
+  document.querySelectorAll('.tool-btn').forEach(btn => {
+    btn.addEventListener('click', () => setTool(btn.dataset.tool));
+  });
+}
+
+/* ============================================================
+   EVENT BINDING — SIZE BUTTONS
+   ============================================================ */
+function bindSizeButtons() {
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newSize = parseInt(btn.dataset.size);
+      if (newSize === state.gridSize) return;
+      if (confirm(`Change canvas to ${newSize}×${newSize}? This will clear your drawing.`)) {
+        state.gridSize = newSize;
+        createEmptyGrid(newSize);
+        undoStack.length = 0;
+        redoStack.length = 0;
+        saveToStorage();
+        updateUI();
+        render();
+      }
+    });
+  });
+}
+
+/* ============================================================
+   EVENT BINDING — COLOR PICKER
+   ============================================================ */
+function bindColorPicker() {
+  colorPicker.addEventListener('input', () => {
+    setColor(colorPicker.value);
+  });
+}
+
+/* ============================================================
+   EVENT BINDING — GRID TOGGLE
+   ============================================================ */
+function bindGridToggle() {
+  gridToggle.addEventListener('change', () => {
+    state.showGrid = gridToggle.checked;
+    render();
+  });
+}
+
+/* ============================================================
+   EVENT BINDING — ACTION BUTTONS
+   ============================================================ */
+function bindActionButtons() {
+  undoBtn.addEventListener('click', () => { undo(); });
+  redoBtn.addEventListener('click', () => { redo(); });
+  downloadBtn.addEventListener('click', () => { downloadPNG(); });
+  clearBtn.addEventListener('click', () => {
+    if (confirm('Clear the entire canvas?')) {
+      pushUndo();
+      createEmptyGrid(state.gridSize);
+      saveToStorage();
+      render();
+    }
+  });
+}
+
+/* ============================================================
+   EVENT BINDING — CANVAS MOUSE EVENTS
+   ============================================================ */
+
+/**
+ * Convert canvas pixel coordinates to grid coordinates.
+ */
+function getGridCoords(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / PIXEL_SCALE);
+  const y = Math.floor((e.clientY - rect.top) / PIXEL_SCALE);
+  return [x, y];
+}
+
+function bindCanvasEvents() {
+  // --- Mouse down: start drawing or single-click action ---
+  canvas.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    const [gx, gy] = getGridCoords(e);
+
+    if (state.currentTool === 'fill') {
+      pushUndo();
+      floodFill(gx, gy);
+      addRecentColor(state.currentColor);
+      saveToStorage();
+      render();
+      return;
+    }
+
+    if (state.currentTool === 'eyedropper') {
+      pickColor(gx, gy);
+      return;
+    }
+
+    // Pencil / Eraser: start a stroke
+    state.isDrawing = true;
+    pushUndo();
+
+    if (state.currentTool === 'pencil') {
+      paintPixel(gx, gy);
+      addRecentColor(state.currentColor);
+    } else if (state.currentTool === 'eraser') {
+      erasePixel(gx, gy);
+    }
+
+    render();
+  });
+
+  // --- Mouse move: continue drawing ---
+  canvas.addEventListener('mousemove', (e) => {
+    if (!state.isDrawing) return;
+    const [gx, gy] = getGridCoords(e);
+
+    if (state.currentTool === 'pencil') {
+      paintPixel(gx, gy);
+    } else if (state.currentTool === 'eraser') {
+      erasePixel(gx, gy);
+    }
+
+    render();
+  });
+
+  // --- Mouse up / leave: end drawing ---
+  const endStroke = () => {
+    if (state.isDrawing) {
+      state.isDrawing = false;
+      saveToStorage();
+    }
+  };
+
+  canvas.addEventListener('mouseup', endStroke);
+  canvas.addEventListener('mouseleave', endStroke);
+
+  // Prevent context menu on canvas
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+}
+
+/* ============================================================
+   EVENT BINDING — KEYBOARD SHORTCUTS
+   ============================================================ */
+function bindKeyboard() {
+  document.addEventListener('keydown', (e) => {
+    // Ctrl/Cmd + Z  →  Undo
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+      e.preventDefault();
+      undo();
+    }
+    // Ctrl/Cmd + Shift + Z  →  Redo
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Z') {
+      e.preventDefault();
+      redo();
+    }
+    // Ctrl/Cmd + Y  →  Redo (alternative)
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'y') {
+      e.preventDefault();
+      redo();
+    }
+    // Quick tool shortcuts
+    if (!e.ctrlKey && !e.metaKey) {
+      switch (e.key) {
+        case 'b': case 'p': setTool('pencil'); break;
+        case 'e': setTool('eraser'); break;
+        case 'g': case 'f': setTool('fill'); break;
+        case 'i': case 'd': setTool('eyedropper'); break;
+        case 'z': undo(); break; // bare z without modifier also undoes
+      }
+    }
+  });
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+init();
+</script>
+</body>
+</html>

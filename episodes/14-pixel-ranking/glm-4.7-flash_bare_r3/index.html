@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Editor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .main-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+        }
+
+        .toolbar {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 200px;
+        }
+
+        .tool-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tool-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaa;
+        }
+
+        .tool-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .tool-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .tool-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .tool-btn.active {
+            border-color: #4fc3f7;
+            background: rgba(79, 195, 247, 0.3);
+        }
+
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .palette-color {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .palette-color:hover {
+            transform: scale(1.1);
+        }
+
+        .palette-color.selected {
+            border-color: #fff;
+        }
+
+        .recent-colors {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .recent-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .recent-color:hover {
+            transform: scale(1.1);
+        }
+
+        .recent-color.selected {
+            border-color: #fff;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        #pixelCanvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .canvas-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .size-select {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-container input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-container span {
+            font-size: 0.9rem;
+        }
+
+        .status-bar {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .status-bar span {
+            color: #4fc3f7;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn.confirm {
+            background: #4fc3f7;
+            color: #1a1a2e;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Pixel Art Editor</h1>
+
+    <div class="main-container">
+        <div class="toolbar">
+            <div class="tool-section">
+                <h3>Tools</h3>
+                <div class="tool-buttons">
+                    <button class="tool-btn active" data-tool="pencil" title="Pencil (P)">✏️ Pencil</button>
+                    <button class="tool-btn" data-tool="eraser" title="Eraser (E)">🧹 Eraser</button>
+                    <button class="tool-btn" data-tool="fill" title="Fill (F)">🪣 Fill</button>
+                    <button class="tool-btn" data-tool="eyedropper" title="Eyedropper (I)">💉 Eyedropper</button>
+                </div>
+            </div>
+
+            <div class="tool-section">
+                <h3>Color</h3>
+                <div class="color-picker-container">
+                    <input type="color" id="colorPicker" value="#4fc3f7">
+                    <span id="colorHex">#4fc3f7</span>
+                </div>
+            </div>
+
+            <div class="tool-section">
+                <h3>Palette</h3>
+                <div class="palette" id="palette"></div>
+            </div>
+
+            <div class="tool-section">
+                <h3>Recent Colors</h3>
+                <div class="recent-colors" id="recentColors"></div>
+            </div>
+
+            <div class="tool-section action-buttons">
+                <button class="action-btn" id="undoBtn">↩️ Undo (Ctrl+Z)</button>
+                <button class="action-btn" id="redoBtn">↪️ Redo (Ctrl+Shift+Z)</button>
+                <button class="action-btn" id="downloadBtn">💾 Download PNG</button>
+                <button class="action-btn" id="clearBtn">🗑️ Clear Canvas</button>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <div class="canvas-wrapper">
+                <canvas id="pixelCanvas"></canvas>
+                <canvas class="grid-overlay" id="gridOverlay"></canvas>
+            </div>
+
+            <div class="canvas-controls">
+                <select class="size-select" id="sizeSelect">
+                    <option value="16">16×16</option>
+                    <option value="32">32×32</option>
+                    <option value="64">64×64</option>
+                </select>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="gridToggle" checked>
+                    <span>Show Grid</span>
+                </label>
+            </div>
+
+            <div class="status-bar">
+                Current size: <span id="currentSize">16×16</span> | 
+                Zoom: <span id="zoomLevel">10x</span> | 
+                Pixels drawn: <span id="pixelCount">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h2>Are you sure?</h2>
+            <p>This will clear your artwork. This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="cancelClear">Cancel</button>
+                <button class="modal-btn confirm" id="confirmClear">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const CONFIG = {
+            gridSize: 16,
+            pixelSize: 10,
+            maxHistory: 20,
+            defaultColor: '#4fc3f7',
+            paletteColors: [
+                '#ff0000', '#ff7f00', '#ffff00', '#00ff00',
+                '#0000ff', '#4b0082', '#9400d3', '#ffffff',
+                '#808080', '#800000', '#808000', '#008000',
+                '#008080', '#000080', '#800080', '#000000'
+            ],
+            recentColors: []
+        };
+
+        // ==================== STATE ====================
+        let state = {
+            currentTool: 'pencil',
+            currentColor: CONFIG.defaultColor,
+            isDrawing: false,
+            showGrid: true,
+            pixelData: [],
+            history: [],
+            historyIndex: -1,
+            pixelCount: 0
+        };
+
+        // ==================== DOM ELEMENTS ====================
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridOverlay = document.getElementById('gridOverlay');
+        const gridCtx = gridOverlay.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const colorHex = document.getElementById('colorHex');
+        const palette = document.getElementById('palette');
+        const recentColors = document.getElementById('recentColors');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sizeSelect = document.getElementById('sizeSelect');
+        const gridToggle = document.getElementById('gridToggle');
+        const currentSizeSpan = document.getElementById('currentSize');
+        const zoomLevelSpan = document.getElementById('zoomLevel');
+        const pixelCountSpan = document.getElementById('pixelCount');
+        const confirmModal = document.getElementById('confirmModal');
+        const cancelClear = document.getElementById('cancelClear');
+        const confirmClear = document.getElementById('confirmClear');
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            // Load from localStorage
+            const saved = localStorage.getItem('pixelArtData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                CONFIG.gridSize = data.gridSize || 16;
+                state.pixelData = data.pixelData || [];
+                state.recentColors = data.recentColors || [];
+                state.history = data.history || [];
+                state.historyIndex = data.historyIndex || -1;
+                state.pixelCount = data.pixelCount || 0;
+            }
+
+            // Initialize pixel data if empty
+            if (state.pixelData.length === 0) {
+                initPixelData();
+            }
+
+            // Initialize UI
+            initPalette();
+            initRecentColors();
+            updateCanvas();
+            updateHistoryButtons();
+            updatePixelCount();
+
+            // Event listeners
+            setupEventListeners();
+        }
+
+        function initPixelData() {
+            state.pixelData = [];
+            for (let i = 0; i < CONFIG.gridSize; i++) {
+                state.pixelData[i] = [];
+                for (let j = 0; j < CONFIG.gridSize; j++) {
+                    state.pixelData[i][j] = null;
+                }
+            }
+        }
+
+        function initPalette() {
+            palette.innerHTML = '';
+            CONFIG.paletteColors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'palette-color';
+                div.style.backgroundColor = color;
+                div.dataset.color = color;
+                div.addEventListener('click', () => selectColor(color));
+                palette.appendChild(div);
+            });
+        }
+
+        function initRecentColors() {
+            recentColors.innerHTML = '';
+            state.recentColors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'recent-color';
+                div.style.backgroundColor = color;
+                div.dataset.color = color;
+                div.addEventListener('click', () => selectColor(color));
+                recentColors.appendChild(div);
+            });
+        }
+
+        // ==================== CANVAS RENDERING ====================
+        function updateCanvas() {
+            // Set canvas size
+            const canvasSize = CONFIG.gridSize * CONFIG.pixelSize;
+            canvas.width = canvasSize;
+            canvas.height = canvasSize;
+            gridOverlay.width = canvasSize;
+            gridOverlay.height = canvasSize;
+
+            // Draw pixel data
+            drawPixels();
+
+            // Draw grid overlay
+            if (state.showGrid) {
+                drawGrid();
+            }
+
+            // Update status
+            currentSizeSpan.textContent = `${CONFIG.gridSize}×${CONFIG.gridSize}`;
+            zoomLevelSpan.textContent = `${CONFIG.pixelSize}x`;
+        }
+
+        function drawPixels() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw transparent pixels as checkerboard
+            const checkerSize = CONFIG.pixelSize;
+            for (let i = 0; i < CONFIG.gridSize; i++) {
+                for (let j = 0; j < CONFIG.gridSize; j++) {
+                    const x = j * checkerSize;
+                    const y = i * checkerSize;
+
+                    // Checkerboard pattern for transparent areas
+                    if ((i + j) % 2 === 0) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                        ctx.fillRect(x, y, checkerSize, checkerSize);
+                    }
+
+                    // Draw colored pixels
+                    if (state.pixelData[i][j]) {
+                        ctx.fillStyle = state.pixelData[i][j];
+                        ctx.fillRect(x, y, checkerSize, checkerSize);
+                    }
+                }
+            }
+        }
+
+        function drawGrid() {
+            gridCtx.clearRect(0, 0, gridOverlay.width, gridOverlay.height);
+            gridCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            gridCtx.lineWidth = 1;
+
+            for (let i = 0; i <= CONFIG.gridSize; i++) {
+                const pos = i * CONFIG.pixelSize;
+                gridCtx.beginPath();
+                gridCtx.moveTo(pos, 0);
+                gridCtx.lineTo(pos, gridOverlay.height);
+                gridCtx.stroke();
+
+                gridCtx.beginPath();
+                gridCtx.moveTo(0, pos);
+                gridCtx.lineTo(gridOverlay.width, pos);
+                gridCtx.stroke();
+            }
+        }
+
+        // ==================== COLOR HANDLING ====================
+        function selectColor(color) {
+            state.currentColor = color;
+            colorPicker.value = color;
+            colorHex.textContent = color;
+
+            // Update palette selection
+            document.querySelectorAll('.palette-color').forEach(el => {
+                el.classList.toggle('selected', el.dataset.color === color);
+            });
+
+            // Update recent colors
+            updateRecentColors(color);
+        }
+
+        function updateRecentColors(color) {
+            // Remove if already in list
+            state.recentColors = state.recentColors.filter(c => c !== color);
+            // Add to front
+            state.recentColors.unshift(color);
+            // Keep only 8
+            state.recentColors = state.recentColors.slice(0, 8);
+
+            // Update UI
+            recentColors.innerHTML = '';
+            state.recentColors.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'recent-color';
+                div.style.backgroundColor = c;
+                div.dataset.color = c;
+                div.addEventListener('click', () => selectColor(c));
+                recentColors.appendChild(div);
+            });
+
+            // Save to localStorage
+            saveToStorage();
+        }
+
+        // ==================== TOOLS ====================
+        function handlePixelClick(x, y) {
+            const gridX = Math.floor(x / CONFIG.pixelSize);
+            const gridY = Math.floor(y / CONFIG.pixelSize);
+
+            if (gridX < 0 || gridX >= CONFIG.gridSize || gridY < 0 || gridY >= CONFIG.gridSize) {
+                return;
+            }
+
+            switch (state.currentTool) {
+                case 'pencil':
+                    if (state.pixelData[gridY][gridX] !== state.currentColor) {
+                        saveState();
+                        state.pixelData[gridY][gridX] = state.currentColor;
+                        state.pixelCount++;
+                        updateCanvas();
+                        updatePixelCount();
+                    }
+                    break;
+
+                case 'eraser':
+                    if (state.pixelData[gridY][gridX] !== null) {
+                        saveState();
+                        state.pixelData[gridY][gridX] = null;
+                        state.pixelCount--;
+                        updateCanvas();
+                        updatePixelCount();
+                    }
+                    break;
+
+                case 'fill':
+                    floodFill(gridX, gridY, state.pixelData[gridY][gridX], state.currentColor);
+                    break;
+
+                case 'eyedropper':
+                    if (state.pixelData[gridY][gridX]) {
+                        selectColor(state.pixelData[gridY][gridX]);
+                    }
+                    break;
+            }
+        }
+
+        function floodFill(startX, startY, targetColor, replacementColor) {
+            // Don't fill if colors are the same
+            if (targetColor === replacementColor) return;
+
+            // Don't fill if target is transparent
+            if (targetColor === null) return;
+
+            const queue = [[startX, startY]];
+            const visited = new Set();
+            let filled = 0;
+
+            while (queue.length > 0) {
+                const [x, y] = queue.shift();
+                const key = `${x},${y}`;
+
+                if (visited.has(key)) continue;
+                if (x < 0 || x >= CONFIG.gridSize || y < 0 || y >= CONFIG.gridSize) continue;
+                if (state.pixelData[y][x] !== targetColor) continue;
+
+                visited.add(key);
+                state.pixelData[y][x] = replacementColor;
+                filled++;
+
+                queue.push([x + 1, y]);
+                queue.push([x - 1, y]);
+                queue.push([x, y + 1]);
+                queue.push([x, y - 1]);
+
+                // Safety check to prevent stack overflow
+                if (filled > CONFIG.gridSize * CONFIG.gridSize) return;
+            }
+
+            if (filled > 0) {
+                saveState();
+                updateCanvas();
+                updatePixelCount();
+            }
+        }
+
+        // ==================== HISTORY ====================
+        function saveState() {
+            // Remove any future states if we're not at the end
+            state.history = state.history.slice(0, state.historyIndex + 1);
+
+            // Create deep copy of pixel data
+            const pixelCopy = state.pixelData.map(row => [...row]);
+
+            state.history.push({
+                pixelData: pixelCopy,
+                gridSize: CONFIG.gridSize,
+                pixelCount: state.pixelCount
+            });
+
+            // Limit history size
+            if (state.history.length > CONFIG.maxHistory) {
+                state.history.shift();
+            } else {
+                state.historyIndex++;
+            }
+
+            updateHistoryButtons();
+            saveToStorage();
+        }
+
+        function undo() {
+            if (state.historyIndex > 0) {
+                state.historyIndex--;
+                restoreState(state.history[state.historyIndex]);
+            }
+        }
+
+        function redo() {
+            if (state.historyIndex < state.history.length - 1) {
+                state.historyIndex++;
+                restoreState(state.history[state.historyIndex]);
+            }
+        }
+
+        function restoreState(savedState) {
+            state.pixelData = savedState.pixelData.map(row => [...row]);
+            state.pixelCount = savedState.pixelCount;
+            updateCanvas();
+            updatePixelCount();
+            updateHistoryButtons();
+            saveToStorage();
+        }
+
+        function updateHistoryButtons() {
+            undoBtn.disabled = state.historyIndex <= 0;
+            redoBtn.disabled = state.historyIndex >= state.history.length - 1;
+            undoBtn.style.opacity = undoBtn.disabled ? 0.5 : 1;
+            redoBtn.style.opacity = redoBtn.disabled ? 0.5 : 1;
+        }
+
+        function updatePixelCount() {
+            pixelCountSpan.textContent = state.pixelCount;
+        }
+
+        // ==================== EXPORT ====================
+        function downloadPNG() {
+            // Create export canvas
+            const exportCanvas = document.createElement('canvas');
+            const exportSize = CONFIG.gridSize * 10; // 10x scale
+            exportCanvas.width = exportSize;
+            exportCanvas.height = exportSize;
+            const exportCtx = exportCanvas.getContext('2d');
+
+            // Draw pixels
+            for (let i = 0; i < CONFIG.gridSize; i++) {
+                for (let j = 0; j < CONFIG.gridSize; j++) {
+                    if (state.pixelData[i][j]) {
+                        exportCtx.fillStyle = state.pixelData[i][j];
+                        exportCtx.fillRect(j * 10, i * 10, 10, 10);
+                    }
+                }
+            }
+
+            // Download
+            const link = document.createElement('a');
+            link.download = `pixel-art-${Date.now()}.png`;
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // ==================== STORAGE ====================
+        function saveToStorage() {
+            const data = {
+                gridSize: CONFIG.gridSize,
+                pixelData: state.pixelData,
+                recentColors: state.recentColors,
+                history: state.history,
+                historyIndex: state.historyIndex,
+                pixelCount: state.pixelCount
+            };
+            localStorage.setItem('pixelArtData', JSON.stringify(data));
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        function setupEventListeners() {
+            // Canvas mouse events
+            canvas.addEventListener('mousedown', (e) => {
+                state.isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                handlePixelClick(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (state.isDrawing && (state.currentTool === 'pencil' || state.currentTool === 'eraser')) {
+                    const rect = canvas.getBoundingClientRect();
+                    handlePixelClick(e.clientX - rect.left, e.clientY - rect.top);
+                }
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                if (state.isDrawing) {
+                    state.isDrawing = false;
+                    saveState();
+                }
+            });
+
+            canvas.addEventListener('mouseleave', () => {
+                if (state.isDrawing) {
+                    state.isDrawing = false;
+                    saveState();
+                }
+            });
+
+            // Touch support
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                handlePixelClick(touch.clientX - rect.left, touch.clientY - rect.top);
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (state.isDrawing && (state.currentTool === 'pencil' || state.currentTool === 'eraser')) {
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    handlePixelClick(touch.clientX - rect.left, touch.clientY - rect.top);
+                }
+            });
+
+            canvas.addEventListener('touchend', () => {
+                if (state.isDrawing) {
+                    state.isDrawing = false;
+                    saveState();
+                }
+            });
+
+            // Tool buttons
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.currentTool = btn.dataset.tool;
+                });
+            });
+
+            // Color picker
+            colorPicker.addEventListener('input', (e) => {
+                selectColor(e.target.value);
+            });
+
+            // Action buttons
+            undoBtn.addEventListener('click', undo);
+            redoBtn.addEventListener('click', redo);
+            downloadBtn.addEventListener('click', downloadPNG);
+
+            // Size select
+            sizeSelect.addEventListener('change', (e) => {
+                const newSize = parseInt(e.target.value);
+                if (newSize !== CONFIG.gridSize) {
+                    confirmModal.classList.add('active');
+                }
+            });
+
+            // Grid toggle
+            gridToggle.addEventListener('change', (e) => {
+                state.showGrid = e.target.checked;
+                if (state.showGrid) {
+                    drawGrid();
+                } else {
+                    gridCtx.clearRect(0, 0, gridOverlay.width, gridOverlay.height);
+                }
+            });
+
+            // Clear button
+            clearBtn.addEventListener('click', () => {
+                confirmModal.classList.add('active');
+            });
+
+            cancelClear.addEventListener('click', () => {
+                confirmModal.classList.remove('active');
+            });
+
+            confirmClear.addEventListener('click', () => {
+                initPixelData();
+                state.pixelCount = 0;
+                saveState();
+                updateCanvas();
+                updatePixelCount();
+                confirmModal.classList.remove('active');
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    if (e.key === 'z') {
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            redo();
+                        } else {
+                            undo();
+                        }
+                    }
+                }
+
+                switch (e.key.toLowerCase()) {
+                    case 'p':
+                        document.querySelector('[data-tool="pencil"]').click();
+                        break;
+                    case 'e':
+                        document.querySelector('[data-tool="eraser"]').click();
+                        break;
+                    case 'f':
+                        document.querySelector('[data-tool="fill"]').click();
+                        break;
+                    case 'i':
+                        document.querySelector('[data-tool="eyedropper"]').click();
+                        break;
+                }
+            });
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>

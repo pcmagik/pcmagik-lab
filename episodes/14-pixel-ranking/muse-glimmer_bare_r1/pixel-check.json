@@ -1,0 +1,72 @@
+{
+  "grader": 5.1,
+  "score": 28,
+  "total": 29,
+  "verdict": "PASS",
+  "checks": {
+    "noJsErrors": true,
+    "singleFile": true,
+    "noLibraries": true,
+    "surface": true,
+    "sizes": true,
+    "sizeConfirms": true,
+    "sizeClears": true,
+    "gridToggle": true,
+    "checkerboard": true,
+    "drawsClick": true,
+    "drawsDrag": true,
+    "toolbarActive": true,
+    "pencil": true,
+    "eraser": true,
+    "fill": true,
+    "fillLarge": true,
+    "eyedropper": true,
+    "colorPicker": true,
+    "palette": true,
+    "recentColors": true,
+    "undoRedoButtons": true,
+    "undoShortcut": true,
+    "redoShortcut": true,
+    "undoDepth20": true,
+    "dragIsOneStep": true,
+    "exportPng": true,
+    "persists": false,
+    "clearConfirms": true,
+    "crisp": true
+  },
+  "failed": [
+    "persists"
+  ],
+  "unverified": [],
+  "notes": {
+    "background": "6 colours on the empty canvas, 409600 opaque pixels of 409600",
+    "palette": "17 swatches",
+    "cells": "one click painted 20x20 of a 640 px bitmap -> 32 cells",
+    "draws": "ink 0 -> 400 -> 6400",
+    "undo": "ink after drag 6400, after one undo 400, click-only was 400",
+    "redo": "redo by key \"Z\"",
+    "toolbarActive": "active before [\"✏️ pencil pencil active\"], after [\"🧽 eraser eraser active\"]",
+    "eraser": "ink 6400 -> 6000, transparent 0 -> 0",
+    "fill": "painted share gained 98.5%",
+    "eyedropper": "picked #123456; actual painted pixel #123456, ink true",
+    "recentColors": "3 marked recent in 1 container(s), 1 strip(s) of <= 8 with a used colour that changed; 20 swatches total (was 17)",
+    "checkerboard": "on load: tones lum 240/224, contrast 28, share 41+41%, rows 0.90, cols 0.90, cells 18/18 px",
+    "checkerboardLight": true,
+    "undoDepth20": "ink 0 -> 8000 -> 0 after 20 undos; checksum back to start: true",
+    "storageBeforeReload": {
+      "saved": true,
+      "keys": [
+        "pixelArtEditor"
+      ]
+    },
+    "persists": "saved before reload: true; ink 400 -> 0 after reload; localStorage keys: 1; retry: saved before reload: true; ink 400 -> 0 after reload; localStorage keys: 1",
+    "exportPng": "png 320x320, colorType 6, 32 cells, bitmap 640, needs >= 128",
+    "resizedBackground": "2 colours measured on a fresh blank 64 grid",
+    "sizes": "selected 64; bitmap 640 -> 1280, ink 400 -> 0, dialogs +1; measured 64 cells from a fresh sample",
+    "fillLarge": "on 1280x1280: ink 1638400, new errors 0",
+    "clearConfirms": "dialogs +1, ink 1638400 -> 0"
+  },
+  "blocked": {},
+  "errors": [],
+  "loadError": null
+}

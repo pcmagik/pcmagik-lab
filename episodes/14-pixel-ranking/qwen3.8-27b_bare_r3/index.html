@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Art Editor</title>
+<style>
+  /* ---------- Layout & theme ---------- */
+  :root {
+    --bg: #1e1f24;
+    --panel: #262833;
+    --panel-2: #2e3140;
+    --border: #3a3e52;
+    --text: #e8eaf2;
+    --muted: #9aa0b5;
+    --accent: #4f8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .app {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 230px;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  /* ---------- Buttons ---------- */
+  button {
+    font: inherit;
+    color: var(--text);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button:active { transform: translateY(1px); }
+  .tool-row { display: flex; gap: 6px; }
+  .tool-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  .tool-btn .icon { font-size: 18px; line-height: 1; }
+  .tool-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn-row button { flex: 1; min-width: 60px; }
+  select {
+    font: inherit;
+    color: var(--text);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 8px;
+    width: 100%;
+  }
+  /* ---------- Canvas ---------- */
+  .canvas-wrap {
+    position: relative;
+    line-height: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #fff; /* canvas draws its own background; this is a fallback */
+  }
+  canvas#board {
+    display: block;
+    width: 480px;
+    height: 480px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  /* ---------- Colors ---------- */
+  .color-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 48px;
+    height: 36px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel-2);
+    cursor: pointer;
+  }
+  input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+  input[type="color"]::-webkit-color-swatch { border: none; border-radius: 5px; }
+  .color-hex {
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 5px;
+  }
+  .swatch {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255,255,255,0.18);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0;
+    background-clip: padding-box;
+  }
+  .swatch.active {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .recent-strip {
+    display: flex;
+    gap: 5px;
+    min-height: 26px;
+    align-items: center;
+  }
+  .recent-strip .empty {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .recent-swatch {
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255,255,255,0.18);
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 0;
+  }
+  /* ---------- Misc ---------- */
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    user-select: none;
+  }
+  .status {
+    font-size: 11px;
+    color: var(--muted);
+    min-height: 15px;
+  }
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ Canvas panel ============ -->
+  <div class="panel">
+    <div class="canvas-wrap">
+      <canvas id="board" width="512" height="512" aria-label="Pixel art canvas"></canvas>
+    </div>
+    <p class="status" id="status"></p>
+  </div>
+
+  <!-- ============ Toolbar panel ============ -->
+  <div class="panel toolbar">
+
+    <div>
+      <p class="section-title">Tools</p>
+      <div class="tool-row" role="group" aria-label="Drawing tools">
+        <button class="tool-btn active" data-tool="pencil" title="Pencil (P)">
+          <span class="icon">&#9998;</span><span>Pencil</span>
+        </button>
+        <button class="tool-btn" data-tool="eraser" title="Eraser (E)">
+          <span class="icon">&#128662;</span><span>Eraser</span>
+        </button>
+        <button class="tool-btn" data-tool="fill" title="Fill (F)">
+          <span class="icon">&#127912;</span><span>Fill</span>
+        </button>
+        <button class="tool-btn" data-tool="eyedropper" title="Eyedropper (I)">
+          <span class="icon">&#128004;</span><span>Drop</span>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Grid size</p>
+      <select id="sizeSelect" aria-label="Grid size">
+        <option value="16" selected>16 &times; 16</option>
+        <option value="32">32 &times; 32</option>
+        <option value="64">64 &times; 64</option>
+      </select>
+      <div class="checkbox-row" style="margin-top:8px;">
+        <input type="checkbox" id="gridToggle" checked>
+        <label for="gridToggle">Show grid lines</label>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Color</p>
+      <div class="color-main">
+        <input type="color" id="colorPicker" value="#4f8cff" aria-label="Pick color">
+        <span class="color-hex" id="colorHex">#4F8CFF</span>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Palette</p>
+      <div class="swatch-grid" id="palette"></div>
+    </div>
+
+    <div>
+      <p class="section-title">Recent colors</p>
+      <div class="recent-strip" id="recentStrip"></div>
+    </div>
+
+    <div>
+      <p class="section-title">Actions</p>
+      <div class="btn-row">
+        <button id="undoBtn" title="Undo (Ctrl+Z)">&#8617; Undo</button>
+        <button id="redoBtn" title="Redo (Ctrl+Shift+Z)">&#8618; Redo</button>
+      </div>
+      <div class="btn-row" style="margin-top:6px;">
+        <button id="clearBtn">Clear</button>
+        <button id="downloadBtn">Download PNG</button>
+      </div>
+    </div>
+
+    <p class="hint">
+      Click or drag to paint. Shortcuts: <b>P</b> pencil, <b>E</b> eraser,
+      <b>F</b> fill, <b>I</b> eyedropper. History holds the last 50 steps.
+    </p>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+ *  Pixel Art Editor
+ *  - Model: a flat RGBA pixel buffer (Uint8ClampedArray), N x N
+ *  - View:  rendered to a small offscreen canvas, then scaled up with
+ *           imageSmoothing disabled => crisp, no anti-aliased edges
+ *  - Tools: pencil / eraser / flood-fill (BFS) / eyedropper
+ *  - Undo/redo snapshot stacks (a whole drag = one undo step)
+ *  - Persistence: localStorage; export: scaled PNG with transparency
+ * ===================================================================== */
+
+/* ----------------------------- State -------------------------------- */
+const STORAGE_KEY = "pixel-art-editor-v1";
+const HISTORY_LIMIT = 50;          // >= 20 required
+const EXPORT_SCALE = 10;           // 1 logical pixel => 10x10 in export
+const CANVAS_PX = 512;             // internal render size of #board
+
+let N = 16;                        // grid dimension (16, 32 or 64)
+let pixels = new Uint8ClampedArray(N * N * 4); // RGBA, transparent = alpha 0
+let currentTool = "pencil";
+let currentColor = [79, 140, 255]; // RGB
+let showGrid = true;
+let recentColors = [];             // most-recent first, max 8
+let isDrawing = false;             // true while a pencil/eraser drag is in progress
+let lastCell = -1;                 // last painted cell index (avoid duplicates)
+
+/* Undo / redo stacks of pixel-buffer snapshots (as Uint8ClampedArray copies) */
+let undoStack = [];
+let redoStack = [];
+
+/* ---------------------------- DOM refs ------------------------------- */
+const board   = document.getElementById("board");
+const ctx     = board.getContext("2d");
+const off     = document.createElement("canvas");   // small canvas (N x N)
+const offCtx  = off.getContext("2d");
+const statusEl    = document.getElementById("status");
+const colorPicker = document.getElementById("colorPicker");
+const colorHex    = document.getElementById("colorHex");
+const paletteEl   = document.getElementById("palette");
+const recentEl    = document.getElementById("recentStrip");
+const sizeSelect  = document.getElementById("sizeSelect");
+const gridToggle  = document.getElementById("gridToggle");
+
+/* 16 preset palette colors (hex, alpha always opaque) */
+const PALETTE = [
+  "#000000", "#ffffff", "#7f7f7f", "#c0c0c0",
+  "#ff0000", "#ff7f00", "#ffff00", "#00ff00",
+  "#00ffff", "#008080", "#0000ff", "#000080",
+  "#800080", "#ff00ff", "#8b4513", "#ffd54a"
+];
+
+/* ------------------------- Color helpers ----------------------------- */
+
+/** Parse "#rrggbb" -> [r,g,b] */
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/** [r,g,b] -> "#rrggbb" (lowercase) */
+function rgbToHex(rgb) {
+  const h = v => v.toString(16).padStart(2, "0");
+  return `#${h(rgb[0])}${h(rgb[1])}${h(rgb[2])}`;
+}
+
+function setcurrentColor(rgb, { updateUI = true, record = false } = {}) {
+  currentColor = rgb;
+  if (updateUI) {
+    const hex = rgbToHex(rgb);
+    colorPicker.value = hex;
+    colorHex.textContent = hex.toUpperCase();
+    markActiveSwatch();
+  }
+  if (record) pushRecentColor(rgb);
+}
+
+/* ------------------------ Recent colors ------------------------------ */
+
+function pushRecentColor(rgb) {
+  const key = rgbToHex(rgb);
+  recentColors = recentColors.filter(c => rgbToHex(c) !== key);
+  recentColors.unshift(rgb);
+  if (recentColors.length > 8) recentColors.length = 8;
+  renderRecentStrip();
+}
+
+function renderRecentStrip() {
+  recentEl.innerHTML = "";
+  if (recentColors.length === 0) {
+    recentEl.innerHTML = '<span class="empty">Colors you use will appear here</span>';
+    return;
+  }
+  recentColors.forEach(rgb => {
+    const hex = rgbToHex(rgb);
+    const btn = document.createElement("button");
+    btn.className = "recent-swatch";
+    btn.style.background = hex;
+    btn.title = hex;
+    btn.addEventListener("click", () => setcurrentColor(rgb));
+    recentEl.appendChild(btn);
+  });
+}
+
+/* --------------------------- Palette UI ------------------------------ */
+
+function buildPalette() {
+  paletteEl.innerHTML = "";
+  PALETTE.forEach(hex => {
+    const btn = document.createElement("button");
+    btn.className = "swatch";
+    btn.style.background = hex;
+    btn.dataset.hex = hex;
+    btn.title = hex;
+    btn.addEventListener("click", () => setcurrentColor(hexToRgb(hex)));
+    paletteEl.appendChild(btn);
+  });
+  markActiveSwatch();
+}
+
+function markActiveSwatch() {
+  const hex = rgbToHex(currentColor);
+  paletteEl.querySelectorAll(".swatch").forEach(s =>
+    s.classList.toggle("active", s.dataset.hex === hex));
+}
+
+/* ------------------------- Pixel buffer ------------------------------ */
+
+function cellIndex(cx, cy) { return cy * N + cx; }
+
+/** Read RGBA of a cell (a,b,c,d) */
+function getPixel(cx, cy) {
+  const i = cellIndex(cx, cy) * 4;
+  return [pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]];
+}
+
+/** Write RGBA to a cell */
+function setPixel(cx, cy, r, g, b, a) {
+  const i = cellIndex(cx, cy) * 4;
+  pixels[i] = r; pixels[i + 1] = g; pixels[i + 2] = b; pixels[i + 3] = a;
+}
+
+function clearAll() {
+  pixels.fill(0); // fully transparent
+}
+
+/* --------------------------- Undo/redo ------------------------------- */
+
+function snapshot() {
+  return new Uint8ClampedArray(pixels);
+}
+
+/** Record the current state so the *upcoming* change is undoable. */
+function commitPoint() {
+  undoStack.push(snapshot());
+  if (undoStack.length > HISTORY_LIMIT) undoStack.shift();
+  redoStack.length = 0; // any new action invalidates redo history
+  updateHistoryButtons();
+  saveToStorage();
+}
+
+function applySnapshot(snap) {
+  pixels.set(snap);
+  render();
+  saveToStorage();
+}
+
+function undo() {
+  if (undoStack.length === 0) return;
+  redoStack.push(snapshot());
+  applySnapshot(undoStack.pop());
+  updateHistoryButtons();
+}
+
+function redo() {
+  if (redoStack.length === 0) return;
+  undoStack.push(snapshot());
+  applySnapshot(redoStack.pop());
+  updateHistoryButtons();
+}
+
+function updateHistoryButtons() {
+  document.getElementById("undoBtn").disabled = undoStack.length === 0;
+  document.getElementById("redoBtn").disabled = redoStack.length === 0;
+}
+document.getElementById("undoBtn").disabled = true;
+document.getElementById("redoBtn").disabled = true;
+
+/* ------------------------ Rendering (view) --------------------------- */
+
+function render() {
+  const cellPx = CANVAS_PX / N; // 32 / 16 / 8 — all integers, no fractional cells
+
+  /* 1. Checkerboard background (matches logical pixel cells) */
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, CANVAS_PX, CANVAS_PX);
+  ctx.fillStyle = "#e2e5ee";
+  for (let y = 0; y < N; y++) {
+    for (let x = 0; x < N; x++) {
+      if ((x + y) & 1) ctx.fillRect(x * cellPx, y * cellPx, cellPx, cellPx);
+    }
+  }
+
+  /* 2. Pixel art: paint to N x N canvas, upscale with smoothing OFF */
+  off.width = N;   // resizing clears it, which we want
+  off.height = N;
+  const img = offCtx.createImageData(N, N);
+  img.data.set(pixels);
+  offCtx.putImageData(img, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(off, 0, 0, N, N, 0, 0, CANVAS_PX, CANVAS_PX);
+
+  /* 3. Subtle grid overlay (optional) */
+  if (showGrid) {
+    ctx.strokeStyle = N === 64 ? "rgba(0,0,0,0.18)" : "rgba(0,0,0,0.12)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const p = Math.round(i * cellPx) + 0.5; // half-pixel => crisp 1px lines
+      ctx.moveTo(p, 0);  ctx.lineTo(p, CANVAS_PX);
+      ctx.moveTo(0, p);  ctx.lineTo(CANVAS_PX, p);
+    }
+    ctx.stroke();
+  }
+}
+
+/* ------------------------- Flood fill (BFS) -------------------------- */
+
+/**
+ * 4-connected flood fill from (cx,cy) with color (r,g,b).
+ * Iterative BFS with an explicit queue => no recursion, no stack overflow
+ * even on a fully empty 64x64 grid (4096 cells).
+ */
+function floodFill(cx, cy, r, g, b) {
+  const [tr, tg, tb, ta] = getPixel(cx, cy);
+
+  // Target signature: a pixel matches the seed if it is the same color.
+  // Opaque pixels: exact RGBA match. Fully transparent pixels are the
+  // "empty" state, so they match on alpha === 0 regardless of RGB.
+  const seedTransparent = ta === 0;
+  const matches = (x, y) => {
+    const i = cellIndex(x, y) * 4;
+    if (seedTransparent) return pixels[i + 3] === 0;
+    return pixels[i] === tr && pixels[i + 1] === tg &&
+           pixels[i + 2] === tb && pixels[i + 3] === ta;
+  };
+
+  if (!matches(cx, cy)) return false; // nothing to do (already target color)
+  if (!seedTransparent && r === tr && g === tg && b === tb) return false;
+
+  const queue = [cx, cy];
+  const visited = new Uint8Array(N * N);
+  visited[cellIndex(cx, cy)] = 1;
+  let head = 0;
+  while (head < queue.length) {
+    const x = queue[head++];
+    const y = queue[head++];
+    setPixel(x, y, r, g, b, 255);
+    // 4-neighborhood
+    const neighbors = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]];
+    for (const [nx, ny] of neighbors) {
+      if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+      const idx = cellIndex(nx, ny);
+      if (visited[idx]) continue;
+      visited[idx] = 1;
+      if (matches(nx, ny)) queue.push(nx, ny);
+    }
+  }
+  return true;
+}
+
+/* ----------------------- Mouse interaction --------------------------- */
+
+/** Convert a mouse event to a cell coordinate, or null if outside. */
+function eventToCell(e) {
+  const rect = board.getBoundingClientRect();
+  const scaleX = CANVAS_PX / rect.width;
+  const scaleY = CANVAS_PX / rect.height;
+  const px = (e.clientX - rect.left) * scaleX;
+  const py = (e.clientY - rect.top) * scaleY;
+  const cx = Math.floor(px / (CANVAS_PX / N));
+  const cy = Math.floor(py / (CANVAS_PX / N));
+  if (cx < 0 || cy < 0 || cx >= N || cy >= N) return null;
+  return [cx, cy];
+}
+
+function paintCell(cx, cy) {
+  if (currentTool === "pencil") {
+    setPixel(cx, cy, currentColor[0], currentColor[1], currentColor[2], 255);
+  } else if (currentTool === "eraser") {
+    setPixel(cx, cy, 0, 0, 0, 0);
+  } else {
+    return; // fill & eyedropper are single-click actions
+  }
+  render();
+}
+
+board.addEventListener("mousedown", e => {
+  if (e.button !== 0) return;
+  e.preventDefault();
+  const cell = eventToCell(e);
+  if (!cell) return;
+  const [cx, cy] = cell;
+
+  if (currentTool === "eyedropper") {
+    const [r, g, b, a] = getPixel(cx, cy);
+    if (a === 0) {
+      setStatus("That pixel is transparent — color unchanged.");
+      return;
+    }
+    setcurrentColor([r, g, b]);
+    setStatus(`Picked ${rgbToHex([r, g, b]).toUpperCase()}`);
+    return;
+  }
+
+  if (currentTool === "fill") {
+    commitPoint();
+    const changed = floodFill(cx, cy, currentColor[0], currentColor[1], currentColor[2]);
+    if (changed) {
+      pushRecentColor(currentColor);
+      render();
+      setStatus("Filled.");
+    } else {
+      // Nothing changed: drop the pointless history entry.
+      undoStack.pop();
+      updateHistoryButtons();
+      saveToStorage();
+    }
+    return;
+  }
+
+  /* pencil / eraser: begin a drag stroke = ONE undo step */
+  isDrawing = true;
+  lastCell = cellIndex(cx, cy);
+  commitPoint();
+  paintCell(cx, cy);
+});
+
+window.addEventListener("mousemove", e => {
+  if (!isDrawing) return;
+  const cell = eventToCell(e);
+  if (!cell) return;
+  const [cx, cy] = cell;
+  const idx = cellIndex(cx, cy);
+  if (idx === lastCell) return; // avoid duplicate paint on same cell
+  lastCell = idx;
+  paintCell(cx, cy);
+});
+
+window.addEventListener("mouseup", () => {
+  if (!isDrawing) return;
+  isDrawing = false;
+  // A drag with the pencil/eraser counts as a recent-color usage.
+  if (currentTool === "pencil") pushRecentColor(currentColor);
+  saveToStorage();
+});
+
+/* --------------------------- Toolbar --------------------------------- */
+
+function setTool(tool) {
+  currentTool = tool;
+  document.querySelectorAll(".tool-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.tool === tool));
+  // Cursor feedback per tool
+  const cursors = { pencil: "crosshair", eraser: "cell", fill: "pointer", eyedropper: "pointer" };
+  board.style.cursor = cursors[tool];
+  setStatus(`Tool: ${tool}`);
+}
+
+document.querySelectorAll(".tool-btn").forEach(btn =>
+  btn.addEventListener("click", () => setTool(btn.dataset.tool)));
+
+/* Size selector — confirm + clear on change */
+sizeSelect.addEventListener("change", () => {
+  const newSize = parseInt(sizeSelect.value, 10);
+  if (newSize === N) return;
+  const ok = confirm(`Change grid to ${newSize}×${newSize}?\nThis clears the current drawing.`);
+  if (!ok) {
+    sizeSelect.value = String(N); // revert
+    return;
+  }
+  commitPoint(); // keep the old grid undoable
+  N = newSize;
+  pixels = new Uint8ClampedArray(N * N * 4);
+  render();
+  saveToStorage();
+  setStatus(`Grid is now ${N}×${N}.`);
+});
+
+/* Grid overlay toggle */
+gridToggle.addEventListener("change", () => {
+  showGrid = gridToggle.checked;
+  render();
+});
+
+/* Color picker */
+colorPicker.addEventListener("input", () => {
+  setcurrentColor(hexToRgb(colorPicker.value));
+});
+
+/* ---------------------- Persistence (localStorage) ------------------- */
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      n: N,
+      color: rgbToHex(currentColor),
+      recent: recentColors.map(rgbToHex),
+      // base64-encode the RGBA buffer for compact storage
+      // (chunked to avoid a giant fromCharCode argument list)
+      pixels: (() => {
+        const bytes = new Uint8Array(pixels.buffer, pixels.byteOffset, pixels.byteLength);
+        let out = "";
+        for (let i = 0; i < bytes.length; i += 8192) {
+          out += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+        }
+        return btoa(out);
+      })()
+    }));
+  } catch (err) {
+    /* Storage may be unavailable (private mode / quota) — non-fatal. */
+  }
+}
+
+function loadFromStorage() {
+  let data;
+  try { data = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return false; }
+  if (!data || !data.n) return false;
+
+  N = data.n;
+  sizeSelect.value = String(N);
+  pixels = new Uint8ClampedArray(N * N * 4);
+  try {
+    const bin = atob(data.pixels);
+    if (bin.length === N * N * 4) {
+      for (let i = 0; i < bin.length; i++) pixels[i] = bin.charCodeAt(i);
+    }
+  } catch { /* corrupt saved pixels — start blank */ }
+
+  if (data.color) setcurrentColor(hexToRgb(data.color));
+  recentColors = (data.recent || []).slice(0, 8).map(hexToRgb);
+  renderRecentStrip();
+  return true;
+}
+
+/* --------------------------- Export ---------------------------------- */
+
+function downloadPNG() {
+  // Draw at 1x into N×N canvas, then scale up EXPORT_SCALE times,
+  // with smoothing OFF so each pixel becomes a crisp EXPORT_SCALE² block.
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = N * EXPORT_SCALE;
+  exportCanvas.height = N * EXPORT_SCALE;
+  const ectx = exportCanvas.getContext("2d");
+  ectx.imageSmoothingEnabled = false;
+  ectx.drawImage(off, 0, 0, N, N, 0, 0, exportCanvas.width, exportCanvas.height);
+
+  const link = document.createElement("a");
+  link.download = `pixel-art-${N}x${N}.png`;
+  link.href = exportCanvas.toDataURL("image/png"); // transparency preserved
+  link.click();
+  setStatus(`Downloaded ${N * EXPORT_SCALE}×${N * EXPORT_SCALE} PNG.`);
+}
+
+document.getElementById("downloadBtn").addEventListener("click", downloadPNG);
+
+/* ----------------------------- Clear --------------------------------- */
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  if (!confirm("Clear the entire canvas? (You can still undo)")) return;
+  commitPoint();
+  clearAll();
+  render();
+  saveToStorage();
+  setStatus("Canvas cleared.");
+});
+
+/* --------------------- Keyboard shortcuts ---------------------------- */
+
+window.addEventListener("keydown", e => {
+  const mod = e.ctrlKey || e.metaKey;
+  if (mod && e.key.toLowerCase() === "z") {
+    e.preventDefault();
+    if (e.shiftKey) redo(); else undo();
+    return;
+  }
+  if (mod && e.key.toLowerCase() === "y") { e.preventDefault(); redo(); return; }
+  if (mod || e.metaKey || e.altKey) return; // don't hijack browser combos
+
+  switch (e.key.toLowerCase()) {
+    case "p": setTool("pencil"); break;
+    case "e": setTool("eraser"); break;
+    case "f": setTool("fill"); break;
+    case "i": setTool("eyedropper"); break;
+  }
+});
+
+/* ---------------------------- Status --------------------------------- */
+
+function setStatus(msg) {
+  statusEl.textContent = msg || "";
+}
+
+/* ------------------------------ Init --------------------------------- */
+
+(function init() {
+  buildPalette();
+  const restored = loadFromStorage();
+  if (restored) {
+    renderRecentStrip();
+    setStatus("Restored your saved drawing.");
+  } else {
+    clearAll();
+    renderRecentStrip();
+    setStatus("Ready. Click or drag on the canvas to draw.");
+  }
+  // Ensure color UI is in sync (loadFromStorage may have set a color)
+  setcurrentColor(currentColor);
+  render();
+  updateHistoryButtons();
+})();
+</script>
+</body>
+</html>

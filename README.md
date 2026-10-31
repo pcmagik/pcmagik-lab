@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 14 | [Only 1 of 12 local model files never dropped below 28/29](episodes/14-pixel-ranking/README.md) | Pixel_Art_Editor | 36 | [YouTube](https://www.youtube.com/shorts/97iBgMEQLAE) |
 | 13 | [One rules file. Twelve models.](episodes/13-jeden-model-z-dwunastu/README.md) | easy | 72 | [YouTube](https://www.youtube.com/shorts/GTVkK2dTcNs) |
 | 12 | [Muse Glimmer 30B spends a third of its output thinking. Do rules change that?](episodes/12-muse-glimmer-30b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/79nWI3PeOyI) |
 | 11 | [Ornith 1.0 35B writes 945 lines for one web page. Do rules trim it?](episodes/11-ornith-1.0-35b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/JZv6WS69qyg) |

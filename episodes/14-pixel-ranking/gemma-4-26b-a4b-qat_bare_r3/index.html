@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Editor</title>
+    <style>
+        :root {
+            --bg-color: #2c3e50;
+            --panel-color: #34495e;
+            --accent-color: #3498db;
+            --text-color: #ecf0f1;
+            --border-color: #2c3e50;
+            --button-hover: #2980b9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Layout */
+        header {
+            background-color: var(--panel-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Toolbar */
+        #toolbar {
+            width: 260px;
+            background-color: var(--panel-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .toolbar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toolbar-section h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #bdc3c7;
+            letter-spacing: 1px;
+        }
+
+        /* Tools Grid */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+        }
+
+        button.tool-btn {
+            background: #4e6a85;
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        button.tool-btn:hover {
+            background: #5d7a99;
+        }
+
+        button.tool-btn.active {
+            background: var(--accent-color);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Colors */
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #colorPicker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.1s;
+        }
+
+        .swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .swatch.active {
+            border-color: white;
+        }
+
+        .recent-colors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .recent-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Canvas Area */
+        #canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #1a1a1a;
+            background-image: 
+                linear-gradient(45deg, #222 25%, transparent 25%), 
+                linear-gradient(-45deg, #222 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #222 75%), 
+                linear-gradient(-45deg, transparent 75%, #222 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            overflow: auto;
+            padding: 50px;
+            position: relative;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background-color: transparent;
+            cursor: crosshair;
+            display: block;
+        }
+
+        /* Controls/Footer */
+        .footer-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select, .btn {
+            background: #4e6a85;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        select:hover, .btn:hover {
+            background: #5d7a99;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-primary {
+            background: #27ae60;
+        }
+
+        .btn-primary:hover {
+            background: #219150;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="footer-controls">
+        <h2 style="margin:0; font-size: 1.2rem;">PixelArt Studio</h2>
+    </div>
+    <div class="footer-controls">
+        <button class="btn" id="undoBtn">Undo (Ctrl+Z)</button>
+        <button class="btn" id="redoBtn">Redo (Ctrl+Shift+Z)</button>
+        <button class="btn btn-danger" id="clearBtn">Clear</button>
+        <button class="btn btn-primary" id="downloadBtn">Download PNG</button>
+    </div>
+</header>
+
+<main>
+    <aside id="toolbar">
+        <div class="toolbar-section">
+            <h3>Grid Size</h3>
+            <select id="gridSize">
+                <option value="16">16 × 16</option>
+                <option value="32" selected>32 × 32</option>
+                <option value="64">64 × 64</option>
+            </select>
+        </div>
+
+        <div class="toolbar-section">
+            <h3>Tools</h3>
+            <div class="tool-grid">
+                <button class="tool-btn active" data-tool="pencil" title="Pencil (P)">
+                    <span>✏️</span> Pencil
+                </button>
+                <button class="tool-btn" data-tool="eraser" title="Eraser (E)">
+                    <span>🧽</span> Eraser
+                </button>
+                <button class="tool-btn" data-tool="fill" title="Flood Fill (F)">
+                    <span>🪣</span> Fill
+                </button>
+                <button class="tool-btn" data-tool="eyedropper" title="Eyedropper (I)">
+                    <span>🧪</span> Eyedropper
+                </button>
+            </div>
+        </div>
+
+        <div class="toolbar-section">
+            <h3>Color</h3>
+            <div class="color-picker-wrapper">
+                <input type="color" id="colorPicker" value="#000000">
+                <div id="swatchDisplay" style="width: 40px; height: 40px; border-radius: 4px; border: 1px solid #fff; background: #000;"></div>
+            </div>
+            <div class="palette-grid" id="palette">
+                <!-- Swatches generated by JS -->
+            </div>
+            <div class="recent-colors" id="recentColors">
+                <!-- Recent colors generated by JS -->
+            </div>
+        </div>
+
+        <div class="toolbar-section">
+            <label class="checkbox-group">
+                <input type="checkbox" id="showGrid" checked> Show Grid
+            </label>
+        </div>
+    </aside>
+
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+</main>
+
+<script>
+    /**
+     * Pixel Art Editor
+     * Implements a functional drawing tool with Canvas API.
+     */
+
+    const CONFIG = {
+        maxHistory: 25,
+        zoom: 15,
+        defaultSize: 32,
+        presets: [
+            '#000000', '#ffffff', '#ff0000', '#00ff00', 
+            '#0000ff', '#ffff00', '#ff00ff', '#00ffff',
+            '#808080', '#800000', '#008000', '#000080',
+            '#808000', '#800080', '#008080', '#ffa500'
+        ]
+    };
+
+    // --- State Management ---
+    let state = {
+        size: CONFIG.defaultSize,
+        color: '#000000',
+        tool: 'pencil',
+        gridVisible: true,
+        history: [],
+        redoStack: [],
+        recentColors: [],
+        isDrawing: false,
+        lastX: null,
+        lastY: null,
+        pixels: [] // 1D array of color strings or null for transparent
+    };
+
+    // --- DOM Elements ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const gridSizeSelect = document.getElementById('gridSize');
+    const colorPicker = document.getElementById('colorPicker');
+    const swatchDisplay = document.getElementById('swatchDisplay');
+    const paletteContainer = document.getElementById('palette');
+    const recentColorsContainer = document.getElementById('recentColors');
+    const showGridCheckbox = document.getElementById('showGrid');
+    const canvasContainer = document.getElementById('canvas-container');
+
+    // --- Initialization ---
+    function init() {
+        setupEventListeners();
+        setupPalette();
+        loadFromStorage();
+        setupCanvas();
+        render();
+    }
+
+    function setupCanvas() {
+        // Canvas dimensions (actual pixel size)
+        canvas.width = state.size;
+        canvas.height = state.size;
+        
+        // Visual scale (displayed size)
+        canvas.style.width = (state.size * CONFIG.zoom) + 'px';
+        canvas.style.height = (state.size * CONFIG.zoom) + 'px';
+
+        // Initialize pixels if new
+        if (state.pixels.length !== state.size * state.size) {
+            state.pixels = new Array(state.size * state.size).fill(null);
+        }
+    }
+
+    function setupPalette() {
+        paletteContainer.innerHTML = '';
+        CONFIG.presets.forEach(color => {
+            const swatch = document.createElement('div');
+            swatch.className = 'swatch';
+            swatch.style.backgroundColor = color;
+            swatch.dataset.color = color;
+            swatch.addEventListener('click', () => setColor(color));
+            paletteContainer.appendChild(swatch);
+        });
+    }
+
+    // --- Core Logic ---
+
+    function setColor(color) {
+        state.color = color;
+        colorPicker.value = colorToHex(color);
+        swatchDisplay.style.backgroundColor = color;
+    }
+
+    function colorToHex(c) {
+        const div = document.createElement('div');
+        div.style.color = c;
+        document.body.appendChild(div);
+        const rgb = window.getComputedStyle(div).color;
+        document.body.removeChild(div);
+        const match = rgb.match(/\d+/g);
+        if (!match) return '#000000';
+        const r = parseInt(match[0]);
+        const g = parseInt(match[1]);
+        const b = parseInt(match[2]);
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    function pushHistory() {
+        const currentState = JSON.stringify(state.pixels);
+        if (state.history.length > 0 && state.history[state.history.length - 1] === currentState) {
+            return;
+        }
+        
+        state.history.push(JSON.stringify(state.pixels));
+        if (state.history.length > CONFIG.maxHistory) {
+            state.history.shift();
+        }
+        state.redoStack = [];
+        saveToStorage();
+    }
+
+    function undo() {
+        if (state.history.length > 0) {
+            state.redoStack.push(JSON.stringify(state.pixels));
+            state.pixels = JSON.parse(state.history.pop());
+            render();
+            saveToStorage();
+        }
+    }
+
+    function redo() {
+        if (state.redoStack.length > 0) {
+            state.history.push(JSON.stringify(state.pixels));
+            state.pixels = JSON.parse(state.redoStack.pop());
+            render();
+            saveToStorage();
+        }
+    }
+
+    function floodFill(startX, startY, fillColor) {
+        const targetColor = state.pixels[startY * state.size + startX];
+        const targetHex = colorToHex(fillColor);
+        if (targetColor === targetHex) return;
+
+        const queue = [[startX, startY]];
+        const targetColorStr = targetColor === null ? 'null' : targetColor;
+        const newColorStr = targetHex;
+
+        while (queue.length > 0) {
+            const [x, y] = queue.shift();
+            const idx = y * state.size + x;
+
+            if (String(state.pixels[idx]) === targetColorStr) {
+                state.pixels[idx] = newColorStr;
+
+                const neighbors = [
+                    [x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]
+                ];
+
+                for (const [nx, ny] of neighbors) {
+                    if (nx >= 0 && nx < state.size && ny >= 0 && ny < state.size) {
+                        if (String(state.pixels[ny * state.size + nx]) === targetColorStr) {
+                            queue.push([nx, ny]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // --- Rendering ---
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw pixels
+        for (let y = 0; y < state.size; y++) {
+            for (let x = 0; x < state.size; x++) {
+                const color = state.pixels[y * state.size + x];
+                if (color) {
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
+
+        // Draw Grid
+        if (state.gridVisible) {
+            drawGrid();
+        }
+    }
+
+    function drawGrid() {
+        ctx.strokeStyle = 'rgba(128, 128, 128, 0.3)';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        for (let i = 0; i <= state.size; i++) {
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, state.size);
+            ctx.moveTo(0, i);
+            ctx.lineTo(state.size, i);
+        }
+        ctx.stroke();
+    }
+
+    // --- Interaction ---
+
+    function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        return {
+            x: Math.floor((e.clientX - rect.left) * scaleX),
+            y: Math.floor((e.clientY - rect.top) * scaleY)
+        };
+    }
+
+    function handleDraw(e) {
+        if (!state.isDrawing) return;
+
+        const pos = getMousePos(e);
+        if (pos.x < 0 || pos.x >= state.size || pos.y < 0 || pos.y >= state.size) return;
+
+        if (state.tool === 'pencil') {
+            setPixel(pos.x, pos.y, state.color);
+        } else if (state.tool === 'eraser') {
+            setPixel(pos.x, pos.y, null);
+        }
+
+        render();
+    }
+
+    function setPixel(x, y, color) {
+        if (state.pixels[y * state.size + x] === color) return;
+        state.pixels[y * state.size + x] = color;
+        
+        if (color && state.tool === 'pencil') {
+            updateRecentColors(color);
+        }
+    }
+
+    function updateRecentColors(color) {
+        if (!state.recentColors.includes(color)) {
+            state.recentColors.unshift(color);
+            if (state.recentColors.length > 8) {
+                state.recentColors.pop();
+            }
+            renderRecentColors();
+        }
+    }
+
+    function renderRecentColors() {
+        recentColorsContainer.innerHTML = '';
+        state.recentColors.forEach(color => {
+            const swatch = document.createElement('div');
+            swatch.className = 'recent-swatch';
+            swatch.style.backgroundColor = color;
+            swatch.addEventListener('click', () => setColor(color));
+            recentColorsContainer.appendChild(swatch);
+        });
+    }
+
+    function setupEventListeners() {
+        canvas.addEventListener('pointerdown', (e) => {
+            pushHistory();
+            state.isDrawing = true;
+
+            const pos = getMousePos(e);
+            if (pos.x < 0 || pos.x >= state.size || pos.y < 0 || pos.y >= state.size) {
+                state.isDrawing = false;
+                return;
+            }
+
+            if (state.tool === 'fill') {
+                floodFill(pos.x, pos.y, state.color);
+                render();
+                state.isDrawing = false;
+                return;
+            }
+            
+            if (state.tool === 'eyedropper') {
+                const pixelColor = state.pixels[pos.y * state.size + pos.x];
+                if (pixelColor) {
+                    setColor(pixelColor);
+                }
+                state.isDrawing = false;
+                return;
+            }
+
+            if (state.tool === 'pencil') {
+                setPixel(pos.x, pos.y, state.color);
+            } else if (state.tool === 'eraser') {
+                setPixel(pos.x, pos.y, null);
+            }
+            render();
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (state.isDrawing) {
+                handleDraw(e);
+            }
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (state.isDrawing) {
+                state.isDrawing = false;
+                saveToStorage();
+            }
+        });
+
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.tool = btn.dataset.tool;
+            });
+        });
+
+        colorPicker.addEventListener('input', (e) => {
+            setColor(e.target.value);
+        });
+
+        showGridCheckbox.addEventListener('change', (e) => {
+            state.gridVisible = e.target.checked;
+            render();
+        });
+
+        gridSizeSelect.addEventListener('change', (e) => {
+            const newSize = parseInt(e.target.value);
+            if (confirm(`Changing size to ${newSize}x${newSize} will clear your drawing. Continue?`)) {
+                state.size = newSize;
+                state.pixels = new Array(state.size * state.size).fill(null);
+                state.history = [];
+                state.redoStack = [];
+                setupCanvas();
+                render();
+                saveToStorage();
+            } else {
+                gridSizeSelect.value = state.size;
+            }
+        });
+
+        document.getElementById('undoBtn').addEventListener('click', undo);
+        document.getElementById('redoBtn').addEventListener('click', redo);
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (confirm('Clear canvas?')) {
+                pushHistory();
+                state.pixels.fill(null);
+                render();
+                saveToStorage();
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', downloadPNG);
+
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z') {
+                    e.shiftKey ? redo() : undo();
+                    e.preventDefault();
+                }
+            }
+            if (e.key.toLowerCase() === 'p') document.querySelector('[data-tool="pencil"]').click();
+            if (e.key.toLowerCase() === 'e') document.querySelector('[data-tool="eraser"]').click();
+            if (e.key.toLowerCase() === 'f') document.querySelector('[data-tool="fill"]').click();
+            if (e.key.toLowerCase() === 'i') document.querySelector('[data-tool="eyedropper"]').click();
+        });
+    }
+
+    function saveToStorage() {
+        const data = {
+            size: state.size,
+            pixels: state.pixels,
+            color: state.color,
+            recentColors: state.recentColors,
+            gridVisible: state.gridVisible
+        };
+        localStorage.setItem('pixelArt_data', JSON.stringify(data));
+    }
+
+    function loadFromStorage() {
+        const saved = localStorage.getItem('pixelArt_data');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                state.size = data.size || CONFIG.defaultSize;
+                gridSizeSelect.value = state.size;
+                state.pixels = data.pixels || new Array(state.size * state.size).fill(null);
+                state.color = data.color || '#000000';
+                state.recentColors = data.recentColors || [];
+                state.gridVisible = data.gridVisible !== undefined ? data.gridVisible : true;
+                showGridCheckbox.checked = state.gridVisible;
+                setColor(state.color);
+                renderRecentColors();
+            } catch (e) {
+                console.error("Failed to load from storage", e);
+            }
+        }
+    }
+
+    function downloadPNG() {
+        const exportScale = 16; 
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = state.size * exportScale;
+        exportCanvas.height = state.size * exportScale;
+        const exportCtx = exportCanvas.getContext('2d');
+
+        for (let y = 0; y < state.size; y++) {
+            for (let x = 0; x < state.size; x++) {
+                const color = state.pixels[y * state.size + x];
+                if (color) {
+                    exportCtx.fillStyle = color;
+                    exportCtx.fillRect(x * exportScale, y * exportScale, exportScale, exportScale);
+                }
+            }
+        }
+
+        const link = document.createElement('a');
+        link.download = 'pixel-art.png';
+        link.href = exportCanvas.toDataURL('image/png');
+        link.click();
+    }
+
+    init();
+</script>
+</body>
+</html>

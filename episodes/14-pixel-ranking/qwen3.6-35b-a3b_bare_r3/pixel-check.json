@@ -1,0 +1,85 @@
+{
+  "grader": 5.1,
+  "score": 19,
+  "total": 29,
+  "verdict": "PASS",
+  "checks": {
+    "noJsErrors": true,
+    "singleFile": true,
+    "noLibraries": true,
+    "surface": true,
+    "sizes": true,
+    "sizeConfirms": false,
+    "sizeClears": false,
+    "gridToggle": true,
+    "checkerboard": true,
+    "drawsClick": true,
+    "drawsDrag": false,
+    "toolbarActive": true,
+    "pencil": true,
+    "eraser": true,
+    "fill": true,
+    "fillLarge": null,
+    "eyedropper": false,
+    "colorPicker": true,
+    "palette": true,
+    "recentColors": true,
+    "undoRedoButtons": true,
+    "undoShortcut": false,
+    "redoShortcut": false,
+    "undoDepth20": false,
+    "dragIsOneStep": false,
+    "exportPng": true,
+    "persists": true,
+    "clearConfirms": false,
+    "crisp": true
+  },
+  "failed": [
+    "sizeConfirms",
+    "sizeClears",
+    "drawsDrag",
+    "eyedropper",
+    "undoShortcut",
+    "redoShortcut",
+    "undoDepth20",
+    "dragIsOneStep",
+    "clearConfirms"
+  ],
+  "unverified": [
+    "fillLarge"
+  ],
+  "notes": {
+    "background": "6 colours on the empty canvas, 102400 opaque pixels of 102400",
+    "palette": "17 swatches",
+    "cells": "one click painted 10x10 of a 320 px bitmap -> 32 cells",
+    "draws": "ink 0 -> 100 -> 100",
+    "undo": "ink after drag 100, after one undo 100, click-only was 100",
+    "redo": "redo by key \"Z\"",
+    "toolbarActive": "active before [\"16×16 size-btn active\",\"✏️ pencil (b) pencil tool-btn active\"], after [\"16×16 size-btn active\",\"🧹 eraser (e) eraser tool-btn active\"]",
+    "eraser": "ink 100 -> 0, transparent 0 -> 0",
+    "fill": "painted share gained 100.0%",
+    "eyedropper": "picked #123456; actual painted pixel #00ff00, ink true",
+    "recentColors": "2 marked recent in 1 container(s), 1 strip(s) of <= 8 with a used colour that changed; 19 swatches total (was 17)",
+    "checkerboard": "on load: tones lum 255/224, contrast 54, share 42+42%, rows 1.00, cols 0.91, cells 11/11 px",
+    "checkerboardLight": true,
+    "undoDepth20": "ink 102400 -> 102400 -> 102400 after 20 undos; checksum back to start: true",
+    "storageBeforeReload": {
+      "saved": true,
+      "keys": [
+        "pixelArtEditor"
+      ]
+    },
+    "persists": "saved before reload: false; ink 102400 -> 102400 after reload; localStorage keys: 1; retry: saved before reload: true; ink 102400 -> 102400 after reload; localStorage keys: 1",
+    "exportPng": "png 320x320, colorType 6, 32 cells, bitmap 320, needs >= 128",
+    "resizedBackground": "2 colours measured on a fresh blank 64 grid",
+    "sizes": "selected 64; bitmap 320 -> 320, ink 102400 -> 102400, dialogs +0; measured unknown cells from a fresh sample",
+    "sizeClears": "64x64 grid not established; judged on the canvas the page gives after the 64 request",
+    "fillLarge": "on 320x320: ink 102400, new errors 0",
+    "clearConfirms": "dialogs +0, ink 102400 -> 102400"
+  },
+  "blocked": {
+    "fillLarge": "64x64 grid was not established; fill on a smaller grid is not evidence"
+  },
+  "errors": [],
+  "loadError": null
+}

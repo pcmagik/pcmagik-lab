@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Editor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .main-panel {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .canvas-container {
+            background: #0f0f23;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        canvas {
+            display: block;
+            cursor: crosshair;
+            border-radius: 4px;
+        }
+
+        .toolbar {
+            background: #0f0f23;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            min-width: 250px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .tool-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #1a1a2e;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            border-color: #666;
+        }
+
+        .tool-btn.active {
+            border-color: #4a9eff;
+            background: #1a3a5e;
+            box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .current-color {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+        }
+
+        .palette-color {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .palette-color:hover {
+            transform: scale(1.1);
+            border-color: #fff;
+        }
+
+        .recent-colors {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .recent-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .recent-color:hover {
+            transform: scale(1.1);
+            border-color: #fff;
+        }
+
+        .size-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .size-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            background: #1a1a2e;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .size-btn:hover {
+            border-color: #666;
+        }
+
+        .size-btn.active {
+            border-color: #4a9eff;
+            background: #1a3a5e;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4a9eff;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #3a8eef;
+        }
+
+        .btn-danger {
+            background: #ff4a4a;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #ef3a3a;
+        }
+
+        .btn-secondary {
+            background: #4a4a6a;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #3a3a5a;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .history-controls .action-btn {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .status-bar {
+            margin-top: 15px;
+            padding: 10px;
+            background: #1a1a2e;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #888;
+            text-align: center;
+        }
+
+        .shortcuts {
+            margin-top: 15px;
+            padding: 10px;
+            background: #1a1a2e;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .shortcuts p {
+            margin: 5px 0;
+        }
+
+        .shortcuts kbd {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Pixel Art Editor</h1>
+        
+        <div class="main-panel">
+            <div class="canvas-container">
+                <canvas id="pixelCanvas"></canvas>
+            </div>
+            
+            <div class="toolbar">
+                <!-- Tools -->
+                <div class="section">
+                    <div class="section-title">Tools</div>
+                    <div class="tools-grid">
+                        <button class="tool-btn active" data-tool="pencil" title="Pencil">✏️</button>
+                        <button class="tool-btn" data-tool="eraser" title="Eraser">🧹</button>
+                        <button class="tool-btn" data-tool="fill" title="Fill">🪣</button>
+                        <button class="tool-btn" data-tool="eyedropper" title="Eyedropper">💉</button>
+                    </div>
+                </div>
+
+                <!-- Size Selector -->
+                <div class="section">
+                    <div class="section-title">Canvas Size</div>
+                    <div class="size-selector">
+                        <button class="size-btn active" data-size="16">16×16</button>
+                        <button class="size-btn" data-size="32">32×32</button>
+                        <button class="size-btn" data-size="64">64×64</button>
+                    </div>
+                </div>
+
+                <!-- Color Picker -->
+                <div class="section">
+                    <div class="section-title">Color</div>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="colorPicker" value="#4a9eff">
+                        <span class="current-color" id="currentColorText">#4a9eff</span>
+                    </div>
+                    <div class="palette" id="palette"></div>
+                </div>
+
+                <!-- Recent Colors -->
+                <div class="section">
+                    <div class="section-title">Recent Colors</div>
+                    <div class="recent-colors" id="recentColors"></div>
+                </div>
+
+                <!-- Grid Toggle -->
+                <div class="section">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="gridToggle" checked>
+                        <span>Show Grid</span>
+                    </label>
+                </div>
+
+                <!-- History -->
+                <div class="section">
+                    <div class="section-title">History</div>
+                    <div class="history-controls">
+                        <button class="action-btn btn-secondary" id="undoBtn">↩️ Undo</button>
+                        <button class="action-btn btn-secondary" id="redoBtn">↪️ Redo</button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="section">
+                    <button class="action-btn btn-primary" id="downloadBtn">📥 Download PNG</button>
+                    <button class="action-btn btn-danger" id="clearBtn">🗑️ Clear Canvas</button>
+                </div>
+
+                <!-- Status -->
+                <div class="status-bar" id="statusBar">Ready</div>
+
+                <!-- Shortcuts -->
+                <div class="shortcuts">
+                    <p><kbd>Ctrl</kbd> + <kbd>Z</kbd> Undo</p>
+                    <p><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> Redo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== Configuration ====================
+        const CONFIG = {
+            gridSize: 16,
+            pixelSize: 25,
+            maxHistory: 20,
+            exportScale: 10,
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            checkerColor1: 'rgba(255, 255, 255, 0.3)',
+            checkerColor2: 'rgba(255, 255, 255, 0.1)',
+            paletteColors: [
+                '#ff4757', '#ff6b81', '#ffa502', '#ffdd59',
+                '#2ed573', '#1e90ff', '#3742fa', '#5352ed',
+                '#ff7f50', '#00d2d3', '#ff9ff3', '#54a0ff',
+                '#5f27cd', '#009432', '#ff6348', '#7bed9f'
+            ]
+        };
+
+        // ==================== State ====================
+        let state = {
+            pixels: [], // 2D array of color strings or null for transparent
+            currentColor: '#4a9eff',
+            currentTool: 'pencil',
+            isDrawing: false,
+            showGrid: true,
+            history: [],
+            historyIndex: -1,
+            recentColors: []
+        };
+
+        // ==================== DOM Elements ====================
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const currentColorText = document.getElementById('currentColorText');
+        const palette = document.getElementById('palette');
+        const recentColors = document.getElementById('recentColors');
+        const gridToggle = document.getElementById('gridToggle');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const statusBar = document.getElementById('statusBar');
+        const toolBtns = document.querySelectorAll('.tool-btn');
+        const sizeBtns = document.querySelectorAll('.size-btn');
+
+        // ==================== Initialization ====================
+        function init() {
+            loadFromStorage();
+            if (state.pixels.length === 0) {
+                createEmptyGrid();
+            }
+            renderPalette();
+            renderRecentColors();
+            saveState();
+            render();
+            setupEventListeners();
+        }
+
+        function createEmptyGrid() {
+            state.pixels = Array(CONFIG.gridSize).fill(null).map(() => 
+                Array(CONFIG.gridSize).fill(null)
+            );
+        }
+
+        // ==================== Rendering ====================
+        function render() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw checkerboard background
+            drawCheckerboard();
+
+            // Draw pixels
+            for (let y = 0; y < CONFIG.gridSize; y++) {
+                for (let x = 0; x < CONFIG.gridSize; x++) {
+                    if (state.pixels[y][x]) {
+                        ctx.fillStyle = state.pixels[y][x];
+                        ctx.fillRect(
+                            x * CONFIG.pixelSize,
+                            y * CONFIG.pixelSize,
+                            CONFIG.pixelSize,
+                            CONFIG.pixelSize
+                        );
+                    }
+                }
+            }
+
+            // Draw grid overlay
+            if (state.showGrid) {
+                drawGrid();
+            }
+
+            // Update status
+            updateStatus();
+        }
+
+        function drawCheckerboard() {
+            const size = CONFIG.pixelSize;
+            for (let y = 0; y < CONFIG.gridSize; y++) {
+                for (let x = 0; x < CONFIG.gridSize; x++) {
+                    const isEven = (x + y) % 2 === 0;
+                    ctx.fillStyle = isEven ? CONFIG.checkerColor1 : CONFIG.checkerColor2;
+                    ctx.fillRect(x * size, y * size, size, size);
+                }
+            }
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+
+            // Vertical lines
+            for (let x = 0; x <= CONFIG.gridSize; x++) {
+                ctx.beginPath();
+                ctx.moveTo(x * CONFIG.pixelSize, 0);
+                ctx.lineTo(x * CONFIG.pixelSize, CONFIG.gridSize * CONFIG.pixelSize);
+                ctx.stroke();
+            }
+
+            // Horizontal lines
+            for (let y = 0; y <= CONFIG.gridSize; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, y * CONFIG.pixelSize);
+                ctx.lineTo(CONFIG.gridSize * CONFIG.pixelSize, y * CONFIG.pixelSize);
+                ctx.stroke();
+            }
+        }
+
+        function renderPalette() {
+            palette.innerHTML = '';
+            CONFIG.paletteColors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'palette-color';
+                div.style.backgroundColor = color;
+                div.addEventListener('click', () => setColor(color));
+                palette.appendChild(div);
+            });
+        }
+
+        function renderRecentColors() {
+            recentColors.innerHTML = '';
+            state.recentColors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'recent-color';
+                div.style.backgroundColor = color;
+                div.addEventListener('click', () => setColor(color));
+                recentColors.appendChild(div);
+            });
+        }
+
+        function updateStatus() {
+            const pixelCount = state.pixels.flat().filter(p => p !== null).length;
+            statusBar.textContent = `Canvas: ${CONFIG.gridSize}×${CONFIG.gridSize} | Pixels: ${pixelCount}`;
+        }
+
+        // ==================== Color Handling ====================
+        function setColor(color) {
+            state.currentColor = color;
+            colorPicker.value = color;
+            currentColorText.textContent = color;
+            addToRecentColors(color);
+        }
+
+        function addToRecentColors(color) {
+            // Remove if already in list
+            state.recentColors = state.recentColors.filter(c => c !== color);
+            // Add to front
+            state.recentColors.unshift(color);
+            // Keep only 8 colors
+            state.recentColors = state.recentColors.slice(0, 8);
+            renderRecentColors();
+        }
+
+        // ==================== Tool Handling ====================
+        function handlePixel(x, y) {
+            if (x < 0 || x >= CONFIG.gridSize || y < 0 || y >= CONFIG.gridSize) return;
+
+            switch (state.currentTool) {
+                case 'pencil':
+                    if (state.pixels[y][x] !== state.currentColor) {
+                        state.pixels[y][x] = state.currentColor;
+                        saveState();
+                        render();
+                    }
+                    break;
+                case 'eraser':
+                    if (state.pixels[y][x] !== null) {
+                        state.pixels[y][x] = null;
+                        saveState();
+                        render();
+                    }
+                    break;
+                case 'fill':
+                    floodFill(x, y, state.pixels[y][x], state.currentColor);
+                    saveState();
+                    render();
+                    break;
+                case 'eyedropper':
+                    const pickedColor = state.pixels[y][x];
+                    if (pickedColor) {
+                        setColor(pickedColor);
+                    }
+                    break;
+            }
+        }
+
+        function floodFill(startX, startY, targetColor, replacementColor) {
+            // Don't fill if colors are the same
+            if (targetColor === replacementColor) return;
+
+            const queue = [[startX, startY]];
+            const visited = new Set();
+            const size = CONFIG.gridSize;
+
+            while (queue.length > 0) {
+                const [x, y] = queue.shift();
+                const key = `${x},${y}`;
+
+                if (visited.has(key)) continue;
+                if (x < 0 || x >= size || y < 0 || y >= size) continue;
+                if (state.pixels[y][x] !== targetColor) continue;
+
+                visited.add(key);
+                state.pixels[y][x] = replacementColor;
+
+                // Add neighbors
+                queue.push([x + 1, y]);
+                queue.push([x - 1, y]);
+                queue.push([x, y + 1]);
+                queue.push([x, y - 1]);
+            }
+        }
+
+        // ==================== History (Undo/Redo) ====================
+        function saveState() {
+            // Remove any future states if we're not at the end
+            state.history = state.history.slice(0, state.historyIndex + 1);
+            
+            // Deep copy pixels
+            const pixelsCopy = state.pixels.map(row => [...row]);
+            
+            state.history.push({
+                pixels: pixelsCopy,
+                gridSize: CONFIG.gridSize
+            });
+
+            // Limit history size
+            if (state.history.length > CONFIG.maxHistory) {
+                state.history.shift();
+            } else {
+                state.historyIndex++;
+            }
+
+            updateHistoryButtons();
+        }
+
+        function undo() {
+            if (state.historyIndex > 0) {
+                state.historyIndex--;
+                state.pixels = state.history[state.historyIndex].pixels.map(row => [...row]);
+                render();
+                updateHistoryButtons();
+            }
+        }
+
+        function redo() {
+            if (state.historyIndex < state.history.length - 1) {
+                state.historyIndex++;
+                state.pixels = state.history[state.historyIndex].pixels.map(row => [...row]);
+                render();
+                updateHistoryButtons();
+            }
+        }
+
+        function updateHistoryButtons() {
+            undoBtn.disabled = state.historyIndex <= 0;
+            redoBtn.disabled = state.historyIndex >= state.history.length - 1;
+            undoBtn.style.opacity = undoBtn.disabled ? 0.5 : 1;
+            redoBtn.style.opacity = redoBtn.disabled ? 0.5 : 1;
+        }
+
+        // ==================== Storage ====================
+        function saveToStorage() {
+            const data = {
+                pixels: state.pixels,
+                gridSize: CONFIG.gridSize,
+                currentColor: state.currentColor,
+                recentColors: state.recentColors
+            };
+            localStorage.setItem('pixelArtEditor', JSON.stringify(data));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('pixelArtEditor');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    state.pixels = data.pixels;
+                    CONFIG.gridSize = data.gridSize;
+                    state.currentColor = data.currentColor;
+                    state.recentColors = data.recentColors || [];
+                } catch (e) {
+                    console.error('Failed to load from storage:', e);
+                }
+            }
+        }
+
+        // ==================== Export ====================
+        function downloadPNG() {
+            const exportCanvas = document.createElement('canvas');
+            const exportCtx = exportCanvas.getContext('2d');
+            const exportSize = CONFIG.gridSize * CONFIG.exportScale;
+
+            exportCanvas.width = exportSize;
+            exportCanvas.height = exportSize;
+
+            // Draw pixels
+            for (let y = 0; y < CONFIG.gridSize; y++) {
+                for (let x = 0; x < CONFIG.gridSize; x++) {
+                    if (state.pixels[y][x]) {
+                        exportCtx.fillStyle = state.pixels[y][x];
+                        exportCtx.fillRect(
+                            x * CONFIG.exportScale,
+                            y * CONFIG.exportScale,
+                            CONFIG.exportScale,
+                            CONFIG.exportScale
+                        );
+                    }
+                }
+            }
+
+            // Download
+            const link = document.createElement('a');
+            link.download = 'pixel-art.png';
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // ==================== Event Listeners ====================
+        function setupEventListeners() {
+            // Canvas mouse events
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleMouseUp);
+
+            // Color picker
+            colorPicker.addEventListener('input', (e) => setColor(e.target.value));
+
+            // Tools
+            toolBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    toolBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.currentTool = btn.dataset.tool;
+                    updateStatus();
+                });
+            });
+
+            // Size selector
+            sizeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (state.pixels.flat().some(p => p !== null)) {
+                        const confirmed = confirm('Changing size will clear your drawing. Continue?');
+                        if (!confirmed) return;
+                    }
+                    sizeBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    CONFIG.gridSize = parseInt(btn.dataset.size);
+                    createEmptyGrid();
+                    saveState();
+                    render();
+                    saveToStorage();
+                });
+            });
+
+            // Grid toggle
+            gridToggle.addEventListener('change', (e) => {
+                state.showGrid = e.target.checked;
+                render();
+            });
+
+            // History buttons
+            undoBtn.addEventListener('click', undo);
+            redoBtn.addEventListener('click', redo);
+
+            // Action buttons
+            downloadBtn.addEventListener('click', downloadPNG);
+            clearBtn.addEventListener('click', () => {
+                const confirmed = confirm('Are you sure you want to clear the canvas?');
+                if (confirmed) {
+                    createEmptyGrid();
+                    saveState();
+                    render();
+                    saveToStorage();
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    if (e.key === 'z' && !e.shiftKey) {
+                        e.preventDefault();
+                        undo();
+                    } else if (e.key === 'z' && e.shiftKey) {
+                        e.preventDefault();
+                        redo();
+                    } else if (e.key === 's') {
+                        e.preventDefault();
+                        downloadPNG();
+                    }
+                }
+            });
+        }
+
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: Math.floor((e.clientX - rect.left) * scaleX / CONFIG.pixelSize),
+                y: Math.floor((e.clientY - rect.top) * scaleY / CONFIG.pixelSize)
+            };
+        }
+
+        function handleMouseDown(e) {
+            e.preventDefault();
+            state.isDrawing = true;
+            const coords = getCanvasCoords(e);
+            handlePixel(coords.x, coords.y);
+        }
+
+        function handleMouseMove(e) {
+            if (!state.isDrawing) return;
+            const coords = getCanvasCoords(e);
+            handlePixel(coords.x, coords.y);
+        }
+
+        function handleMouseUp() {
+            if (state.isDrawing) {
+                state.isDrawing = false;
+                saveState();
+            }
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        // ==================== Start ====================
+        init();
+    </script>
+</body>
+</html>

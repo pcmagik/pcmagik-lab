@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pixel Art Editor</title>
+    <style>
+        /* ─── Reset & base layout ───────────────────────────── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #1e1e2e;
+            color: #cdd6f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #89b4fa;
+            letter-spacing: 0.05em;
+        }
+
+        /* ─── Toolbar ───────────────────────────────────────── */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            background: #313244;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            max-width: 90vw;
+        }
+
+        .toolbar-group {
+            display: flex; gap: 4px; align-items: center;
+            padding-right: 0.6rem; border-right: 1px solid #45475a;
+        }
+        .toolbar-group:last-child { border-right: none; }
+
+        .tool-btn, .action-btn {
+            background: #45475a; color: #cdd6f4;
+            border: 2px solid transparent; border-radius: 4px;
+            padding: 0.3rem 0.55rem; font-size: 0.8rem; cursor: pointer;
+            transition: background .15s, border-color .15s;
+        }
+        .tool-btn:hover, .action-btn:hover { background: #585b70; }
+
+        /* Active tool highlight */
+        .tool-btn.active {
+            border-color: #89b4fa; background: #1e66f5; color: #fff; font-weight: 600;
+        }
+
+        /* ─── Canvas area — wrapper supplies checkerboard bg ── */
+        .canvas-wrap {
+            position: relative;
+            display: inline-block;
+            border: 3px solid #45475a; border-radius: 4px;
+            /* Checkerboard pattern for transparent pixels (CSS background) */
+            background-image:
+                linear-gradient(45deg, #d6d8e0 25%, transparent 25%),
+                linear-gradient(-45deg, #d6d8e0 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #d6d8e0 75%),
+                linear-gradient(-45deg, transparent 75%, #d6d8e0 75%);
+            background-size: 16px 16px;
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+        }
+
+        /* Artwork canvas — internal resolution = grid size */
+        #artwork {
+            display: block;
+            image-rendering: pixelated;   /* crisp pixels at any scale */
+            image-rendering: crisp-edges;
+            cursor: crosshair;
+        }
+
+        /* Grid overlay canvas — sits on top, transparent background */
+        #gridOverlay {
+            position: absolute; top: 0; left: 0;
+            pointer-events: none;           /* clicks pass through to artwork */
+            display: block;
+        }
+
+        /* ─── Colors section ────────────────────────────────── */
+        .colors {
+            display: flex; flex-wrap: wrap; gap: 0.5rem;
+            align-items: center; justify-content: center;
+            background: #313244; padding: 0.6rem 1rem;
+            border-radius: 8px; margin-top: 0.75rem;
+        }
+
+        .color-swatch {
+            width: 28px; height: 28px; border-radius: 4px;
+            border: 2px solid transparent; cursor: pointer;
+            transition: transform .1s, border-color .15s;
+        }
+        .color-swatch:hover { transform: scale(1.15); }
+        .color-swatch.selected { border-color: #fff; box-shadow: 0 0 4px rgba(255,255,255,.6); }
+
+        input[type="color"] { width: 34px; height: 34px; border: none; padding: 0; cursor: pointer; background: transparent; }
+    </style>
+</head>
+<body>
+
+<h1>🎨 Pixel Art Editor</h1>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+    <div class="toolbar-group" id="toolGroup">
+        <button class="tool-btn active" data-tool="pencil"  title="Pencil (B)">✏️ Pencil</button>
+        <button class="tool-btn" data-tool="eraser"   title="Eraser (E)">🧹 Eraser</button>
+        <button class="tool-btn" data-tool="fill"     title="Fill Bucket (F)">🪣 Fill</button>
+        <button class="tool-btn" data-tool="eyedropper"  title="Eyedropper (I)">💉 Eyedropper</button>
+    </div>
+
+    <div class="toolbar-group">
+        <label for="sizeSelect">Grid:</label>
+        <select id="sizeSelect">
+            <option value="16">16 × 16</option>
+            <option value="32" selected>32 × 32</option>
+            <option value="64">64 × 64</option>
+        </select>
+    </div>
+
+    <div class="toolbar-group">
+        <button id="undoBtn" class="action-btn" title="Undo (Ctrl+Z)">↩️ Undo</button>
+        <button id="redoBtn" class="action-btn" title="Redo (Ctrl+Shift+Z)">↪️ Redo</button>
+    </div>
+
+    <div class="toolbar-group">
+        <label><input type="checkbox" id="gridToggle" checked> Grid</label>
+        <button id="clearBtn"  class="action-btn">🗑 Clear</button>
+        <button id="downloadBtn" class="action-btn">⬇️ PNG</button>
+    </div>
+</div>
+
+<!-- CANVAS WRAPPER (checkerboard bg shows through transparent pixels) -->
+<div class="canvas-wrap">
+    <canvas id="artwork"></canvas>
+    <canvas id="gridOverlay"></canvas>
+</div>
+
+<!-- COLOR PALETTE -->
+<div class="colors">
+    <input type="color" id="nativePicker" value="#000000" title="Choose any colour">
+
+    <span style="font-size:.7rem; color:#a6adc8;">Palette:</span>
+    <div id="paletteWrap" style="display:flex; gap:3px;" class="recent-strip"></div>
+
+    <span style="font-size:.7rem; color:#a6adc8;">Recent:</span>
+    <div id="recentStrip" style="display:flex; gap:3px;" class="recent-strip"></div>
+
+    <!-- Current colour indicator -->
+    <div id="currentSwatch" style="width:28px;height:28px;border-radius:4px;border:2px solid #fff;margin-left:4px;"></div>
+</div>
+
+<script>
+/* ===========================================================
+   Pixel Art Editor — single-file vanilla-JS implementation
+   Architecture:
+     • `buffer` (ImageData) holds artwork pixels only (no grid, no artefacts).
+     • `#artwork` canvas displays the buffer at internal resolution = gridSize.
+     • `#gridOverlay` canvas sits on top for the optional grid lines.
+     • Export reads directly from `buffer`, so exports are clean.
+   =========================================================== */
+
+// ─── DOM refs ──────────────────────────────────────────────
+const artwork      = document.getElementById('artwork');
+const gridCanvas   = document.getElementById('gridOverlay');
+const gctx         = gridCanvas.getContext('2d');
+const sizeSelect   = document.getElementById('sizeSelect');
+const gridToggle   = document.getElementById('gridToggle');
+const undoBtn      = document.getElementById('undoBtn');
+const redoBtn      = document.getElementById('redoBtn');
+const clearBtn     = document.getElementById('clearBtn');
+const downloadBtn  = document.getElementById('downloadBtn');
+const nativePicker = document.getElementById('nativePicker');
+const paletteWrap  = document.getElementById('paletteWrap');
+const recentStrip  = document.getElementById('recentStrip');
+const currentSwatch= document.getElementById('currentSwatch');
+
+// ─── State ────────────────────────────────────────────────
+let gridSize     = 32;                    // pixels per side (16 | 32 | 64)
+let tool         = 'pencil';              // pencil | eraser | fill | eyedropper
+let currentColor = '#000000';             // hex "#RRGGBB"
+
+const palette    = [                       // 16 preset swatches
+    '#000000','#5d5d5d','#8a2be2','#ff00ff',
+    '#b22222','#ff4500','#ffd700','#9acd32',
+    '#2e8b57','#1e90ff','#4169e1','#87ceeb',
+    '#ffffff','#a0522d','#c84fba','#6b8e23'
+];
+
+const recentColors = [];                  // up to 8 most-recently-used colours
+
+// ImageData source of truth for artwork pixels (off-screen)
+let buffer       = null;
+
+// Undo / Redo history — stores copies of the full ImageData (max 25)
+let undoStack    = [];
+let redoStack    = [];
+const MAX_HISTORY = 25;
+
+// Drawing state machine flags
+let isDrawing     = false;                // mouse button held during pencil/eraser stroke
+let lastPixel     = { x: -1, y: -1 };    // previous pixel coord for Bresenham interpolation
+
+// ─── Initialise canvas dimensions ──────────────────────
+const DISPLAY_SCALE = 12;                  // each grid pixel → 12 display px
+
+function resizeCanvas() {
+    // Internal resolution = gridSize (one pixel per cell)
+    artwork.width  = gridSize;
+    artwork.height = gridSize;
+    artwork.style.width  = gridSize * DISPLAY_SCALE + 'px';
+    artwork.style.height = gridSize * DISPLAY_SCALE + 'px';
+
+    gridCanvas.width  = artwork.width;
+    gridCanvas.height = artwork.height;
+    gridCanvas.style.width  = artwork.style.width;
+    gridCanvas.style.height = artwork.style.height;
+
+    // (Re-)allocate buffer to match new size.
+    if (buffer) {
+        const oldData = buffer.data.slice();   // preserve pixels
+        buffer = createImageData(gridSize, gridSize);
+        // Copy old data into the new buffer where dimensions overlap
+        const copyRows = Math.min(oldData.length / 4, buffer.data.length / 4);
+        buffer.data.set(oldData.subarray(0, copyRows * 4));
+    } else {
+        clearBuffer();
+    }
+    redrawDisplay();   // push artwork + grid to visible canvases
+}
+
+/** Create an ImageData of the given size (all pixels transparent). */
+function createImageData(w, h) {
+    const offscreen = document.createElement('canvas');
+    offscreen.width  = w;
+    offscreen.height = h;
+    return offscreen.getContext('2d', { willReadFrequently: true }).createImageData(w, h);
+}
+
+// ─── Drawing helpers (operate on `buffer`, not canvas) ─────
+
+/** Fill buffer with fully transparent pixels. */
+function clearBuffer() {
+    buffer = createImageData(gridSize, gridSize);   // alpha stays 0 by default
+}
+
+/** Copy current buffer → artwork canvas for display. */
+function pushToArtworkCanvas() {
+    const aCtx = artwork.getContext('2d', { willReadFrequently: true });
+    aCtx.imageSmoothingEnabled = false;
+    aCtx.putImageData(buffer, 0, 0);
+}
+
+/** Capture buffer snapshot for undo/redo. */
+function snapshotBuffer() {
+    return buffer.data.slice();   // copy pixel bytes
+}
+
+/** Restore a snapshot from the undo stack into `buffer`. */
+function restoreFromSnapshot(data) {
+    const newBuf = createImageData(gridSize, gridSize);
+    newBuf.data.set(data);
+    buffer = newBuf;
+}
+
+/** Set one pixel in the buffer to (r,g,b,a). */
+function setPixel(x, y, r, g, b, a = 255) {
+    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) return false;
+    const idx = (y * gridSize + x) * 4;
+    buffer.data[idx]     = r;
+    buffer.data[idx + 1] = g;
+    buffer.data[idx + 2] = b;
+    buffer.data[idx + 3] = a;
+    return true;
+}
+
+/** Get RGBA of pixel at (x,y) from the buffer. */
+function getPixel(x, y) {
+    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) return [0, 0, 0, 0];
+    const idx = (y * gridSize + x) * 4;
+    return [buffer.data[idx], buffer.data[idx+1], buffer.data[idx+2], buffer.data[idx+3]];
+}
+
+/** Convert hex "#rrggbb" → [r,g,b]. */
+function hexToRGB(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
+}
+
+/** Convert [r,g,b] → hex "#rrggbb". */
+function rgbToHex(r, g, b) {
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+// ─── Undo / Redo ──────────────────────────────────────
+
+/** Push a snapshot to the undo stack; clear redo on new action. */
+function pushUndo() {
+    undoStack.push(snapshotBuffer());
+    if (undoStack.length > MAX_HISTORY) undoStack.shift();   // trim oldest
+    redoStack.length = 0;                                     // new action invalidates redo
+}
+
+/** Pop one step: current → redo, previous → artwork. */
+function doUndo() {
+    if (undoStack.length === 0) return;
+    redoStack.push(snapshotBuffer());
+    const prev = undoStack.pop();
+    restoreFromSnapshot(prev);
+    redrawDisplay(); saveToStorage();
+}
+
+/** Pop one step: current → undo, next → artwork. */
+function doRedo() {
+    if (redoStack.length === 0) return;
+    undoStack.push(snapshotBuffer());
+    const next = redoStack.pop();
+    restoreFromSnapshot(next);
+    redrawDisplay(); saveToStorage();
+}
+
+// ─── Flood fill — iterative BFS (no stack overflow on 64×64)
+/**
+ * Fill the contiguous region of pixels sharing the same colour as `startPixel`.
+ * Uses an explicit queue so recursion depth is never a concern.
+ */
+function floodFill(startX, startY) {
+    const [tr, tg, tb] = hexToRGB(currentColor);
+    const target       = getPixel(startX, startY);
+
+    // Early-out: clicking on the fill colour itself does nothing meaningful.
+    if (target[3] !== 0 &&
+        target[0] === tr && target[1] === tg && target[2] === tb) return;
+
+    const queue = [[startX, startY]];
+    const visited = new Uint8Array(gridSize * gridSize);
+    visited[startY * gridSize + startX] = 1;
+
+    while (queue.length > 0) {
+        const [cx, cy] = queue.shift();                     // dequeue
+        const nIdx     = cy * gridSize + cx;                // linear index into buffer.data
+
+        // Paint this pixel.
+        const base = nIdx * 4;
+        buffer.data[base]     = tr;
+        buffer.data[base + 1] = tg;
+        buffer.data[base + 2] = tb;
+        buffer.data[base + 3] = 255;
+
+        // Enqueue orthogonal neighbours that match the target colour.
+        const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+        for (const [dx, dy] of dirs) {
+            const nx = cx + dx, ny = cy + dy;
+            if (nx < 0 || nx >= gridSize || ny < 0 || ny >= gridSize) continue;
+            const ni = ny * gridSize + nx;
+            if (visited[ni]) continue;
+
+            const j = ni * 4;
+            // Neighbour must have the same non-transparent colour as startPixel.
+            if (buffer.data[j]     === target[0] &&
+                buffer.data[j + 1] === target[1] &&
+                buffer.data[j + 2] === target[2] &&
+                buffer.data[j + 3] !== 0) {
+                visited[ni] = 1;
+                queue.push([nx, ny]);
+            }
+        }
+    }
+
+    redrawDisplay();   // push updated buffer to canvas after fill completes
+}
+
+// ─── Mouse coordinate mapping ──────────────────────────
+
+/** Map a pointer event's screen coordinates → grid pixel (x,y). */
+function getPixelCoords(e) {
+    const rect = artwork.getBoundingClientRect();
+    return {
+        x: Math.floor((e.clientX - rect.left)  / rect.width  * gridSize),
+        y: Math.floor((e.clientY - rect.top)   / rect.height * gridSize)
+    };
+}
+
+/** Bresenham line — calls fn(x,y) for every pixel from (x0,y0) to (x1,y1). */
+function bresenhamLine(x0, y0, x1, y1, fn) {
+    const dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    const dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    let err  = dx - dy;
+    while (true) {
+        fn(x0, y0);
+        if (x0 === x1 && y0 === y1) break;
+        const e2 = 2 * err;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 <  dx) { err += dx; y0 += sy; }
+    }
+}
+
+// ─── Drawing actions on the buffer ─────────────────────
+
+function paintPixel(x, y) {
+    const [r, g, b] = hexToRGB(currentColor);
+    setPixel(x, y, r, g, b, 255);
+}
+
+function erasePixel(x, y) {
+    // Transparent pixels → alpha = 0. Fill with white so checkerboard shows clearly.
+    setPixel(x, y, 255, 255, 255, 0);
+}
+
+// ─── Mouse event handlers ──────────────────────────────
+
+artwork.addEventListener('mousedown', (e) => {
+    const p = getPixelCoords(e);
+    if (!inBounds(p)) return;
+
+    // Capture pre-draw state BEFORE any changes for undo.
+    pushUndo();
+
+    switch (tool) {
+        case 'pencil':
+            isDrawing   = true;
+            lastPixel   = { x: p.x, y: p.y };
+            paintPixel(p.x, p.y);
+            redrawDisplay();
+            break;
+
+        case 'eraser':
+            isDrawing   = true;
+            lastPixel   = { x: p.x, y: p.y };
+            erasePixel(p.x, p.y);
+            redrawDisplay();
+            break;
+
+        case 'fill':
+            floodFill(p.x, p.y);
+            saveToStorage();
+            break;
+
+        case 'eyedropper':
+            pickColorAt(p.x, p.y);
+            break;
+    }
+});
+
+artwork.addEventListener('mousemove', (e) => {
+    if (!isDrawing || (tool !== 'pencil' && tool !== 'eraser')) return;
+    const p = getPixelCoords(e);
+    if (!inBounds(p)) return;
+
+    // Bresenham interpolation for smooth drag strokes.
+    bresenhamLine(lastPixel.x, lastPixel.y, p.x, p.y, (x, y) => {
+        if (tool === 'pencil') paintPixel(x, y);
+        else                   erasePixel(x, y);
+    });
+
+    lastPixel = { x: p.x, y: p.y };
+    redrawDisplay();   // refresh after each interpolated segment
+});
+
+window.addEventListener('mouseup', () => {
+    if (isDrawing) {
+        isDrawing  = false;
+        saveToStorage();   // persist the completed stroke
+    }
+});
+
+/** Eyedropper — read pixel colour and set as current. */
+function pickColorAt(x, y) {
+    const [r, g, b] = getPixel(x, y);
+    if (r === 0 && g === 0 && b === 0) return;   // skip transparent pixels
+    setColour(rgbToHex(r, g, b));
+}
+
+// ─── In-bounds guard ──────────────────────────────────
+
+function inBounds(p) {
+    return p.x >= 0 && p.x < gridSize && p.y >= 0 && p.y < gridSize;
+}
+
+// ─── Colour management ────────────────────────────────
+
+function setColour(hex) {
+    currentColor = hex;
+    nativePicker.value = hex;
+    updateCurrentSwatch();
+    addRecent(hex);
+}
+
+/** Update the "current colour" indicator square. */
+function updateCurrentSwatch() {
+    currentSwatch.style.backgroundColor = currentColor;
+}
+
+/** Add a colour to recent strip (max 8), removing duplicates first. */
+function addRecent(hex) {
+    const idx = recentColors.indexOf(hex);
+    if (idx !== -1) recentColors.splice(idx, 1);
+    recentColors.unshift(hex);
+    if (recentColors.length > 8) recentColors.pop();
+    renderRecentStrip();
+}
+
+/** Re-render the recent colours strip DOM. */
+function renderRecentStrip() {
+    recentStrip.innerHTML = '';
+    for (const c of recentColors) {
+        const s = document.createElement('div');
+        s.className  = 'color-swatch' + (c === currentColor ? ' selected' : '');
+        s.style.backgroundColor = c;
+        s.addEventListener('click', () => setColour(c));
+        recentStrip.appendChild(s);
+    }
+}
+
+/** Render the static palette swatches. */
+function renderPalette() {
+    paletteWrap.innerHTML = '';
+    for (const hex of palette) {
+        const s = document.createElement('div');
+        s.className  = 'color-swatch' + (hex === currentColor ? ' selected' : '');
+        s.style.backgroundColor = hex;
+        s.addEventListener('click', () => setColour(hex));
+        paletteWrap.appendChild(s);
+    }
+}
+
+// ─── Tool selection ──────────────────────────────────
+
+document.getElementById('toolGroup').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tool-btn');
+    if (!btn) return;
+    tool = btn.dataset.tool;
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+});
+
+// ─── Grid size change (confirmation + clear) ──────────
+
+sizeSelect.addEventListener('change', () => {
+    const newSize = parseInt(sizeSelect.value);
+    if (newSize === gridSize) return;
+    if (!confirm(`Change grid to ${newSize}×${newSize}? Current drawing will be cleared.`)) {
+        sizeSelect.value = gridSize;   // revert
+        return;
+    }
+    gridSize = newSize;
+    undoStack.length  = 0;
+    redoStack.length  = 0;
+    resizeCanvas();                // clears buffer and re-renders
+    saveToStorage();
+});
+
+// ─── Grid overlay redraw (called when toggle changes) ──
+
+function redrawDisplay() {
+    pushToArtworkCanvas();          // artwork pixels onto artwork canvas
+    drawGridOverlay();              // grid lines onto overlay canvas
+}
+
+/** Draw the optional grid overlay on `gridCanvas`. */
+function drawGridOverlay() {
+    gctx.clearRect(0, 0, gridSize, gridSize);   // clear overlay first
+    if (!gridToggle.checked) return;
+
+    gctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
+    gctx.lineWidth   = 0.5;                      // half a canvas pixel (sub-pixel line)
+
+    for (let i = 0; i <= gridSize; i++) {
+        const pos = i + 0.5;                     // centre of cell boundary in canvas coords
+        gctx.beginPath(); gctx.moveTo(pos, 0);   gctx.lineTo(pos, gridSize); gctx.stroke();
+        gctx.beginPath(); gctx.moveTo(0, pos);   gctx.lineTo(gridSize, pos); gctx.stroke();
+    }
+}
+
+gridToggle.addEventListener('change', drawGridOverlay);
+
+// ─── Clear button ──────────────────────────────────────
+
+clearBtn.addEventListener('click', () => {
+    if (!confirm('Clear the entire canvas?')) return;
+    clearBuffer();
+    undoStack.length  = 0;
+    redoStack.length  = 0;
+    redrawDisplay();
+    saveToStorage();
+});
+
+// ─── Download PNG — each pixel → 10×10 block, transparency preserved ──
+
+downloadBtn.addEventListener('click', () => {
+    const scale   = 10;
+    const exportW = gridSize * scale;
+    const exportH = gridSize * scale;
+
+    // Offscreen canvas at scaled resolution.
+    const expCanvas = document.createElement('canvas');
+    expCanvas.width  = exportW;
+    expCanvas.height = exportH;
+    const ectx       = expCanvas.getContext('2d');
+
+    // Draw checkerboard background so transparent areas show up in the exported PNG.
+    const sqSize = scale / 4;
+    for (let y = 0; y < exportH; y += sqSize) {
+        for (let x = 0; x < exportW; x += sqSize) {
+            if ((Math.floor(x / sqSize) + Math.floor(y / sqSize)) % 2 === 0) {
+                ectx.fillStyle = '#ccc';
+            } else {
+                ectx.fillStyle = '#fff';
+            }
+            ectx.fillRect(x, y, sqSize, sqSize);
+        }
+    }
+
+    // Scale artwork with nearest-neighbour (pixelated) rendering.
+    // Use a temp canvas at grid resolution to hold the buffer, then scale up.
+    const tmp = document.createElement('canvas');
+    tmp.width  = gridSize;
+    tmp.height = gridSize;
+    tmp.getContext('2d').putImageData(buffer, 0, 0);
+
+    ectx.imageSmoothingEnabled = false;
+    ectx.drawImage(tmp, 0, 0, exportW, exportH);
+
+    // Trigger download.
+    const link   = document.createElement('a');
+    link.download = `pixel-art-${gridSize}x${gridSize}.png`;
+    link.href     = expCanvas.toDataURL('image/png');
+    link.click();
+});
+
+// ─── localStorage persistence (auto-save on changes) ──
+
+function saveToStorage() {
+    try {
+        // Store buffer as base64 string for compactness.
+        const b64  = btoa(String.fromCharCode(...buffer.data));
+        localStorage.setItem('pixArt', JSON.stringify({
+            grid:   gridSize,
+            data:   b64,
+            color:  currentColor,
+            recent: recentColors.slice(0, 8),
+            tool:   tool
+        }));
+    } catch (e) { /* localStorage may be full or unavailable */ }
+}
+
+function loadFromStorage() {
+    try {
+        const raw = localStorage.getItem('pixArt');
+        if (!raw) return;
+        const obj  = JSON.parse(raw);
+        gridSize   = obj.grid   || 32;
+        sizeSelect.value = String(gridSize);
+        currentColor = obj.color || '#000000';
+        nativePicker.value = currentColor;
+        tool       = obj.tool   || 'pencil';
+
+        // Restore recent colours.
+        if (Array.isArray(obj.recent)) {
+            for (const c of obj.recent) addRecent(c);
+        }
+
+        resizeCanvas();   // allocates buffer at new gridSize
+
+        // Decode base64 → ImageData bytes.
+        const bytes = atob(obj.data);
+        for (let i = 0; i < bytes.length; i++) buffer.data[i] = bytes.charCodeAt(i);
+
+        redrawDisplay();
+
+        // Update UI to match loaded state.
+        document.querySelectorAll('.tool-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.tool === tool);
+        });
+    } catch (e) { /* ignore corrupted data */ }
+}
+
+// ─── Keyboard shortcuts ──────────────────────────────
+
+window.addEventListener('keydown', (e) => {
+    // Ctrl / Cmd + Z for undo, Ctrl/Cmd+Shift+Z for redo.
+    if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+        if (!e.shiftKey && e.key === 'z')  { e.preventDefault(); doUndo(); }
+        else if (e.shiftKey && e.key === 'Z') { e.preventDefault(); doRedo(); }
+    }
+
+    // Single-key tool shortcuts.
+    switch (e.key.toLowerCase()) {
+        case 'b': selectTool('pencil');     break;
+        case 'e': selectTool('eraser');     break;
+        case 'f': selectTool('fill');       break;
+        case 'i': selectTool('eyedropper');  break;
+    }
+});
+
+function selectTool(t) {
+    tool = t;
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.toggle('active', b.dataset.tool === t));
+}
+
+// ─── Native colour picker ──────────────────────────────
+
+nativePicker.addEventListener('input', (e) => setColour(e.target.value));
+
+// ─── Undo / Redo buttons ──────────────────────────────
+
+undoBtn.addEventListener('click', doUndo);
+redoBtn.addEventListener('click', doRedo);
+
+// ─── Initialise ──────────────────────────────────────
+
+resizeCanvas();                     // creates buffer, sets canvas size
+renderPalette();
+updateCurrentSwatch();
+loadFromStorage();                  // restore saved artwork if available (else blank)
+
+</script>
+</body>
+</html>

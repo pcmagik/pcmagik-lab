@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 15 | [Same model, same prompt: 29, 29 and 9 out of 29](episodes/15-pixel-rozrzut/README.md) | Pixel_Art_Editor | 3 | [YouTube](https://www.youtube.com/shorts/NFQZRo-lQnA) |
 | 14 | [Only 1 of 12 local model files never dropped below 28/29](episodes/14-pixel-ranking/README.md) | Pixel_Art_Editor | 36 | [YouTube](https://www.youtube.com/shorts/97iBgMEQLAE) |
 | 13 | [One rules file. Twelve models.](episodes/13-jeden-model-z-dwunastu/README.md) | easy | 72 | [YouTube](https://www.youtube.com/shorts/GTVkK2dTcNs) |
 | 12 | [Muse Glimmer 30B spends a third of its output thinking. Do rules change that?](episodes/12-muse-glimmer-30b/README.md) | easy | 6 | [YouTube](https://www.youtube.com/shorts/79nWI3PeOyI) |

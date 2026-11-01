@@ -1,9 +1,328 @@
 {
   "schema_version": 2,
-  "generated": "2026-10-31",
+  "generated": "2026-11-01",
   "source": "seria/harness/publikuj.py",
   "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
   "episodes": [
+    {
+      "published": "2026-11-01",
+      "slug": "15-pixel-rozrzut",
+      "title": "Same model, same prompt: 29, 29 and 9 out of 29",
+      "kind": "pixel",
+      "task": "Pixel_Art_Editor",
+      "task_file": null,
+      "prompt_file": "episodes/15-pixel-rozrzut/prompt.txt",
+      "youtube": "https://www.youtube.com/shorts/NFQZRo-lQnA",
+      "opis": "Qwen3.6 27B built the same pixel art editor 3 times: 29, 29 and 9 out of 29. The 9/29 run looks finished, but a JavaScript error on load means nothing draws. Without rules, 7 of the 12 models swing by 8 points or more between runs; in 6 of those 7 the lowest run is a page where nothing can be drawn. Task: Pixel_Art_Editor from Prompt Vault, graded by a script with 29 checks from the prompt. Harness: Pi. LM Studio defaults, no fixed seed; the model was reloaded before every run. Full cohort measurements, representative pages and prompts are available on the episode page.",
+      "thesis": {
+        "metric": "checks",
+        "models": [
+          {
+            "model": "qwen/qwen3.6-27b",
+            "n_bare": 3,
+            "n_karpathy": 0,
+            "bare": {
+              "min": 9,
+              "max": 29,
+              "n": 3,
+              "mean": 22.3
+            },
+            "karpathy": null,
+            "class": "jeden-wariant"
+          }
+        ],
+        "summary": {
+          "models": 1,
+          "karpathy-mniej": 0,
+          "nakladaja-sie": 0,
+          "karpathy-wiecej": 0,
+          "brak-danych": 0,
+          "jeden-wariant": 1
+        },
+        "total": 29,
+        "pary": [],
+        "claim": "9–29 of 29 checks passed across 3 runs"
+      },
+      "runs": [
+        {
+          "bieg": "qwen3.6-27b_bare_r3",
+          "model": "qwen/qwen3.6-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 204.86,
+          "tokeny": 7576,
+          "myslenie_pct": 5.33,
+          "tok_s": 36.98,
+          "linie": 763,
+          "tokeny_myslenia": 404,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "seria/badania/06-pixel-art-editor/effort-rzeczywisty.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 29,
+            "total": 29,
+            "failed": [],
+            "plik": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/pixel-check.json"
+          },
+          "source_run": "pix-r3_qwen3.6-27b_bare_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/index.html",
+          "zrzut": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/metrics.json",
+          "prompt": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "qwen/qwen3.6-27b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "bieg": "qwen3.6-27b_bare_r1",
+          "model": "qwen/qwen3.6-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 221.18,
+          "tokeny": 8254,
+          "myslenie_pct": 3.04,
+          "tok_s": 37.32,
+          "linie": 950,
+          "tokeny_myslenia": 251,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "seria/badania/06-pixel-art-editor/effort-rzeczywisty.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 29,
+            "total": 29,
+            "failed": [],
+            "plik": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r1/pixel-check.json"
+          },
+          "source_run": "pix-r1_qwen3.6-27b_bare_pi_emedium",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r1/index.html",
+          "zrzut": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r1/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r1/metrics.json",
+          "prompt": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r1/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "qwen/qwen3.6-27b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "qwen3.6-27b_bare_r2",
+          "model": "qwen/qwen3.6-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 187.87,
+          "tokeny": 6850,
+          "myslenie_pct": 3.28,
+          "tok_s": 36.46,
+          "linie": 706,
+          "tokeny_myslenia": 225,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "seria/badania/06-pixel-art-editor/effort-rzeczywisty.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 9,
+            "total": 29,
+            "failed": [
+              "noJsErrors",
+              "sizeConfirms",
+              "sizeClears",
+              "gridToggle",
+              "drawsClick",
+              "drawsDrag",
+              "toolbarActive",
+              "pencil",
+              "eraser",
+              "fill",
+              "fillLarge",
+              "eyedropper",
+              "recentColors",
+              "undoShortcut",
+              "redoShortcut",
+              "undoDepth20",
+              "dragIsOneStep",
+              "exportPng",
+              "persists",
+              "clearConfirms"
+            ],
+            "plik": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r2/pixel-check.json"
+          },
+          "source_run": "pix-r2_qwen3.6-27b_bare_pi_emedium",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r2/index.html",
+          "zrzut": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r2/metrics.json",
+          "prompt": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r2/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "qwen/qwen3.6-27b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "qwen3.6-27b_bare_r3",
+          "model": "qwen/qwen3.6-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 204.86,
+          "tokeny": 7576,
+          "myslenie_pct": 5.33,
+          "tok_s": 36.98,
+          "linie": 763,
+          "tokeny_myslenia": 404,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": "on",
+            "zrodlo": "seria/badania/06-pixel-art-editor/effort-rzeczywisty.json",
+            "zgodny": false
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 29,
+            "total": 29,
+            "failed": [],
+            "plik": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/pixel-check.json"
+          },
+          "source_run": "pix-r3_qwen3.6-27b_bare_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "strona": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/index.html",
+          "zrzut": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/metrics.json",
+          "prompt": "episodes/15-pixel-rozrzut/qwen3.6-27b_bare_r3/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "qwen/qwen3.6-27b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        }
+      ],
+      "cohorts": [
+        {
+          "model": "qwen/qwen3.6-27b",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "B06-QWEN36-27B-BARE",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "qwen3.6-27b_bare_r3",
+          "reprezentant_powod": null
+        }
+      ],
+      "date": "2026-09-21",
+      "social_card": "episodes/15-pixel-rozrzut/card.jpg"
+    },
     {
       "published": "2026-10-31",
       "slug": "14-pixel-ranking",

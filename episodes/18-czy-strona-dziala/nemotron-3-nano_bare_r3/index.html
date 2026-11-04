@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PC Magik Lab</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --neon-pink: #ff00ff;
+    --neon-blue: #00ffff;
+    --neon-yellow: #ffea00;
+    --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    color: #e0e0e0;
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  section {
+    margin: 4rem 0;
+  }
+
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  .card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 20px var(--neon-pink);
+  }
+
+  /* Neon glow utilities */
+  .neon-pink { color: var(--neon-pink); text-shadow: 0 0 5px var(--neon-pink); }
+  .neon-blue { color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue); }
+  .neon-yellow { color: var(--neon-yellow); text-shadow: 0 0 5px var(--neon-yellow); }
+
+  /* Hero */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 500px;
+    background: linear-gradient(135deg, #1a001a, #0d0d1a);
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    margin: 1rem 0;
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink);
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+    color: #b0b0b0;
+    max-width: 600px;
+  }
+
+  /* Sections */
+  .section-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--neon-blue);
+    text-align: center;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .card p {
+    margin: 0.8rem 0;
+    flex-grow: 1;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 2rem 0;
+    border-top: 1px solid var(--glass-border);
+    font-size: 0.9rem;
+    color: #aaa;
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.5rem; }
+    .hero h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1>Local models, real GPUs.</h1>
+      <p>Welcome to PC Magik Lab – a YouTube series exploring how AI models run on real, local GPUs.</p>
+    </section>
+
+    <!-- Measurement -->
+    <section id="measurement">
+      <h2 class="section-title neon-blue">How we measure</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-content">
+            <p class="neon-pink">same prompt, same rig, one variable changed per test</p>
+            <p>the model reloaded before every run</p>
+            <p>every prompt and result file published</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hardware -->
+    <section id="hardware">
+      <h2 class="section-title neon-blue">Hardware</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-content">
+            <p>one rig: NVIDIA RTX 3090 24 GB</p>
+            <p>LM Studio as the model server</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+      <h2 class="section-title neon-blue">About</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-content">
+            <p>PC Magik Lab is a YouTube series about running AI models on real, local GPUs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Links -->
+    <section id="links">
+      <h2 class="section-title neon-blue">Links</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-content">
+            <a href="https://www.youtube.com/@PCMagikLab" target="_blank" style="color:var(--neon-pink); text-decoration:none;">YouTube Channel</a>
+            <br>
+            <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" style="color:var(--neon-blue); text-decoration:none;">Repository with prompts & result files</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>PC Magik (Mateusz Piekut) – computer service and homelab operator from Poland.</p>
+    </footer>
+
+  </div>
+</body>
+</html>
+</function>
+</tool_call>
+<tool_call>
+<function=bash>
+<parameter=command>
+ls -la index.html

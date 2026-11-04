@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PC Magik Lab - Local AI Models on Real GPUs</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg-secondary: #12121a;
+      --fg: #e8e8f0;
+      --muted: #6b6b80;
+      --accent: #00ff88;
+      --accent-dim: rgba(0, 255, 136, 0.15);
+      --neon-blue: #00d4ff;
+      --neon-purple: #9b59b6;
+      --card-bg: rgba(20, 20, 30, 0.7);
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Background pattern */
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(155, 89, 182, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      letter-spacing: 1px;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .tagline {
+      font-size: 3.5rem;
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 0.875rem 1.75rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      letter-spacing: 1px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Sections */
+    .section {
+      padding: 6rem 2rem;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-tagline {
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-description {
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Hardware Section */
+    .hardware-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .hardware-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .hardware-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .hardware-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+    }
+
+    .hardware-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hardware-card p {
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    /* How Section */
+    .how-cards {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .how-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .how-card:hover {
+      border-color: var(--accent);
+    }
+
+    .how-card-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 1rem;
+    }
+
+    .how-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .how-card p {
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    /* About Section */
+    .about-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .about-text {
+      margin-bottom: 2rem;
+    }
+
+    .about-text p {
+      margin-bottom: 1rem;
+      color: var(--muted);
+    }
+
+    .about-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: var(--bg);
+    }
+
+    .author-details span {
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    /* Footer */
+    footer {
+      padding: 3rem 2rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .footer-text {
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    .footer-links {
+      margin-top: 1rem;
+    }
+
+    .footer-link {
+      color: var(--accent);
+      text-decoration: none;
+      margin: 0 0.5rem;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+    }
+
+    .footer-link:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Focus states */
+    a:focus, button:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg-pattern"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <a href="#" class="logo">PC Magik Lab</a>
+      <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="#how">How We Measure</a></li>
+        <li><a href="#hardware">Hardware</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <h1 class="tagline">Local models, real GPUs.</h1>
+      <p class="subtitle">Running AI models on real, local hardware. No cloud. No compromise.</p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary">YouTube Channel</button>
+        <button class="btn-secondary">GitHub Repository</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- How We Measure Section -->
+  <section class="section" id="how">
+    <div class="section-header">
+      <p class="section-tagline">How We Measure</p>
+      <h2 class="section-title">Same prompt, same rig. One variable changed per test.</h2>
+      <p class="section-description">
+        Every episode follows the same rigorous protocol: the model is reloaded before every run,
+        ensuring that the only difference between results is the single variable being tested.
+        All prompts and result files are published alongside each video on YouTube and in the repository.
+      </p>
+    </div>
+
+    <div class="how-cards">
+      <div class="how-card">
+        <svg class="how-card-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 2L3 14h9l-1 8 8-5-5-1-8 5L13 2zM3 14l8 5 5 1H6v-2H3zm4.5 2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm7.5 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+        </svg>
+        <h3>Same Prompt</h3>
+        <p>Every test uses the exact same prompt to ensure consistency across all episodes.</p>
+      </div>
+
+      <div class="how-card">
+        <svg class="how-card-icon" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <h3>Same Rig</h3>
+        <p>The test bench stays identical throughout the series - only the model variable changes.</p>
+      </div>
+
+      <div class="how-card">
+        <svg class="how-card-icon" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="18" height="18"/>
+          <line x1="3" y1="9" x2="21" y2="9"/>
+          <line x1="9" y1="21" x2="9.01" y2="21"/>
+        </svg>
+        <h3>One Variable Changed</h3>
+        <p>Per-test, only a single model parameter or configuration variable is altered.</p>
+      </div>
+
+      <div class="how-card">
+        <svg class="how-card-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path dM9 18V5l12-2v13"/>
+        </svg>
+        <h3>Model Reloaded Before Every Run</h3>
+        <p>The model is fully reloaded before each test run to eliminate state carryover.</p>
+      </div>
+
+      <div class="how-card">
+        <svg class="how-card-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14 2H6a2 2 0 0 0-2 2v3h2V5h12v4h2v3a2 2 0 0 0 2 2h3l1-4h-4l-2 3z"/>
+        </svg>
+        <h3>Every Prompt and Result Published</h3>
+        <p>All input prompts and output result files are made publicly available alongside each episode.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hardware Section -->
+  <section class="section" id="hardware">
+    <div class="section-header">
+      <p class="section-tagline">Hardware</p>
+      <h2 class="section-title">Our Test Rig</h2>
+    </div>
+
+    <div class="hardware-grid">
+      <div class="hardware-card">
+        <svg class="hardware-icon" viewBox="0 0 24 24" fill="#00ff88">
+          <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 11.5 5.16-0.76 9-5.95 9-11.5V7l-10-4zM2 17v5h4v-2H2zm0 4v2h10v-2H2zm0-8v2h14v-2H2z"/>
+        </svg>
+        <h3>NVIDIA RTX 3090 24 GB</h3>
+        <p>The flagship GPU driving every test in the series.</p>
+      </div>
+
+      <div class="hardware-card">
+        <svg class="hardware-icon" viewBox="0 0 24 24" fill="#00d4ff">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="19"/>
+        </svg>
+        <h3>LM Studio - Model Server</h3>
+        <p>Local model serving platform for running inference on the RTX 3090.</p>
+      </div>
+
+      <div class="hardware-card">
+        <svg class="hardware-icon" viewBox="0 0 24 24" fill="#9b59b6">
+          <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 11.5 5.16-0.76 9-5.95 9-11.5V7l-10-4z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        <h3>24 GB VRAM</h3>
+        <p>Enables running large local models interactively.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="section" id="about">
+    <div class="section-header">
+      <p class="section-tagline">About</p>
+      <h2 class="section-title">PC Magik Lab</h2>
+    </div>
+
+    <div class="about-content">
+      <div class="about-text">
+        <p>Welcome to PC Magik Lab, the YouTube series about running AI models on real, local GPUs. We believe in transparency, reproducibility, and the power of local computing.</p>
+        <p>Every episode is crafted with care, using the same protocol to ensure your results are comparable and trustworthy.</p>
+      </div>
+
+      <div class="about-author">
+        <div class="author-avatar">MP</div>
+        <div>
+          <span>Author:</span>
+          <strong>PC Magik (Mateusz Piekut)</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <p class="footer-text">PC Magik Lab - Local models, real GPUs.</p>
+      <div class="footer-links">
+        <a href="https://www.youtube.com/@PCMagikLab" class="footer-link" target="_blank" rel="noopener">
+          YouTube Channel
+        </a>
+        <a href="https://github.com/pcmagik/pcmagik-lab" class="footer-link" target="_blank" rel="noopener">
+          Repository
+        </a>
+      </div>
+      <p class="footer-text">© 2024 PC Magik (Mateusz Piekut). Computer service and homelab operator from Poland.</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Initialize Intersection Observer for scroll animations
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+
+      // Observe all sections
+      document.querySelectorAll('.section').forEach(function(section) {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(section);
+      });
+
+      // Nav link active state on scroll
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.nav-links a');
+
+      function activateNav() {
+        let scrollY = window.pageYOffset;
+        
+        sections.forEach(function(current) {
+          const sectionHeight = current.offsetTop + current.offsetHeight;
+          if (scrollY >= current.offsetTop && scrollY < sectionHeight) {
+            navLinks.forEach(function(link) {
+              link.classList.remove('active');
+              if (current.getAttribute('id') === link.getAttribute('href').substring(1)) {
+                link.classList.add('active');
+              }
+            });
+          }
+        });
+      }
+
+      window.addEventListener('scroll', activateNav);
+      activateNav();
+
+      // Button hover effects already handled by CSS
+      const heroButtons = document.querySelector('.hero-buttons');
+      if (heroButtons) {
+        heroButtons.addEventListener('mouseenter', function(e) {
+          const btn = e.target.closest('.btn');
+          if (btn) {
+            btn.style.transform = 'translateY(-2px)';
+          }
+        });
+        heroButtons.addEventListener('mouseleave', function(e) {
+          const btn = e.target.closest('.btn');
+          if (btn) {
+            btn.style.transform = '';
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

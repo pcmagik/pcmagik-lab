@@ -97,6 +97,21 @@ class VariableEpisodeTest(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     self.load()
 
+    def test_home_and_listing_build_with_group_sample_sizes(self):
+        self.load()
+        site.build()
+        site.build(check=True)
+        home = (self.root / 'index.html').read_text()
+        listing = (self.root / 'episodes/index.html').read_text()
+        self.assertIn('n=3', site.method_samples([self.ep]))
+        self.assertNotIn('n=6', site.method_samples([self.ep]))
+        for html in [home, listing]:
+            self.assertIn('EP 24', html)
+            self.assertIn(self.ep['published'], html)
+            self.assertIn(self.ep['title'], html)
+            self.assertNotIn(self.ep['thesis']['claim'], html)
+            self.assertNotIn('result-verdict', html)
+
     def test_episode_results_and_teasers(self):
         self.load()
         html = site.episode_body(self.ep, self.feed)

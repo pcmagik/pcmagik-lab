@@ -151,14 +151,16 @@ def load():
             if run.get('checks'):
                 checks = run['checks']
                 evidence = json.loads(artifact(checks.get('plik'), slug).read_text())
-                if checks.get('passed') != evidence.get('score') or checks.get('total') != evidence.get('total'):
+                if not checks_match_evidence(checks, evidence):
                     raise ValueError(f'{slug}: checks differ from grader evidence')
                 if any(type(checks.get(k)) is not int for k in ['passed', 'total']) or not 0 <= checks['passed'] <= checks['total']:
                     raise ValueError(f'{slug}: invalid checks score')
             validate_evidence(run, slug)
         if not isinstance(episode.get('cohorts'), list) or not episode['cohorts']:
             raise ValueError(f'{slug}: declared cohorts are required')
-        if 'cohorts' in episode:
+        if episode.get('kind') == 'zmienna':
+            validate_variable_cohorts(episode)
+        elif 'cohorts' in episode:
             declared = {(g['model'], g['wariant']): g['n'] for g in episode['cohorts']}
             actual = defaultdict(int)
             for run in episode['measurements']:
@@ -173,6 +175,83 @@ def load():
         if len({r['bieg'] for r in episode['runs']}) != len(episode['runs']):
             raise ValueError(f'{slug}: duplicate representative')
     return feed
+
+
+def checks_match_evidence(checks, evidence):
+    if checks.get('total') != evidence.get('total'):
+        return False
+    if 'grader_passed' not in checks:
+        return checks.get('passed') == evidence.get('score')
+    manual, failed = checks.get('sprawdzone_recznie'), checks.get('failed')
+    for names in [manual, failed]:
+        if not isinstance(names, list) or any(not isinstance(n, str) for n in names):
+            return False
+        if len(names) != len(set(names)):
+            return False
+    raw = evidence.get('checks')
+    if not isinstance(raw, dict):
+        return False
+    failures = {name for name, passed in raw.items() if passed is False}
+    return (type(checks['grader_passed']) is int
+            and checks['grader_passed'] == evidence.get('score')
+            and set(manual) <= failures
+            and not set(manual) & set(failed)
+            and set(manual) | set(failed) == failures
+            and checks.get('passed') == checks['grader_passed'] + len(manual))
+
+
+def validate_variable_cohorts(ep):
+    def reject():
+        raise ValueError(f'{ep["slug"]}: invalid variable cohort or range')
+
+    groups = {}
+    for group in ep['cohorts']:
+        code = group.get('kod')
+        if not isinstance(code, str) or not code or code in groups:
+            reject()
+        if (not isinstance(group.get('kolor'), str)
+                or not re.fullmatch(r'#[0-9a-fA-F]{6}', group['kolor'])
+                or group['kolor'].lower() in ('#ff9f45', '#5ec8ff')
+                or not isinstance(group.get('etykieta'), str) or not group['etykieta'].strip()
+                or type(group.get('n')) is not int or group['n'] < 1):
+            reject()
+        groups[code] = group
+    measured = defaultdict(list)
+    for run in ep['measurements']:
+        code = run.get('grupa')
+        if not isinstance(code, str) or code not in groups:
+            reject()
+        group = groups[code]
+        if any(run.get(key) != group.get(key) for key in ['model', 'wariant', 'etykieta', 'kolor']):
+            reject()
+        if not run.get('checks'):
+            reject()
+        measured[code].append(run)
+    thesis = ep.get('thesis', {})
+    summaries = thesis.get('kohorty')
+    if (thesis.get('metric') != 'checks' or thesis.get('class') not in CLASSES
+            or not isinstance(summaries, list) or len(summaries) != len(groups)):
+        reject()
+    seen = set()
+    for summary in summaries:
+        code = summary.get('klucz')
+        if not isinstance(code, str) or code not in groups or code in seen:
+            reject()
+        seen.add(code)
+        group, runs = groups[code], measured[code]
+        if len(runs) != group['n'] or any(r['checks']['total'] != thesis.get('total') for r in runs):
+            reject()
+        if any(summary.get(key) != group[key] for key in ['etykieta', 'kolor']):
+            reject()
+        scores = [r['checks']['passed'] for r in runs]
+        expected = dict(min=min(scores), max=max(scores), n=len(scores), mean=round(sum(scores)/len(scores), 1))
+        if summary.get('zakres') != expected:
+            reject()
+        representatives = [r for r in ep['runs'] if r.get('grupa') == code]
+        if len(representatives) != 1 or representatives[0]['bieg'] != group.get('reprezentant'):
+            reject()
+    if len(ep['runs']) != len(groups):
+        reject()
 
 
 def validate_evidence(run, slug):
@@ -268,7 +347,12 @@ CLASSES = {'karpathy-mniej': 'Every Karpathy run below every bare run',
 def thesis_result(ep):
     thesis = ep['thesis']
     verdict = text(thesis['claim'])
-    if ep.get('kind') == 'para-wariantow':
+    if ep.get('kind') == 'zmienna':
+        verdict += ' · ' + ' · '.join(
+            f'<span style="color:{text(g["kolor"])}">{text(g["etykieta"])}: {number(g["zakres"]["min"])}–{number(g["zakres"]["max"])} checks / {thesis["total"]}</span>'
+            for g in thesis['kohorty'])
+        verdict += ' · ' + text(CLASSES[thesis['class']])
+    elif ep.get('kind') == 'para-wariantow':
         model = thesis['models'][0]
         change = model.get('zmiana_sredniej_pct')
         if model['class'] in ('karpathy-mniej', 'karpathy-wiecej') and change is not None:
@@ -335,7 +419,7 @@ def result_card(runs, href, ep=None):
     """The same result tile on the home, archive and episode pages."""
     model = ('COMPARISON RESULTS' if len({r['model'] for r in runs}) > 1 else model_label(ep)) if ep else runs[0]['model']
     result = thesis_result(ep) if ep and ep.get('thesis') else episode_result(runs)
-    note = 'Checks measure completed requirements.' if ep and ep.get('kind') == 'pixel' else 'Effects count CSS/JS constructs, not visual quality.'
+    note = 'Checks measure completed requirements.' if ep and ep.get('kind') in ('pixel', 'zmienna') else 'Effects count CSS/JS constructs, not visual quality.'
     return f'<div class="result-hero glass" data-fx="fx-border fx-pulse"><div><p class="eyebrow">{text(model)}</p>{result}<p class="measurement-note">{note}</p></div><a class="button" href="{text(href)}">Explore all {len(runs)} runs ↓</a></div>'
 
 
@@ -497,19 +581,28 @@ def episode_body(ep, feed):
         if not compact:
             body.append('<div id="all-runs" class="section-head"><h2>Every run. Every result.</h2></div>')
         body.append('<div class="cohort-grid">')
-        variants = dict.fromkeys(r['wariant'] for r in runs)
+        group_key = 'grupa' if ep.get('kind') == 'zmienna' else 'wariant'
+        variants = dict.fromkeys(r[group_key] for r in runs)
         for variant in variants:
             color = variant if variant in ['bare', 'karpathy'] else 'other'
             description = {'bare': 'NO RULES, NO EXTRAS', 'karpathy': 'ONE RULES FILE'}.get(variant, '')
-            cohort = [r for r in runs if r['wariant'] == variant]
+            cohort = [r for r in runs if r[group_key] == variant]
+            label = text(variant.upper())
+            color_attr = f'class="v-{color}"'
+            score_attr = f'class="run-effects v-{color}"'
+            if group_key == 'grupa':
+                label = text(cohort[0]['etykieta'])
+                description = ''
+                color_attr = f'style="color:{text(cohort[0]["kolor"])}"'
+                score_attr = f'class="run-effects" style="color:{text(cohort[0]["kolor"])}"'
             sample = f' · n={len(cohort)}'
-            body.append(f'<div class="cohort"><div class="cohort-heading"><h3 class="v-{color}">{text(variant.upper())}</h3><span>{text(description)}{sample}</span></div>')
+            body.append(f'<div class="cohort"><div class="cohort-heading"><h3 {color_attr}>{label}</h3><span>{text(description)}{sample}</span></div>')
             for i, r in enumerate(cohort, 1):
                 metrics = ''.join(f'<div><strong>{duration(r.get(key)) if key == 'sekundy' else thinking(r.get(key)) if key == 'myslenie_pct' else number(r.get(key))}</strong><span>{label}</span></div>' for key, label, suffix in [('sekundy','time',' s'),('tokeny','output tokens',''),('myslenie_pct','thinking','%'),('tok_s','tok/s',''),('linie','lines of code','')])
                 links = evidence_links(r)
                 if ep.get('prompt_file') is None and 'prompt_file' in ep:
                     links += f'<a href="/{text(r["prompt"])}">Prompt ↗</a>'
-                body.append(f'''<article class="run-result glass" id="run-{text(r['bieg'])}" data-run="{text(r['bieg'])}"><div class="run-result-head"><h4>Run {r.get("powtorzenie", f"{i:02}")}</h4><div class="run-effects v-{color}"><strong>{run_score(r)}</strong><span>{'checks' if ep.get('kind') == 'pixel' else 'effects'}</span></div></div><div class="run-metrics">{metrics}</div>{effort_note(r)}<p class="run-id">{text(r['bieg'])}</p>{f'<div class="foot">{links}</div>' if links else ''}</article>''')
+                body.append(f'''<article class="run-result glass" id="run-{text(r['bieg'])}" data-run="{text(r['bieg'])}"><div class="run-result-head"><h4>Run {r.get("powtorzenie", f"{i:02}")}</h4><div {score_attr}><strong>{run_score(r)}</strong><span>{'checks' if ep.get('kind') in ('pixel', 'zmienna') else 'effects'}</span></div></div><div class="run-metrics">{metrics}</div>{effort_note(r)}<p class="run-id">{text(r['bieg'])}</p>{f'<div class="foot">{links}</div>' if links else ''}</article>''')
             body.append('</div>')
         body.append('</div><p class="measurement-note">output = thinking + final code. Lines of code show the page size the model chose, not the cost of equivalent work.</p></section>')
         if compact:
@@ -538,7 +631,11 @@ def episode_body(ep, feed):
 def run_score(run):
     checks = run.get('checks')
     if checks:
-        return f'<a href="/{text(checks["plik"])}">{checks["passed"]} / {checks["total"]}</a>'
+        score = f'<a href="/{text(checks["plik"])}">{checks["passed"]} / {checks["total"]}</a>'
+        manual = checks.get('sprawdzone_recznie')
+        if manual:
+            score += f'<small class="manual-checks">grader {checks["grader_passed"]} · {len(manual)} checks verified by hand: {text(", ".join(manual))}</small>'
+        return score
     return number(run.get('efekty'))
 
 
@@ -566,6 +663,12 @@ def duration(value):
 
 def thesis_comparison(ep, ident):
     thesis = ep['thesis']
+    if ep.get('kind') == 'zmienna':
+        rows = []
+        for group in thesis['kohorty']:
+            measured = group['zakres']
+            rows.append(f'<div class="compare-row"><span class="compare-label" style="color:{text(group["kolor"])}">{text(group["etykieta"])}<span class="variant-sample">n={measured["n"]}</span></span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:{text(group["kolor"])};width:{measured["max"]/thesis["total"]*100:.4f}%"></div></div><strong class="compare-value">{number(measured["min"])}–{number(measured["max"])} / {thesis["total"]}</strong></div>')
+        return '<div class="comparison"><div class="compare-top"><h4>Repeated ranges · checks</h4></div><div class="compare-rows">' + ''.join(rows) + '</div></div>'
     sizes = sorted({m[v]['n'] for m in thesis['models'] for v in ['bare', 'karpathy'] if m.get(v)})
     sample_in_heading = ep.get('_sample_in_heading') and len(sizes) == 1
     key, label = ('checks', 'Checks') if thesis['metric'] == 'checks' else ('effects', 'Effects')
@@ -690,7 +793,13 @@ def preview_card(r, slug, prompt_file=None):
     description = {'bare': 'NO RULES, NO EXTRAS', 'karpathy': 'ONE RULES FILE'}.get(variant, 'PUBLISHED OUTPUT')
     prompt_link = '' if prompt_file else f'<a href="/{text(r["prompt"])}">Prompt ↗</a>'
     picture = preview_picture(r)
-    return f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}">{picture}</a><div class="body"><div class="name"><b class="v-{color}">{text(variant.upper())}</b><span class="tag">{description}</span></div><div class="kv">{f'<div><b>{run_score(r)}</b><small>checks</small></div>' if r.get("checks") else ""}<div><b>{duration(r.get('sekundy'))}</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{thinking(r.get('myslenie_pct'))}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div>{effort_note(r)}</div><div class="foot">{evidence_links(r)}{prompt_link}</div></div></div>'''
+    label = text(variant.upper())
+    color_attr = f'class="v-{color}"'
+    if r.get('grupa'):
+        label = text(r['etykieta'])
+        color_attr = f'style="color:{text(r["kolor"])}"'
+        description = 'PUBLISHED OUTPUT'
+    return f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}">{picture}</a><div class="body"><div class="name"><b {color_attr}>{label}</b><span class="tag">{description}</span></div><div class="kv">{f'<div><b>{run_score(r)}</b><small>checks</small></div>' if r.get("checks") else ""}<div><b>{duration(r.get('sekundy'))}</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{thinking(r.get('myslenie_pct'))}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div>{effort_note(r)}</div><div class="foot">{evidence_links(r)}{prompt_link}</div></div></div>'''
 
 
 def episode_teaser(ep, feed, latest=False):
@@ -710,13 +819,15 @@ def method_samples(episodes):
     for ep in episodes:
         groups = defaultdict(int)
         for run in ep['measurements']:
-            groups[(run['model'], run['wariant'])] += 1
+            key = run['grupa'] if ep.get('kind') == 'zmienna' else (run['model'], run['wariant'])
+            groups[key] += 1
         counts.extend(groups.values())
     repeated = sorted(set(n for n in counts if n >= 3))
     if not repeated:
         return 'Repeat each variant and compare the measured ranges.'
     sizes = ' / '.join(f'n={n}' for n in repeated)
-    return f'Published cohorts: {sizes} per variant. See each episode for cohort details.'
+    unit = 'group' if any(ep.get('kind') == 'zmienna' for ep in episodes) else 'variant'
+    return f'Published cohorts: {sizes} per {unit}. See each episode for cohort details.'
 
 
 def build(check=False):
@@ -734,6 +845,8 @@ def build(check=False):
     hero_model = text(model_parts[0].capitalize()) + (f' <span>{text(model_parts[1].upper())}</span>' if len(model_parts) > 1 else '')
     variants = ' VS '.join(f'<span class="v-{text(v)}">{text(v.upper())}</span>' for v in dict.fromkeys(r['wariant'] for r in latest['runs'])) if latest else 'BROWSE EPISODES'
     telemetry_title = 'LATEST EXPERIMENT' if latest else 'EXPLORE THE LAB'
+    if latest and latest.get('kind') == 'zmienna':
+        variants = ' VS '.join(f'<span style="color:{text(g["kolor"])}">{text(g["etykieta"])}</span>' for g in latest['cohorts'])
     telemetry = f'<a class="telemetry telemetry-run glass" href="/episodes/{latest["slug"]+"/" if latest else ""}" data-fx="fx-border fx-glass"><span class="tiny-label">{telemetry_title} <span>↗</span></span><strong>{hero_model}</strong><small><span class="violet-dot"></span>{variants}</small>{f"<small>{publication_time(latest)}</small>" if latest else ""}</a>'
     latest_section = (ROOT / 'bin/templates/latest.html').read_text().replace('{{cards}}', home_cards(episodes[:3], feed)).replace('{{episode_count}}', f'{len(episodes):02}') if episodes else f'<section id="episodes" class="empty-experiments" aria-labelledby="experiments-title"><p class="eyebrow"><span class="section-number">01 /</span> THE EXPERIMENTS</p><h2 id="experiments-title">The next experiment<br><span>starts here.</span></h2><p class="ep-subtitle">{EMPTY_FEED}</p><a class="text-link" href="https://www.youtube.com/@PCMagikLab">Watch the experiments on YouTube ↗</a></section>'
     outputs = {'index.html': template('home.html', latest_section=latest_section, method_samples=method_samples(episodes), telemetry=telemetry, episode_count=f'{len(episodes):02}', prompt_link=('/'+latest['prompt_file'] if latest.get('prompt_file') else '/'+latest['measurements'][0]['prompt']) if latest else '/episodes/')}

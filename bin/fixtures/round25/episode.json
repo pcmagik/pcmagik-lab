@@ -1,0 +1,620 @@
+{
+  "published": "2026-11-07",
+  "slug": "24-claude-code-lokalnie",
+  "title": "Claude Code for free on your own GPU? Qwen3.8 27B: 29 of 29, Pi 25–29",
+  "kind": "zmienna",
+  "task": "Pixel_Art_Editor",
+  "task_file": null,
+  "prompt_file": "episodes/24-claude-code-lokalnie/prompt.txt",
+  "youtube": "",
+  "opis": "Claude Code 2.1.310 with a local model: Qwen3.8 27B (Q4_K_M) in LM Studio 2.41.0 on one RTX 3090 24 GB, no subscription and no API key. Same task (Pixel_Art_Editor, Medium in Prompt Vault, 29 checks) in Pi 0.85.1, 3 runs each, model reloaded before every run, effort medium. Score after checking every lost point by hand in a browser: Claude Code 29 of 29 in every run, Pi 25–29 — the ranges overlap (Pi also reached 29); that is not proof of equal quality. Claude Code worked longer in every run (826–2202 s vs 156–199 s), wrote more output tokens (29132–56152 vs 8561–10645) and generated slower (32.5–41.1 vs 60.0–61.2 tok/s). These are properties of the whole setup (harness, system prompt, tools, protocol), not of the model alone. \"Free\" means no subscription or API key, not free hardware or power.",
+  "thesis": {
+    "metric": "checks",
+    "total": 29,
+    "zmienna": "harness",
+    "kohorty": [
+      {
+        "klucz": "claude-code",
+        "etykieta": "CLAUDE CODE",
+        "kolor": "#d97757",
+        "zakres": {
+          "min": 29,
+          "max": 29,
+          "n": 3,
+          "mean": 29.0
+        }
+      },
+      {
+        "klucz": "pi-agent",
+        "etykieta": "PI AGENT",
+        "kolor": "#a3e635",
+        "zakres": {
+          "min": 25,
+          "max": 29,
+          "n": 3,
+          "mean": 27.7
+        }
+      }
+    ],
+    "class": "nakladaja-sie",
+    "claim": "CLAUDE CODE 29, PI AGENT 25–29 of 29 checks across 6 runs; ranges overlap",
+    "models": [],
+    "pary": [],
+    "summary": {
+      "models": 1
+    }
+  },
+  "runs": [
+    {
+      "bieg": "claude-code_r2",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "claude",
+      "sekundy": 1929.1,
+      "tokeny": 56152,
+      "myslenie_pct": null,
+      "tok_s": 29.11,
+      "linie": 969,
+      "tokeny_myslenia": null,
+      "efekty": null,
+      "effort_zadany": "medium",
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": "medium",
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 29,
+        "total": 29,
+        "failed": [],
+        "plik": "episodes/24-claude-code-lokalnie/claude-code_r2/pixel-check.json",
+        "grader_passed": 26,
+        "sprawdzone_recznie": [
+          "eraser",
+          "dragIsOneStep",
+          "undoDepth20"
+        ]
+      },
+      "source_run": "cc-r2_qwen3.8-27b_bare_claude_emedium",
+      "powtorzenie": 2,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "strona": "episodes/24-claude-code-lokalnie/claude-code_r2/index.html",
+      "zrzut": "episodes/24-claude-code-lokalnie/claude-code_r2/screenshot-1920.png",
+      "zrzut_390": "episodes/24-claude-code-lokalnie/claude-code_r2/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/24-claude-code-lokalnie/claude-code_r2/preview-390.png",
+      "metrics": "episodes/24-claude-code-lokalnie/claude-code_r2/metrics.json",
+      "prompt": "episodes/24-claude-code-lokalnie/claude-code_r2/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 262144,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 128000,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "claude 2.1.310 (Claude Code) sha256:b73676430af12f97316a798b8371f81d640f90a58bdcb8f3ce56a835bb47df56",
+        "effort": "medium",
+        "rules": null
+      },
+      "etykieta": "CLAUDE CODE",
+      "kolor": "#d97757",
+      "grupa": "claude-code"
+    },
+    {
+      "bieg": "pi-agent_r2",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 196.01,
+      "tokeny": 10645,
+      "myslenie_pct": 38.92,
+      "tok_s": 54.31,
+      "linie": 644,
+      "tokeny_myslenia": 4143,
+      "efekty": null,
+      "effort_zadany": "medium",
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": "medium",
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 25,
+        "total": 29,
+        "failed": [
+          "redoShortcut",
+          "undoDepth20",
+          "dragIsOneStep",
+          "crisp"
+        ],
+        "plik": "episodes/24-claude-code-lokalnie/pi-agent_r2/pixel-check.json",
+        "grader_passed": 25,
+        "sprawdzone_recznie": []
+      },
+      "source_run": "ctl-A0-r2_qwen3.8-27b_bare_pi_emedium",
+      "powtorzenie": 2,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "strona": "episodes/24-claude-code-lokalnie/pi-agent_r2/index.html",
+      "zrzut": "episodes/24-claude-code-lokalnie/pi-agent_r2/screenshot-1920.png",
+      "zrzut_390": "episodes/24-claude-code-lokalnie/pi-agent_r2/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/24-claude-code-lokalnie/pi-agent_r2/preview-390.png",
+      "metrics": "episodes/24-claude-code-lokalnie/pi-agent_r2/metrics.json",
+      "prompt": "episodes/24-claude-code-lokalnie/pi-agent_r2/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 262144,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 131072,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": "medium",
+        "rules": null
+      },
+      "etykieta": "PI AGENT",
+      "kolor": "#a3e635",
+      "grupa": "pi-agent"
+    }
+  ],
+  "measurements": [
+    {
+      "bieg": "claude-code_r1",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "claude",
+      "sekundy": 826.27,
+      "tokeny": 29132,
+      "myslenie_pct": null,
+      "tok_s": 35.26,
+      "linie": 754,
+      "tokeny_myslenia": null,
+      "efekty": null,
+      "effort_zadany": "medium",
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": "medium",
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 29,
+        "total": 29,
+        "failed": [],
+        "plik": "episodes/24-claude-code-lokalnie/claude-code_r1/pixel-check.json",
+        "grader_passed": 29,
+        "sprawdzone_recznie": []
+      },
+      "source_run": "cc-r1_qwen3.8-27b_bare_claude_emedium",
+      "powtorzenie": 1,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "strona": "episodes/24-claude-code-lokalnie/claude-code_r1/index.html",
+      "zrzut": "episodes/24-claude-code-lokalnie/claude-code_r1/screenshot-1920.png",
+      "zrzut_390": "episodes/24-claude-code-lokalnie/claude-code_r1/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/24-claude-code-lokalnie/claude-code_r1/preview-390.png",
+      "metrics": "episodes/24-claude-code-lokalnie/claude-code_r1/metrics.json",
+      "prompt": "episodes/24-claude-code-lokalnie/claude-code_r1/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 262144,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 128000,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "claude 2.1.310 (Claude Code) sha256:b73676430af12f97316a798b8371f81d640f90a58bdcb8f3ce56a835bb47df56",
+        "effort": "medium",
+        "rules": null
+      },
+      "etykieta": "CLAUDE CODE",
+      "kolor": "#d97757",
+      "grupa": "claude-code"
+    },
+    {
+      "bieg": "claude-code_r2",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "claude",
+      "sekundy": 1929.1,
+      "tokeny": 56152,
+      "myslenie_pct": null,
+      "tok_s": 29.11,
+      "linie": 969,
+      "tokeny_myslenia": null,
+      "efekty": null,
+      "effort_zadany": "medium",
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": "medium",
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 29,
+        "total": 29,
+        "failed": [],
+        "plik": "episodes/24-claude-code-lokalnie/claude-code_r2/pixel-check.json",
+        "grader_passed": 26,
+        "sprawdzone_recznie": [
+          "eraser",
+          "dragIsOneStep",
+          "undoDepth20"
+        ]
+      },
+      "source_run": "cc-r2_qwen3.8-27b_bare_claude_emedium",
+      "powtorzenie": 2,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "strona": "episodes/24-claude-code-lokalnie/claude-code_r2/index.html",
+      "zrzut": "episodes/24-claude-code-lokalnie/claude-code_r2/screenshot-1920.png",
+      "zrzut_390": "episodes/24-claude-code-lokalnie/claude-code_r2/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/24-claude-code-lokalnie/claude-code_r2/preview-390.png",
+      "metrics": "episodes/24-claude-code-lokalnie/claude-code_r2/metrics.json",
+      "prompt": "episodes/24-claude-code-lokalnie/claude-code_r2/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 262144,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 128000,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "claude 2.1.310 (Claude Code) sha256:b73676430af12f97316a798b8371f81d640f90a58bdcb8f3ce56a835bb47df56",
+        "effort": "medium",
+        "rules": null
+      },
+      "etykieta": "CLAUDE CODE",
+      "kolor": "#d97757",
+      "grupa": "claude-code"
+    },
+    {
+      "bieg": "claude-code_r3",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "claude",
+      "sekundy": 2202.27,
+      "tokeny": 55333,
+      "myslenie_pct": null,
+      "tok_s": 25.13,
+      "linie": 771,
+      "tokeny_myslenia": null,
+      "efekty": null,
+      "effort_zadany": "medium",
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": "medium",
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 29,
+        "total": 29,
+        "failed": [],
+        "plik": "episodes/24-claude-code-lokalnie/claude-code_r3/pixel-check.json",
+        "grader_passed": 29,
+        "sprawdzone_recznie": []
+      },
+      "source_run": "cc-r3_qwen3.8-27b_bare_claude_emedium",
+      "powtorzenie": 3,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "strona": "episodes/24-claude-code-lokalnie/claude-code_r3/index.html",
+      "zrzut": "episodes/24-claude-code-lokalnie/claude-code_r3/screenshot-1920.png",
+      "zrzut_390": "episodes/24-claude-code-lokalnie/claude-code_r3/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/24-claude-code-lokalnie/claude-code_r3/preview-390.png",
+      "metrics": "episodes/24-claude-code-lokalnie/claude-code_r3/metrics.json",
+      "prompt": "episodes/24-claude-code-lokalnie/claude-code_r3/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 262144,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 128000,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "claude 2.1.310 (Claude Code) sha256:b73676430af12f97316a798b8371f81d640f90a58bdcb8f3ce56a835bb47df56",
+        "effort": "medium",
+        "rules": null
+      },
+      "etykieta": "CLAUDE CODE",
+      "kolor": "#d97757",
+      "grupa": "claude-code"
+    },
+    {
+      "bieg": "pi-agent_r1",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 199.26,
+      "tokeny": 10288,
+      "myslenie_pct": 17.89,
+      "tok_s": 51.63,
+      "linie": 677,
+      "tokeny_myslenia": 1841,
+      "efekty": null,
+      "effort_zadany": "medium",
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": "medium",
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 29,
+        "total": 29,
+        "failed": [],
+        "plik": "episodes/24-claude-code-lokalnie/pi-agent_r1/pixel-check.json",
+        "grader_passed": 29,
+        "sprawdzone_recznie": []
+      },
+      "source_run": "ctl-A0-r1_qwen3.8-27b_bare_pi_emedium",
+      "powtorzenie": 1,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "strona": "episodes/24-claude-code-lokalnie/pi-agent_r1/index.html",
+      "zrzut": "episodes/24-claude-code-lokalnie/pi-agent_r1/screenshot-1920.png",
+      "zrzut_390": "episodes/24-claude-code-lokalnie/pi-agent_r1/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/24-claude-code-lokalnie/pi-agent_r1/preview-390.png",
+      "metrics": "episodes/24-claude-code-lokalnie/pi-agent_r1/metrics.json",
+      "prompt": "episodes/24-claude-code-lokalnie/pi-agent_r1/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 262144,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 131072,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": "medium",
+        "rules": null
+      },
+      "etykieta": "PI AGENT",
+      "kolor": "#a3e635",
+      "grupa": "pi-agent"
+    },
+    {
+      "bieg": "pi-agent_r2",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 196.01,
+      "tokeny": 10645,
+      "myslenie_pct": 38.92,
+      "tok_s": 54.31,
+      "linie": 644,
+      "tokeny_myslenia": 4143,
+      "efekty": null,
+      "effort_zadany": "medium",
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": "medium",
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 25,
+        "total": 29,
+        "failed": [
+          "redoShortcut",
+          "undoDepth20",
+          "dragIsOneStep",
+          "crisp"
+        ],
+        "plik": "episodes/24-claude-code-lokalnie/pi-agent_r2/pixel-check.json",
+        "grader_passed": 25,
+        "sprawdzone_recznie": []
+      },
+      "source_run": "ctl-A0-r2_qwen3.8-27b_bare_pi_emedium",
+      "powtorzenie": 2,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "strona": "episodes/24-claude-code-lokalnie/pi-agent_r2/index.html",
+      "zrzut": "episodes/24-claude-code-lokalnie/pi-agent_r2/screenshot-1920.png",
+      "zrzut_390": "episodes/24-claude-code-lokalnie/pi-agent_r2/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/24-claude-code-lokalnie/pi-agent_r2/preview-390.png",
+      "metrics": "episodes/24-claude-code-lokalnie/pi-agent_r2/metrics.json",
+      "prompt": "episodes/24-claude-code-lokalnie/pi-agent_r2/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 262144,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 131072,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": "medium",
+        "rules": null
+      },
+      "etykieta": "PI AGENT",
+      "kolor": "#a3e635",
+      "grupa": "pi-agent"
+    },
+    {
+      "bieg": "pi-agent_r3",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 155.72,
+      "tokeny": 8561,
+      "myslenie_pct": 10.92,
+      "tok_s": 54.98,
+      "linie": 732,
+      "tokeny_myslenia": 935,
+      "efekty": null,
+      "effort_zadany": "medium",
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": "medium",
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 29,
+        "total": 29,
+        "failed": [],
+        "plik": "episodes/24-claude-code-lokalnie/pi-agent_r3/pixel-check.json",
+        "grader_passed": 27,
+        "sprawdzone_recznie": [
+          "sizeClears",
+          "clearConfirms"
+        ]
+      },
+      "source_run": "ctl-A0-r3_qwen3.8-27b_bare_pi_emedium",
+      "powtorzenie": 3,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "strona": "episodes/24-claude-code-lokalnie/pi-agent_r3/index.html",
+      "zrzut": "episodes/24-claude-code-lokalnie/pi-agent_r3/screenshot-1920.png",
+      "zrzut_390": "episodes/24-claude-code-lokalnie/pi-agent_r3/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/24-claude-code-lokalnie/pi-agent_r3/preview-390.png",
+      "metrics": "episodes/24-claude-code-lokalnie/pi-agent_r3/metrics.json",
+      "prompt": "episodes/24-claude-code-lokalnie/pi-agent_r3/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 262144,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 131072,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": "medium",
+        "rules": null
+      },
+      "etykieta": "PI AGENT",
+      "kolor": "#a3e635",
+      "grupa": "pi-agent"
+    }
+  ],
+  "cohorts": [
+    {
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "n": 3,
+      "kod": "claude-code",
+      "etykieta": "CLAUDE CODE",
+      "kolor": "#d97757",
+      "n_w_badaniu": 3,
+      "wybor": null,
+      "reprezentant": "claude-code_r2",
+      "reprezentant_powod": null
+    },
+    {
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "n": 3,
+      "kod": "pi-agent",
+      "etykieta": "PI AGENT",
+      "kolor": "#a3e635",
+      "n_w_badaniu": 3,
+      "wybor": null,
+      "reprezentant": "pi-agent_r2",
+      "reprezentant_powod": null
+    }
+  ],
+  "date": "2026-10-25",
+  "social_card": "episodes/24-claude-code-lokalnie/card.jpg"
+}

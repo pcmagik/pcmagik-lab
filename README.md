@@ -5,6 +5,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
 | 18 | [Local AI built 66 web pages. How many actually show up?](episodes/18-czy-strona-dziala/README.md) | easy | 9 | [YouTube](https://www.youtube.com/shorts/VR_8P5QqOBs) |
+| 17 | [Nemotron 3.5 Lightning said "Done." It overwrote its own work](episodes/17-pixel-nemotron-done/README.md) | Pixel_Art_Editor | 3 | [YouTube](https://www.youtube.com/shorts/3qSZqhZ6HAU) |
 | 15 | [Same model, same prompt: 29, 29 and 9 out of 29](episodes/15-pixel-rozrzut/README.md) | Pixel_Art_Editor | 3 | [YouTube](https://www.youtube.com/shorts/NFQZRo-lQnA) |
 | 14 | [Only 1 of 12 local model files never dropped below 28/29](episodes/14-pixel-ranking/README.md) | Pixel_Art_Editor | 36 | [YouTube](https://www.youtube.com/shorts/97iBgMEQLAE) |
 | 13 | [One rules file. Twelve models.](episodes/13-jeden-model-z-dwunastu/README.md) | easy | 72 | [YouTube](https://www.youtube.com/shorts/GTVkK2dTcNs) |

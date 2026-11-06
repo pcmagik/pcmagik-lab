@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pixel Art Editor</title>
+<style>
+  body {font-family: system-ui, sans-serif; background: #111; color: #eee; margin:0; padding:20px;}
+  h1 {margin:0 0 20px 0;}
+  .container {max-width: 960px; margin:0 auto;}
+  /* Toolbar */
+  .toolbar {display:flex; gap:8px; align-items:center; margin-bottom:16px;}
+  .tool-btn, .size-btn, .clear-btn {padding:6px 12px; font-size:14px; cursor:pointer; border:none; border-radius:4px; background:#333; color:#eee;}
+  .tool-btn.active, .size-btn.active, .clear-btn:hover {background:#555;}
+  /* Size selector */
+  .size-group {display:flex; gap:4px; margin-left:auto;}
+  .size-btn {flex:1; padding:6px; background:#444;}
+  .size-btn.active {background:#0a9;}
+  /* Controls */
+  .controls {margin:20px 0; display:flex; gap:12px; flex-wrap:wrap; align-items:center;}
+  .color-picker {width:36px; height:36px; border:none; cursor:pointer;}
+  .palette {display:flex; gap:4px; margin-left:8px; flex-wrap:wrap;}
+  .palette-color {width:24px; height:24px; border:1px solid #555; border-radius:3px; cursor:pointer;}
+  .palette-color.active {border-color:#fff; box-shadow:0 0 0 2px #0a9;}
+  .recent-colors {display:flex; gap:4px; margin-left:auto; flex-wrap:wrap;}
+  .recent-color {width:20px; height:20px; border:1px solid #555; border-radius:2px; cursor:pointer;}
+  /* Canvas container */
+  .canvas-wrapper {border:1px solid #333; background:#eee; display:inline-block; margin-bottom:20px; box-shadow:0 0 8px rgba(0,0,0,.4);}
+  canvas {background-color: #fff; display:block; cursor: crosshair;}
+  .instructions {font-size:12px; color:#aaa; margin-top:8px;}
+</style></head>
+<body>
+<div class="container">
+  <h1>Pixel Art Editor</h1>
+
+  <div class="toolbar">
+    <div class="size-group">
+      <button class="size-btn active" data-size="16">16×16</button>
+      <button class="size-btn" data-size="32">32×32</button>
+      <button class="size-btn" data-size="64">64×64</button>
+    </div>
+    <span style="margin-left:auto;">
+      <label>Grid: <input type="checkbox" id="grid-toggle" checked></label>
+    </span>
+  </div>
+
+  <div class="canvas-wrapper">
+    <canvas id="draw-canvas"></canvas>
+    <div class="instructions">Click / drag to draw. Use tools and colors below.</div>
+  </div>
+
+  <div class="controls">
+    <!-- Tools -->
+    <div style="flex-shrink:0;">
+      <button class="tool-btn active" data-tool="pencil">Pencil</button>
+      <button class="tool-btn" data-tool="eraser">Eraser</button>
+      <button class="tool-btn" data-tool="fill">Fill</button>
+      <button class="tool-btn" data-tool="eyedropper">Eyedropper</button>
+    </div>
+
+    <!-- Color picker and palette -->
+    <div style="margin-left:auto; display:flex; align-items:center; gap:4px;">
+      <input type="color" id="color-picker" class="color-picker" value="#ff0000">
+      <div class="palette" id="palette"></div>
+    </div>
+
+    <!-- Recent colors -->
+    <div style="margin-left:auto; display:flex; align-items:center; gap:2px;">
+      <span style="font-size:12px; color:#aaa;">Recent:</span>
+      <div class="recent-colors" id="recent-colors"></div>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div style="margin-top:16px; display:flex; gap:8px;">
+    <button class="clear-btn">Clear</button>
+    <button id="export-png" style="padding:6px 12px;">Download PNG</button>
+  </div>
+
+  <!-- Undo/Redo -->
+  <div style="margin-top:16px; display:flex; gap:8px; align-items:center;">
+    <button id="undo-btn">Undo</button>
+    <button id="redo-btn">Redo</button>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────
+const STATE = {
+  size: 16,
+  scale: 10, // export scale (pixels per block)
+  gridVisible: true,
+  currentTool: 'pencil',
+  currentColor: '#ff0000',
+
+  // Undo/redo: historyIndex points to the current state in undoStack
+  // -1 means no states saved yet, 0 = first snapshot, etc.
+  historyIndex: -1,
+  maxHistory: 20,
+  undoStack: [],
+  redoStack: [],
+
+  // Recent colors (8 most recent)
+  recentColors: [],
+
+  // Canvas pixel data: Uint32Array of argb values
+  pixels: null,
+
+  // Drag state
+  isDrawing: false,
+  lastX: -1,
+  lastY: -1,
+};
+
+function drawnHeight() {
+  return STATE.size * STATE.scale;
+}
+
+// ── Initialise canvas & palette ────────────────────────────────────
+function init() {
+  const canvas = document.getElementById('draw-canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+  // Apply size from URL query param if valid
+  const urlSize = new URLSearchParams(location.search).get('size');
+  if (urlSize && [16,32,64].includes(parseInt(urlSize))) {
+    STATE.size = parseInt(urlSize);
+  }
+
+  resizeCanvas();
+  loadFromStorage();
+
+  // Build preset palette (~16 colors)
+  const presetColors = [
+    '#ff0000', '#ff7f00', '#ffff00', '#00ff00',
+    '#007fff', '#00ffff', '#007fbf', '#0000ff',
+    '#7f00ff', '#ff00ff', '#ff007f', '#ffaa00',
+    '#888888', '#444444', '#ffffff', '#000000'
+  ];
+  const paletteDiv = document.getElementById('palette');
+  presetColors.forEach(c => {
+    const swatch = document.createElement('div');
+    swatch.className = 'palette-color';
+    swatch.style.backgroundColor = c;
+    swatch.title = c;
+    swatch.dataset.color = c;
+    swatch.addEventListener('click', () => setColor(c));
+    paletteDiv.appendChild(swatch);
+  });
+
+  // Recent colors strip — 8 slots
+  const recentDiv = document.getElementById('recent-colors');
+  for (let i = 0; i < 8; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'recent-color';
+    dot.style.backgroundColor = '#333';
+    recentDiv.appendChild(dot);
+  }
+  STATE.recentDots = Array.from(recentDiv.children);
+
+  // Tool buttons — toggle active state
+  document.querySelectorAll('.tool-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelector('.tool-btn.active')?.classList.remove('active');
+      btn.classList.add('active');
+      STATE.currentTool = btn.dataset.tool;
+      if (btn.dataset.tool === 'eyedropper') {
+        canvas.style.cursor = 'crosshair';
+      } else {
+        canvas.style.cursor = 'default';
+      }
+    });
+  });
+
+  // Size buttons — ask confirmation and clear drawing
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const newSize = parseInt(e.target.dataset.size);
+      if (newSize === STATE.size) return;
+      if (!confirm(`Switch to ${newSize}×${newSize} grid? This will clear the drawing.`)) return;
+      STATE.size = newSize;
+      resizeCanvas();
+      saveToStorage(); // persist new size preference
+      loadFromStorage(); // this will clear the canvas content
+    });
+  });
+
+  // Grid toggle
+  document.getElementById('grid-toggle').addEventListener('change', e => {
+    STATE.gridVisible = e.target.checked;
+    redrawCanvas();
+  });
+
+  // Color picker — update current color
+  const colorPicker = document.getElementById('color-picker');
+  colorPicker.addEventListener('input', e => {
+    setColor(e.target.value);
+  });
+
+  // Palette click delegation
+  paletteDiv.addEventListener('click', e => {
+    if (e.target.classList.contains('palette-color')) {
+      setColor(e.target.dataset.color);
+    }
+  });
+
+  // Recent color slot clicks
+  STATE.recentDots.forEach((dot, i) => {
+    dot.addEventListener('click', e => {
+      const color = STATE.recentColors[i];
+      if (color) setColor(color);
+    });
+  });
+
+  // Clear button
+  document.querySelector('.clear-btn').addEventListener('click', () => {
+    if (confirm('Clear the canvas?')) {
+      clearCanvas();
+    }
+  });
+
+  // Export PNG — downscaled with crisp pixels
+  document.getElementById('export-png').addEventListener('click', () => exportPNG());
+
+  // Undo / Redo buttons
+  document.getElementById('undo-btn').addEventListener('click', undo);
+  document.getElementById('redo-btn').addEventListener('click', redo);
+
+  // Keyboard shortcuts: Ctrl+Z / Ctrl+Shift+Z
+  document.addEventListener('keydown', e => {
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      if (e.shiftKey) redo(); else undo();
+    }
+  });
+
+  // Mouse events for drawing
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('mouseleave', endDraw);
+
+  // Touch support (basic)
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e.touches[0]); });
+  canvas.addEventListener('touchend', endDraw);
+
+  // ── Core drawing helpers ───────────────────────────────────────
+
+  function pixelIndex(x, y) {
+    return y * STATE.size + x;
+  }
+
+  function setColor(hex) {
+    STATE.currentColor = hex;
+    document.getElementById('color-picker').value = hex;
+    updateRecentColor(hex);
+  }
+
+  function updateRecentColor(hex) {
+    // Remove existing occurrence if present
+    const idx = STATE.recentColors.indexOf(hex);
+    if (idx >= 0) STATE.recentColors.splice(idx, 1);
+    STATE.recentColors.push(hex);
+    while (STATE.recentColors.length > 8) STATE.recentColors.shift();
+    // Update UI dots
+    STATE.recentDots.forEach((dot, i) => {
+      dot.style.backgroundColor = STATE.recentColors[i] || '#333';
+    });
+  }
+
+  function startDraw(e) {
+    const {x, y} = windowToCanvas(canvas, e.clientX, e.clientY);
+    if (x < 0 || x >= STATE.size || y < 0 || y >= STATE.size) return;
+    STATE.isDrawing = true;
+    STATE.lastX = x;
+    STATE.lastY = y;
+
+    if (STATE.currentTool === 'eyedropper') {
+      const idx = pixelIndex(x, y);
+      const col = STATE.pixels[idx];
+      if (col !== 0) {
+        const rgb = argbToRgb(col);
+        setColor(`rgb(${rgb.r},${rgb.g},${rgb.b})`);
+      }
+      STATE.isDrawing = false;
+      return;
+    }
+
+    // For pencil/eraser: mark the first pixel
+    markPixel(x, y);
+    redrawCanvas();
+    // Note: endDraw will push the undo step, so a single-click stroke is one step
+  }
+
+  function draw(e) {
+    if (!STATE.isDrawing) return;
+    const {x, y} = windowToCanvas(canvas, e.clientX, e.clientY);
+    if (x < 0 || x >= STATE.size || y < 0 || y >= STATE.size) return;
+    markPixel(x, y);
+    redrawCanvas();
+    STATE.lastX = x;
+    STATE.lastY = y;
+  }
+
+  function endDraw() {
+    if (!STATE.isDrawing) return;
+    STATE.isDrawing = false;
+    // Push one undo step for this entire stroke
+    pushUndoStep();
+  }
+
+  function markPixel(x, y) {
+    const idx = pixelIndex(x, y);
+    const alpha = getAlphaFromColor(STATE.currentColor);
+    const r = getRedFromColor(STATE.currentColor);
+    const g = getGreenFromColor(STATE.currentColor);
+    const b = getBlueFromColor(STATE.currentColor);
+
+    if (STATE.currentTool === 'eraser') {
+      STATE.pixels[idx] = 0; // transparent
+    } else {
+      // Pencil: set pixel color
+      STATE.pixels[idx] = argbFromRgba(r, g, b, 1);
+    }
+  }
+
+  // Color component extractors from #hex
+  function getAlphaFromColor(hex) {
+    const h = hex.replace('#','');
+    if (h.length === 3) { h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2]; }
+    const v = parseInt(h,16);
+    return (v >>> 24) & 0xff;
+  }
+  function getRedFromColor(hex) {
+    const h = hex.replace('#','');
+    if (h.length === 3) { h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2]; }
+    return (parseInt(h,16) >>> 16) & 0xff;
+  }
+  function getGreenFromColor(hex) {
+    const h = hex.replace('#','');
+    if (h.length === 3) { h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2]; }
+    return (parseInt(h,16) >>> 8) & 0xff;
+  }
+  function getBlueFromColor(hex) {
+    const h = hex.replace('#','');
+    if (h.length === 3) { h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2]; }
+    return parseInt(h,16) & 0xff;
+  }
+
+  function argbFromRgba(r, g, b, a) {
+    const aa = Math.round(a * 255);
+    return (aa << 24) | (r << 16) | (g << 8) | b;
+  }
+
+  function argbToRgb(argb) {
+    return {
+      r: (argb >>> 16) & 0xff,
+      g: (argb >>> 8) & 0xff,
+      b: argb & 0xff
+    };
+  }
+
+  // ── Flood fill (BFS — iterative, no stack overflow) ───────────
+
+  function floodFill(x, y) {
+    const targetIdx = pixelIndex(x, y);
+    const targetColor = STATE.pixels[targetIdx];
+    if (targetColor === 0) return; // don't fill transparent
+
+    const {r: tr, g: tg, b: tb} = argbToRgb(targetColor);
+    const newAlpha = getAlphaFromColor(STATE.currentColor);
+    const newR = getRedFromColor(STATE.currentColor);
+    const newG = getGreenFromColor(STATE.currentColor);
+    const newB = getBlueFromColor(STATE.currentColor);
+
+    // BFS using array as queue
+    const queue = [[x, y]];
+    const visited = new Set();
+    visited.add(`${x},${y}`);
+
+    const dirs = [[1,0], [-1,0], [0,1], [0,-1]];
+
+    while (queue.length > 0) {
+      const [cx, cy] = queue.shift();
+      const idx = pixelIndex(cx, cy);
+      const cellColor = STATE.pixels[idx];
+      if (cellColor === 0) continue;
+      const {r: cr, g: cg, b: cb} = argbToRgb(cellColor);
+      if (cr !== tr || cg !== tg || cb !== tb) continue;
+
+      STATE.pixels[idx] = argbFromRgba(newR, newG, newB, newAlpha);
+
+      for (const [dx, dy] of dirs) {
+        const nx = cx + dx, ny = cy + dy;
+        if (nx >= 0 && nx < STATE.size && ny >= 0 && ny < STATE.size) {
+          const key = `${nx},${ny}`;
+          if (!visited.has(key)) {
+            visited.add(key);
+            queue.push([nx, ny]);
+          }
+        }
+      }
+    }
+  }
+
+  // ── Undo / Redo ────────────────────────────────────────────────
+
+  function pushUndoStep() {
+    const snapshot = STATE.pixels.slice();
+    // If user just did a new action after redo, clear the redo stack
+    if (STATE.redoStack.length > 0) {
+      STATE.redoStack = [];
+    }
+    // Snapshot into undo stack
+    if (STATE.historyIndex < STATE.maxHistory - 1) {
+      STATE.historyIndex++;
+      // Trim any old entries beyond historyIndex
+      STATE.undoStack = STATE.undoStack.slice(0, STATE.historyIndex);
+      STATE.undoStack.push(snapshot);
+      if (STATE.undoStack.length > STATE.maxHistory) {
+        STATE.undoStack.shift();
+        STATE.historyIndex = STATE.maxHistory - 1;
+      }
+    } else {
+      // History full: drop oldest, shift all up
+      STATE.undoStack.shift();
+      // historyIndex stays at maxHistory-1 conceptually
+    }
+    updateUIButtons();
+    redrawCanvas();
+  }
+
+  function undo() {
+    if (STATE.historyIndex <= 0) return;
+    STATE.historyIndex--;
+    const snapshot = STATE.undoStack[STATE.historyIndex];
+    if (snapshot) {
+      STATE.pixels = snapshot;
+      redrawCanvas();
+    }
+    updateUIButtons();
+  }
+
+  function redo() {
+    if (STATE.historyIndex >= STATE.undoStack.length) return;
+    const snapshot = STATE.undoStack[STATE.historyIndex];
+    if (snapshot) {
+      STATE.pixels = snapshot;
+      STATE.historyIndex++;
+      redrawCanvas();
+    }
+    updateUIButtons();
+  }
+
+  function updateUIButtons() {
+    const canUndo = STATE.historyIndex > 0;
+    const canRedo = STATE.historyIndex < STATE.undoStack.length;
+    document.getElementById('undo-btn').disabled = !canUndo;
+    document.getElementById('redo-btn').disabled = !canRedo;
+  }
+
+  // ── Export PNG ─────────────────────────────────────────────────
+
+  function exportPNG() {
+    const canvasEl = document.getElementById('draw-canvas');
+    const ctx = canvasEl.getContext('2d');
+
+    const outputSize = STATE.size * STATE.scale;
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = outputSize;
+    outCanvas.height = outputSize;
+    const outCtx = outCanvas.getContext('2d');
+
+    // No anti-aliasing — crisp pixel edges
+    outCtx.imageSmoothingEnabled = false;
+    const imgData = outCtx.createImageData(outputSize, outputSize);
+    const data = imgData.data;
+
+    for (let y = 0; y < STATE.size; y++) {
+      for (let x = 0; x < STATE.size; x++) {
+        const idx = pixelIndex(x, y);
+        const argb = STATE.pixels[idx];
+        const i = (y * outputSize + x) * 4;
+
+        let r, g, b, a;
+        if (argb === 0) {
+          a = 0; r = g = b = 0;
+        } else {
+          const {r:R, g:G, b:B} = argbToRgb(argb);
+          r = R; g = G; b = B; a = 255;
+        }
+        data[i] = r;
+        data[i+1] = g;
+        data[i+2] = b;
+        data[i+3] = a;
+      }
+    }
+
+    outCtx.putImageData(imgData, 0, 0);
+
+    const link = document.createElement('a');
+    link.download = 'pixel-art.png';
+    link.href = outCanvas.toDataURL('image/png');
+    link.click();
+  }
+
+  // ── Clear canvas ───────────────────────────────────────────────
+
+  function clearCanvas() {
+    memset(STATE.pixels, 0, STATE.pixels.byteLength);
+    redrawCanvas();
+    saveToStorage();
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────
+
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const drawnWidth = STATE.size * STATE.scale;
+    canvas.width = drawnWidth * dpr;
+    canvas.height = drawnHeight() * dpr;
+    ctx.scale(dpr, dpr);
+    canvas.style.width = `${drawnWidth}px`;
+    canvas.style.height = `${drawnHeight()}px`;
+
+    const data = new Uint32Array(STATE.size * STATE.size);
+    STATE.pixels = data;
+    memset(data, 0, data.byteLength);
+
+    redrawCanvas();
+  }
+
+  function memset(buf, val, len) {
+    for (let i = 0; i < len/4; i++) buf[i] = val;
+  }
+
+  function redrawCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const drawnWidth = STATE.size * STATE.scale;
+    const drawnHeight = drawnHeight();
+
+    // Draw checkerboard background for transparent pixels
+    const checkSize = STATE.scale; // each checkerboard cell matches one pixel
+    for (let gy = 0; gy < STATE.size; gy++) {
+      for (let gx = 0; gx < STATE.size; gx++) {
+        const isCheckered = (gx + gy) % 2 === 0;
+        ctx.fillStyle = isCheckered ? '#e0e0e0' : '#f0f0f0'; // light checkerboard
+        ctx.fillRect(gx * checkSize, gy * checkSize, checkSize, checkSize);
+      }
+    }
+
+    // Render each opaque pixel on top of the checkerboard
+    for (let y = 0; y < STATE.size; y++) {
+      for (let x = 0; x < STATE.size; x++) {
+        const idx = pixelIndex(x, y);
+        const argb = STATE.pixels[idx];
+        if (argb === 0) continue; // transparent shows checkerboard below
+
+        const {r, g, b} = argbToRgb(argb);
+        ctx.fillStyle = `rgba(${r},${g},${b},1)`;
+        const px = x * STATE.scale;
+        const py = y * STATE.scale;
+        // Use scale-1 so there's a 1px gap between pixels for crispness
+        ctx.fillRect(px + 0.5, py + 0.5, STATE.scale - 1, STATE.scale - 1);
+      }
+    }
+
+    // Draw grid lines on top if visible
+    if (STATE.gridVisible) {
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= STATE.size; i++) {
+        const pos = i * STATE.scale;
+        ctx.beginPath();
+        ctx.moveTo(pos, 0);
+        ctx.lineTo(pos, drawnHeight);
+        ctx.moveTo(0, pos);
+        ctx.lineTo(drawnWidth, pos);
+        ctx.stroke();
+      }
+    }
+  }
+
+  function windowToCanvas(canvasElem, x, y) {
+    const rect = canvasElem.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    // Convert to canvas logical coordinates (undo DPR scaling)
+    const cx = (x - rect.left) / rect.width * STATE.size * STATE.scale / dpr;
+    const cy = (y - rect.top) / rect.height * STATE.size * STATE.scale / dpr;
+    const gx = Math.floor(cx / STATE.scale);
+    const gy = Math.floor(cy / STATE.scale);
+    return { x: gx, y: gy };
+  }
+
+  function saveToStorage() {
+    try {
+      const data = {
+        size: STATE.size,
+        pixels: Array.from(STATE.pixels),
+        currentColor: STATE.currentColor,
+        currentTool: STATE.currentTool,
+        recentColors: STATE.recentColors,
+        gridVisible: STATE.gridVisible
+      };
+      localStorage.setItem('pixelArtEditor', JSON.stringify(data));
+    } catch(e) { /* storage full or disabled */ }
+  }
+
+  function loadFromStorage() {
+    try {
+      const data = JSON.parse(localStorage.getItem('pixelArtEditor'));
+      if (data) {
+        STATE.size = data.size || 16;
+        STATE.currentColor = data.currentColor || '#ff0000';
+        STATE.currentTool = data.currentTool || 'pencil';
+        STATE.gridVisible = data.gridVisible !== false;
+        if (Array.isArray(data.pixels)) {
+          STATE.pixels = new Uint32Array(data.pixels);
+        } else {
+          STATE.pixels = new Uint32Array(STATE.size * STATE.size);
+          memset(STATE.pixels, 0, STATE.pixels.byteLength);
+        }
+        if (Array.isArray(data.recentColors)) {
+          STATE.recentColors = data.recentColors;
+        }
+        // Resize canvas to match stored size
+        resizeCanvas();
+        redrawCanvas();
+      }
+    } catch(e) {}
+  }
+
+  // Init the editor
+  init();
+});
+</script>
+</body>
+</html>

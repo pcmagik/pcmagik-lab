@@ -116,10 +116,10 @@ class VariableEpisodeTest(unittest.TestCase):
         self.load()
         html = site.episode_body(self.ep, self.feed)
         hero = re.search(r'<div class="result-hero.*?</div><a ', html, re.S)[0]
-        self.assertIn(self.ep['thesis']['claim'], hero)
+        self.assertNotIn(self.ep['thesis']['claim'], hero)
         self.assertIn('Ranges overlap · no demonstrated difference', hero)
         self.assertNotIn('not measured yet', hero)
-        for label, color, span in [('CLAUDE CODE', '#d97757', '29–29'), ('PI AGENT', '#a3e635', '25–29')]:
+        for label, color, span in [('CLAUDE CODE', '#d97757', '29'), ('PI AGENT', '#a3e635', '25–29')]:
             self.assertIn(f'style="color:{color}">{label}', html)
             self.assertIn(f'{span} checks / 29', hero)
         for run, note in [('claude-code_r2', 'grader 26 · 3 checks verified by hand: eraser, dragIsOneStep, undoDepth20'), ('pi-agent_r3', 'grader 27 · 2 checks verified by hand: sizeClears, clearConfirms')]:

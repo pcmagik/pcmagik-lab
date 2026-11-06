@@ -348,8 +348,8 @@ def thesis_result(ep):
     thesis = ep['thesis']
     verdict = text(thesis['claim'])
     if ep.get('kind') == 'zmienna':
-        verdict += ' · ' + ' · '.join(
-            f'<span style="color:{text(g["kolor"])}">{text(g["etykieta"])}: {number(g["zakres"]["min"])}–{number(g["zakres"]["max"])} checks / {thesis["total"]}</span>'
+        verdict = ' · '.join(
+            f'<span style="color:{text(g["kolor"])}">{text(g["etykieta"])}: {variable_range(g["zakres"])} checks / {thesis["total"]}</span>'
             for g in thesis['kohorty'])
         verdict += ' · ' + text(CLASSES[thesis['class']])
     elif ep.get('kind') == 'para-wariantow':
@@ -602,7 +602,7 @@ def episode_body(ep, feed):
                 links = evidence_links(r)
                 if ep.get('prompt_file') is None and 'prompt_file' in ep:
                     links += f'<a href="/{text(r["prompt"])}">Prompt ↗</a>'
-                body.append(f'''<article class="run-result glass" id="run-{text(r['bieg'])}" data-run="{text(r['bieg'])}"><div class="run-result-head"><h4>Run {r.get("powtorzenie", f"{i:02}")}</h4><div {score_attr}><strong>{run_score(r)}</strong><span>{'checks' if ep.get('kind') in ('pixel', 'zmienna') else 'effects'}</span></div></div><div class="run-metrics">{metrics}</div>{effort_note(r)}<p class="run-id">{text(r['bieg'])}</p>{f'<div class="foot">{links}</div>' if links else ''}</article>''')
+                body.append(f'''<article class="run-result glass" id="run-{text(r['bieg'])}" data-run="{text(r['bieg'])}"><div class="run-result-head"><h4>Run {r.get("powtorzenie", f"{i:02}")}</h4><div {score_attr}><strong>{run_score(r)}</strong><span>{'checks' if ep.get('kind') in ('pixel', 'zmienna') else 'effects'}</span></div></div>{manual_checks_note(r)}<div class="run-metrics">{metrics}</div>{effort_note(r)}<p class="run-id">{text(r['bieg'])}</p>{f'<div class="foot">{links}</div>' if links else ''}</article>''')
             body.append('</div>')
         body.append('</div><p class="measurement-note">output = thinking + final code. Lines of code show the page size the model chose, not the cost of equivalent work.</p></section>')
         if compact:
@@ -632,11 +632,21 @@ def run_score(run):
     checks = run.get('checks')
     if checks:
         score = f'<a href="/{text(checks["plik"])}">{checks["passed"]} / {checks["total"]}</a>'
-        manual = checks.get('sprawdzone_recznie')
-        if manual:
-            score += f'<small class="manual-checks">grader {checks["grader_passed"]} · {len(manual)} checks verified by hand: {text(", ".join(manual))}</small>'
         return score
     return number(run.get('efekty'))
+
+
+def manual_checks_note(run):
+    checks = run.get('checks') or {}
+    manual = checks.get('sprawdzone_recznie')
+    if not manual:
+        return ''
+    return f'<p class="manual-checks">grader {checks["grader_passed"]} · {len(manual)} checks verified by hand: {text(", ".join(manual))}</p>'
+
+
+def variable_range(measured):
+    low, high = number(measured['min']), number(measured['max'])
+    return low if measured['min'] == measured['max'] else f'{low}–{high}'
 
 
 def study_for(ep):
@@ -667,7 +677,7 @@ def thesis_comparison(ep, ident):
         rows = []
         for group in thesis['kohorty']:
             measured = group['zakres']
-            rows.append(f'<div class="compare-row"><span class="compare-label" style="color:{text(group["kolor"])}">{text(group["etykieta"])}<span class="variant-sample">n={measured["n"]}</span></span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:{text(group["kolor"])};width:{measured["max"]/thesis["total"]*100:.4f}%"></div></div><strong class="compare-value">{number(measured["min"])}–{number(measured["max"])} / {thesis["total"]}</strong></div>')
+            rows.append(f'<div class="compare-row"><span class="compare-label" style="color:{text(group["kolor"])}">{text(group["etykieta"])} <span class="variant-sample">n={measured["n"]}</span></span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:{text(group["kolor"])};width:{measured["max"]/thesis["total"]*100:.4f}%"></div></div><strong class="compare-value">{variable_range(measured)} / {thesis["total"]}</strong></div>')
         return '<div class="comparison"><div class="compare-top"><h4>Repeated ranges · checks</h4></div><div class="compare-rows">' + ''.join(rows) + '</div></div>'
     sizes = sorted({m[v]['n'] for m in thesis['models'] for v in ['bare', 'karpathy'] if m.get(v)})
     sample_in_heading = ep.get('_sample_in_heading') and len(sizes) == 1
@@ -799,7 +809,7 @@ def preview_card(r, slug, prompt_file=None):
         label = text(r['etykieta'])
         color_attr = f'style="color:{text(r["kolor"])}"'
         description = 'PUBLISHED OUTPUT'
-    return f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}">{picture}</a><div class="body"><div class="name"><b {color_attr}>{label}</b><span class="tag">{description}</span></div><div class="kv">{f'<div><b>{run_score(r)}</b><small>checks</small></div>' if r.get("checks") else ""}<div><b>{duration(r.get('sekundy'))}</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{thinking(r.get('myslenie_pct'))}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div>{effort_note(r)}</div><div class="foot">{evidence_links(r)}{prompt_link}</div></div></div>'''
+    return f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}">{picture}</a><div class="body"><div class="name"><b {color_attr}>{label}</b><span class="tag">{description}</span></div><div class="kv">{f'<div><b>{run_score(r)}</b><small>checks</small></div>' if r.get("checks") else ""}<div><b>{duration(r.get('sekundy'))}</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{thinking(r.get('myslenie_pct'))}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div>{effort_note(r)}</div>{manual_checks_note(r)}<div class="foot">{evidence_links(r)}{prompt_link}</div></div></div>'''
 
 
 def episode_teaser(ep, feed, latest=False):

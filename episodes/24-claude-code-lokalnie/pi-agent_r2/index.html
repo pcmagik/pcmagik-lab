@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Art Editor</title>
+<style>
+  /* ---------- Global theme ---------- */
+  :root {
+    --bg: #1e2026;
+    --panel: #2a2d36;
+    --panel-2: #33363f;
+    --border: #454956;
+    --text: #e8eaf0;
+    --muted: #9aa0b0;
+    --accent: #4f8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px 12px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .app {
+    width: 100%;
+    max-width: 720px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.4);
+  }
+  h1 {
+    font-size: 18px;
+    margin: 0 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h1 .dot {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    display: inline-block;
+    image-rendering: pixelated;
+  }
+
+  /* ---------- Canvas ---------- */
+  .canvas-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  #board {
+    display: block;
+    width: min(512px, 100%);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    background: #fff;
+    cursor: crosshair;
+    touch-action: none; /* let pointer events handle dragging on touch */
+  }
+
+  /* ---------- Generic rows ---------- */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .row label, .row .label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-right: 2px;
+  }
+
+  button, select {
+    font: inherit;
+    color: var(--text);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background .12s, border-color .12s;
+  }
+  button:hover, select:hover { background: #3d414d; }
+  button:active { transform: translateY(1px); }
+  button:disabled { opacity: .4; cursor: default; transform: none; }
+
+  /* Tool buttons show a visible active state */
+  .tool {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tool .icon { font-size: 15px; line-height: 1; }
+  .tool.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .tool.active:hover { background: var(--accent); }
+
+  .primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .primary:hover { background: #3f7cf0; }
+  .danger:hover { background: #b3372f; border-color: #b3372f; }
+
+  /* ---------- Color controls ---------- */
+  #colorInput {
+    width: 42px; height: 32px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-2);
+    cursor: pointer;
+  }
+  .swatch {
+    width: 26px; height: 26px;
+    padding: 0;
+    border-radius: 5px;
+    border: 2px solid rgba(255,255,255,.18);
+    cursor: pointer;
+  }
+  .swatch.active {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .swatch.empty {
+    visibility: hidden; /* placeholder to keep the recents strip width stable */
+  }
+  .recents-box {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding-left: 10px;
+    border-left: 1px solid var(--border);
+  }
+
+  .check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .check input { accent-color: var(--accent); }
+
+  .hint { font-size: 11px; color: var(--muted); margin: 4px 2px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1><span class="dot"></span>Pixel Art Editor</h1>
+
+  <!-- Drawing surface (internal resolution is always 512x512; we draw the
+       grid at integer cell sizes, which keeps every edge pixel-crisp). -->
+  <div class="canvas-wrap">
+    <canvas id="board" width="512" height="512" aria-label="Pixel art canvas"></canvas>
+  </div>
+
+  <!-- Tools -->
+  <div class="row" role="toolbar" aria-label="Tools">
+    <button class="tool active" data-tool="pencil"    title="Pencil (paint with current color)"><span class="icon">&#9998;</span>Pencil</button>
+    <button class="tool" data-tool="eraser"    title="Eraser (make pixels transparent)"><span class="icon">&#10068;</span>Eraser</button>
+    <button class="tool" data-tool="fill"      title="Fill (flood-fill contiguous area)"><span class="icon">&#128330;</span>Fill</button>
+    <button class="tool" data-tool="eyedropper" title="Eyedropper (pick a pixel's color)"><span class="icon">&#128004;</span>Eyedropper</button>
+  </div>
+
+  <!-- Color picker + palette + recent colors -->
+  <div class="row">
+    <input type="color" id="colorInput" value="#1a1a1a" title="Pick a custom color">
+    <span class="label">Palette</span>
+    <span id="palette" style="display:inline-flex;gap:6px;"></span>
+    <span class="recents-box">
+      <span class="label">Recent</span>
+      <span id="recents" style="display:inline-flex;gap:6px;"></span>
+    </span>
+  </div>
+
+  <!-- Grid size, grid overlay, undo/redo, actions -->
+  <div class="row">
+    <label for="sizeSelect">Size</label>
+    <select id="sizeSelect" title="Canvas resolution (changing size clears the drawing)">
+      <option value="16">16 &times; 16</option>
+      <option value="32">32 &times; 32</option>
+      <option value="64">64 &times; 64</option>
+    </select>
+
+    <label class="check">
+      <input type="checkbox" id="gridToggle" checked>
+      Show grid
+    </label>
+
+    <span style="flex:1 1 auto"></span>
+
+    <button id="undoBtn" title="Undo (Ctrl/Cmd+Z)">&#8630; Undo</button>
+    <button id="redoBtn" title="Redo (Ctrl/Cmd+Shift+Z)">&#8631; Redo</button>
+    <button id="clearBtn" class="danger" title="Clear the canvas">Clear</button>
+    <button id="exportBtn" class="primary" title="Download as PNG (10px per pixel)">&#8681; Download PNG</button>
+  </div>
+  <p class="hint">Drag to draw &middot; one drag = one undo step &middot; drawing auto-saves to localStorage</p>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================================
+ * State
+ * ========================================================================= */
+const CANVAS_PX = 512;              // internal canvas resolution
+const HISTORY_LIMIT = 50;           // undo/redo depth (>= 20 required)
+const LS_KEY = "pixel-art-editor-v1";
+
+let size    = 16;                  // grid size (16 | 32 | 64)
+let pixels  = new Array(size * size).fill(null);  // null = transparent, else CSS color
+let tool    = "pencil";
+let color   = "#1a1a1a";           // current drawing color
+let recents = [];                  // up to 8 most-recently-used colors
+let showGrid = true;
+
+let history   = [];                // array of pixel-snapshots
+let histIndex = -1;                // index of the "current" snapshot in history
+
+/* 16 preset palette colors */
+const PALETTE = [
+  "#1a1a1a", "#ffffff", "#808080", "#d7ccc8",
+  "#e53935", "#fb8c00", "#fdd835", "#8bc34a",
+  "#43a047", "#00acc1", "#1e88e5", "#3949ab",
+  "#8e24aa", "#d81b60", "#f48fb1", "#795548"
+];
+
+/* =========================================================================
+ * DOM references
+ * ========================================================================= */
+const canvas      = document.getElementById("board");
+const ctx         = canvas.getContext("2d");
+const colorInput  = document.getElementById("colorInput");
+const paletteEl   = document.getElementById("palette");
+const recentsEl   = document.getElementById("recents");
+const sizeSelect  = document.getElementById("sizeSelect");
+const gridToggle  = document.getElementById("gridToggle");
+const undoBtn     = document.getElementById("undoBtn");
+const redoBtn     = document.getElementById("redoBtn");
+const clearBtn    = document.getElementById("clearBtn");
+const exportBtn   = document.getElementById("exportBtn");
+const toolButtons = Array.from(document.querySelectorAll(".tool"));
+
+/* =========================================================================
+ * Rendering
+ *
+ * The canvas is 512x512; the grid cell size is 512/size, an integer for all
+ * supported sizes (32, 16, 8 px). All drawing happens at integer coordinates
+ * with fillRect, so there is no anti-aliasing on pixel edges.
+ * ========================================================================= */
+function render() {
+  const cell = CANVAS_PX / size;
+
+  ctx.clearRect(0, 0, CANVAS_PX, CANVAS_PX);
+
+  // Base + light checkerboard (visible only where pixels are transparent,
+  // since opaque pixels are painted on top).
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, CANVAS_PX, CANVAS_PX);
+  ctx.fillStyle = "#e7e9ef";
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if ((x + y) & 1) ctx.fillRect(x * cell, y * cell, cell, cell);
+    }
+  }
+
+  // Opaque pixels
+  for (let i = 0; i < pixels.length; i++) {
+    const c = pixels[i];
+    if (!c) continue;
+    ctx.fillStyle = c;
+    ctx.fillRect((i % size) * cell, ((i / size) | 0) * cell, cell, cell);
+  }
+
+  // Subtle grid overlay (half-pixel offset keeps 1px lines crisp)
+  if (showGrid) {
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.14)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let k = 1; k < size; k++) {
+      const p = Math.round(k * cell) + 0.5;
+      ctx.moveTo(p, 0);  ctx.lineTo(p, CANVAS_PX);
+      ctx.moveTo(0, p);  ctx.lineTo(CANVAS_PX, p);
+    }
+    ctx.stroke();
+  }
+}
+
+/* =========================================================================
+ * History (undo / redo)
+ * A "step" is a full snapshot of the pixel array. One drag stroke pushes
+ * exactly one step (we snapshot on pointerdown, before the first paint).
+ * ========================================================================= */
+function pushHistory() {
+  // Discard any redo tail, then record the pre-change state.
+  history = history.slice(0, histIndex + 1);
+  history.push(pixels.slice());
+  if (history.length > HISTORY_LIMIT) history.shift();
+  histIndex = history.length - 1;
+  updateHistoryButtons();
+}
+
+function restore(index) {
+  pixels = history[index].slice();
+  render();
+  save();
+}
+
+function undo() {
+  if (histIndex > 0) {
+    histIndex--;
+    restore(histIndex);
+    updateHistoryButtons();
+  }
+}
+
+function redo() {
+  if (histIndex < history.length - 1) {
+    histIndex++;
+    restore(histIndex);
+    updateHistoryButtons();
+  }
+}
+
+function updateHistoryButtons() {
+  undoBtn.disabled = histIndex <= 0;
+  redoBtn.disabled = histIndex >= history.length - 1;
+}
+
+/* =========================================================================
+ * Flood fill (iterative BFS — safe even on 64x64 / 4096 cells)
+ * ========================================================================= */
+function floodFill(startIdx, newColor) {
+  const target = pixels[startIdx];
+  if (target === newColor) return;  // nothing to do
+
+  const queue = [startIdx];
+  while (queue.length > 0) {
+    const i = queue.pop();
+    if (pixels[i] !== target) continue;   // already filled / different color
+    pixels[i] = newColor;
+
+    const x = i % size, y = (i / size) | 0;
+    if (x > 0)        queue.push(i - 1);
+    if (x < size - 1) queue.push(i + 1);
+    if (y > 0)        queue.push(i - size);
+    if (y < size - 1) queue.push(i + size);
+  }
+}
+
+/* =========================================================================
+ * Color handling (current color, palette, recent colors)
+ * ========================================================================= */
+function setColor(c, skipRecents = false) {
+  color = c;
+  colorInput.value = c;
+  renderPaletteHighlight();
+}
+
+function renderPaletteHighlight() {
+  paletteEl.querySelectorAll(".swatch").forEach(el => {
+    el.classList.toggle("active", el.dataset.color === color.toLowerCase());
+  });
+}
+
+function pushRecent(c) {
+  if (!c) return;
+  const cLow = c.toLowerCase();
+  recents = [cLow, ...recents.filter(x => x !== cLow)].slice(0, 8);
+  renderRecents();
+  save();
+}
+
+function renderRecents() {
+  recentsEl.innerHTML = "";
+  for (let i = 0; i < 8; i++) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "swatch" + (i < recents.length ? "" : " empty");
+    if (i < recents.length) {
+      btn.style.background = recents[i];
+      btn.title = recents[i];
+      btn.addEventListener("click", () => {
+        setColor(recents[i]);
+        if (tool === "eraser") setTool("pencil");  // sensible default: pick color -> draw
+      });
+    }
+    recentsEl.appendChild(btn);
+  }
+}
+
+function buildPalette() {
+  paletteEl.innerHTML = "";
+  for (const c of PALETTE) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "swatch";
+    btn.dataset.color = c.toLowerCase();
+    btn.style.background = c;
+    btn.title = c;
+    btn.addEventListener("click", () => {
+      setColor(c);
+      if (tool === "eraser") setTool("pencil");
+    });
+    paletteEl.appendChild(btn);
+  }
+}
+
+/* =========================================================================
+ * Tools
+ * ========================================================================= */
+function setTool(t) {
+  tool = t;
+  toolButtons.forEach(b => b.classList.toggle("active", b.dataset.tool === t));
+  save();
+}
+toolButtons.forEach(b => b.addEventListener("click", () => setTool(b.dataset.tool)));
+
+/* =========================================================================
+ * Drawing input (click + drag)
+ * ========================================================================= */
+let drawing   = false;   // a stroke is in progress
+let lastCell  = -1;      // last painted cell index (for line interpolation)
+
+function eventToCell(e) {
+  const r = canvas.getBoundingClientRect();
+  const x = Math.floor(((e.clientX - r.left) / r.width)  * size);
+  const y = Math.floor(((e.clientY - r.top)  / r.height) * size);
+  if (x < 0 || y < 0 || x >= size || y >= size) return -1;
+  return y * size + x;
+}
+
+/** Bresenham line of cell indices between two cells (inclusive).
+ *  Keeps strokes smooth even when the pointer moves faster than cell size. */
+function lineCells(a, b) {
+  const ax = a % size, ay = (a / size) | 0;
+  const bx = b % size, by = (b / size) | 0;
+  const out = [];
+  let x = ax, y = ay;
+  const dx = Math.abs(bx - ax), dy = Math.abs(by - ay);
+  const sx = ax < bx ? 1 : -1, sy = ay < by ? 1 : -1;
+  let err = dx - dy;
+  for (;;) {
+    out.push(y * size + x);
+    if (x === bx && y === by) break;
+    const e2 = 2 * err;
+    if (e2 > -dy) { err -= dy; x += sx; }
+    if (e2 <  dx) { err += dx; y += sy; }
+  }
+  return out;
+}
+
+function paintCell(i) {
+  const v = (tool === "eraser") ? null : color;
+  if (pixels[i] === v) return;
+  pixels[i] = v;
+}
+
+function strokeTo(cellIdx) {
+  const cells = (lastCell >= 0 && lastCell !== cellIdx)
+    ? lineCells(lastCell, cellIdx)
+    : [cellIdx];
+  for (const i of cells) paintCell(i);
+  lastCell = cellIdx;
+  render();
+  save();
+}
+
+canvas.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  const i = eventToCell(e);
+  if (i < 0) return;
+  canvas.setPointerCapture(e.pointerId);
+
+  if (tool === "pencil" || tool === "eraser") {
+    pushHistory();          // one drag = one undo step
+    pushRecent(color);      // update "recent colors" as the user draws
+    drawing = true;
+    lastCell = -1;
+    strokeTo(i);
+  } else if (tool === "fill") {
+    pushHistory();
+    pushRecent(color);
+    floodFill(i, color);
+    render();
+    save();
+  } else if (tool === "eyedropper") {
+    const c = pixels[i];
+    if (c) setColor(c);     // transparent pixels: pick nothing
+  }
+});
+
+canvas.addEventListener("pointermove", (e) => {
+  if (!drawing) return;
+  const i = eventToCell(e);
+  if (i < 0) return;
+  strokeTo(i);
+});
+
+window.addEventListener("pointerup",    () => { drawing = false; lastCell = -1; });
+window.addEventListener("pointercancel",() => { drawing = false; lastCell = -1; });
+
+// Prevent the native color dialog / context menu from interfering
+canvas.addEventListener("contextmenu", e => e.preventDefault());
+
+/* =========================================================================
+ * Color picker
+ * ========================================================================= */
+colorInput.addEventListener("input", () => {
+  setColor(colorInput.value);
+  pushRecent(color);
+  save();
+});
+
+/* =========================================================================
+ * Grid size / grid overlay / clear
+ * ========================================================================= */
+sizeSelect.addEventListener("change", () => {
+  const s = parseInt(sizeSelect.value, 10);
+  if (s === size) return;
+  if (!confirm("Changing the grid size will clear your drawing. Continue?")) {
+    sizeSelect.value = String(size);
+    return;
+  }
+  size = s;
+  pixels = new Array(size * size).fill(null);
+  pushHistory();
+  render();
+  save();
+});
+
+gridToggle.addEventListener("change", () => {
+  showGrid = gridToggle.checked;
+  render();
+  save();
+});
+
+clearBtn.addEventListener("click", () => {
+  if (!confirm("Clear the entire canvas?")) return;
+  pushHistory();
+  pixels = new Array(pixels.length).fill(null);
+  render();
+  save();
+});
+
+/* =========================================================================
+ * Undo / redo (buttons + Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl/Cmd+Y)
+ * ========================================================================= */
+undoBtn.addEventListener("click", undo);
+redoBtn.addEventListener("click", redo);
+
+window.addEventListener("keydown", (e) => {
+  const mod = e.ctrlKey || e.metaKey;
+  if (!mod) return;
+  const k = e.key.toLowerCase();
+  if (k === "z") {
+    e.preventDefault();
+    if (e.shiftKey) redo(); else undo();
+  } else if (k === "y") {
+    e.preventDefault();
+    redo();
+  }
+});
+
+/* =========================================================================
+ * Export: each art pixel becomes a 10x10 block; transparency preserved.
+ * ========================================================================= */
+exportBtn.addEventListener("click", () => {
+  const SCALE = 10;
+  const off = document.createElement("canvas");
+  off.width = off.height = size * SCALE;
+  const octx = off.getContext("2d");
+  for (let i = 0; i < pixels.length; i++) {
+    const c = pixels[i];
+    if (!c) continue;
+    octx.fillStyle = c;
+    octx.fillRect((i % size) * SCALE, ((i / size) | 0) * SCALE, SCALE, SCALE);
+  }
+  const a = document.createElement("a");
+  a.download = "pixel-art.png";
+  a.href = off.toDataURL("image/png");
+  a.click();
+});
+
+/* =========================================================================
+ * Persistence (auto-save to localStorage, restore on load)
+ * ========================================================================= */
+function save() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      size, pixels, color, recents, tool, showGrid
+    }));
+  } catch (err) { /* storage full/unavailable — non-fatal */ }
+}
+
+function load() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(LS_KEY)); } catch (err) { /* ignore */ }
+  if (!d || !Array.isArray(d.pixels) || ![16, 32, 64].includes(d.size)) return;
+
+  size     = d.size;
+  pixels   = d.pixels.length === size * size ? d.pixels : new Array(size * size).fill(null);
+  color    = typeof d.color === "string" ? d.color : color;
+  recents  = Array.isArray(d.recents) ? d.recents.slice(0, 8) : [];
+  tool     = ["pencil", "eraser", "fill", "eyedropper"].includes(d.tool) ? d.tool : "pencil";
+  showGrid = d.showGrid !== false;
+
+  sizeSelect.value = String(size);
+  gridToggle.checked = showGrid;
+}
+
+/* =========================================================================
+ * Init
+ * ========================================================================= */
+buildPalette();
+load();
+setColor(color, true);
+renderRecents();
+setTool(tool);
+pushHistory();   // initial blank/loaded state is step 0 of history
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pixel Art Editor</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { --bg:#111; --panel:#1e1e1e; --text:#eee; --accent:#4da3ff; }
+  * { box-sizing:border-box }
+  body { margin:0; font-family:system-ui,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); display:flex; flex-direction:column; height:100vh }
+  header { padding:8px 12px; background:#181818; border-bottom:1px solid #333; display:flex; align-items:center; gap:12px; flex-wrap:wrap }
+  header h1 { font-size:16px; margin:0; font-weight:600 }
+  .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+  button, select, input[type="color"] { background:#2a2a2a; color:var(--text); border:1px solid #444; padding:6px 10px; border-radius:6px; cursor:pointer }
+  button.active { outline:2px solid var(--accent) }
+  button:disabled { opacity:.4; cursor:not-allowed }
+  .palette { display:flex; gap:4px; margin-left:8px }
+  .swatch { width:22px; height:22px; border:1px solid #555; border-radius:4px; cursor:pointer }
+  .recent { display:flex; gap:4px; margin-left:8px }
+  .recent .swatch { width:18px; height:18px }
+  main { flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; padding:16px }
+  #canvasWrap { background:#222; padding:12px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,.4) }
+  canvas { image-rendering:pixelated; cursor:crosshair; display:block; background:#fff }
+  .row { display:flex; align-items:center; gap:8px }
+  label { font-size:13px }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pixel Art Editor</h1>
+  <div class="toolbar">
+    <div class="row">
+      <button data-tool="pencil" class="active">Pencil</button>
+      <button data-tool="eraser">Eraser</button>
+      <button data-tool="fill">Fill</button>
+      <button data-tool="eyedropper">Eyedropper</button>
+    </div>
+    <div class="row">
+      <input id="colorPicker" type="color" value="#000000">
+      <div class="palette" id="palette"></div>
+      <div class="recent" id="recent"></div>
+    </div>
+    <div class="row">
+      <label><input id="gridToggle" type="checkbox" checked> Grid</label>
+      <select id="sizeSelect">
+        <option value="16">16×16</option>
+        <option value="32">32×32</option>
+        <option value="64">64×64</option>
+      </select>
+    </div>
+    <div class="row">
+      <button id="undoBtn">Undo</button>
+      <button id="redoBtn">Redo</button>
+      <button id="clearBtn">Clear</button>
+      <button id="downloadBtn">Download PNG</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div id="canvasWrap">
+    <canvas id="canvas" width="320" height="320"></canvas>
+  </div>
+</main>
+<script>
+(() => {
+  // State
+  const pixelSize = 20;
+  let gridSize = 16;
+  let grid = [];
+  let currentTool = 'pencil';
+  let currentColor = '#000000';
+  let showGrid = true;
+  let recentColors = [];
+  let history = [];
+  let historyIndex = -1;
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  // UI refs
+  const colorPicker = document.getElementById('colorPicker');
+  const paletteEl = document.getElementById('palette');
+  const recentEl = document.getElementById('recent');
+  const gridToggle = document.getElementById('gridToggle');
+  const sizeSelect = document.getElementById('sizeSelect');
+  const undoBtn = document.getElementById('undoBtn');
+  const redoBtn = document.getElementById('redoBtn');
+
+  // Preset palette ~16 colors
+  const presets = [
+    '#000000','#ffffff','#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff',
+    '#ffa500','#800080','#a52a2a','#ffc0cb','#808080','#404040','#c0c0c0','#008000'
+  ];
+
+  // Helpers
+  const cloneGrid = g => g.map(row => row.slice());
+  const createEmptyGrid = size => Array.from({length:size},()=>Array(size).fill(null));
+  const setCanvasSize = () => {
+    canvas.width = gridSize * pixelSize;
+    canvas.height = gridSize * pixelSize;
+  };
+  const getPixelFromEvent = e => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = Math.floor((e.clientX - rect.left) * scaleX / pixelSize);
+    const y = Math.floor((e.clientY - rect.top) * scaleY / pixelSize);
+    return {x: Math.max(0,Math.min(gridSize-1,x)), y: Math.max(0,Math.min(gridSize-1,y))};
+  };
+  const setPixel = (x,y,color) => { if(x>=0&&x<gridSize&&y>=0&&y<gridSize) grid[y][x]=color; };
+
+  // Rendering
+  function render() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // checkerboard for transparency
+    const light = '#f0f0f0', dark = '#e0e0e0';
+    for(let y=0;y<gridSize;y++){
+      for(let x=0;x<gridSize;x++){
+        ctx.fillStyle = ((x+y)%2===0)?light:dark;
+        ctx.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+      }
+    }
+    // pixels
+    for(let y=0;y<gridSize;y++){
+      for(let x=0;x<gridSize;x++){
+        const c = grid[y][x];
+        if(c){
+          ctx.fillStyle = c;
+          ctx.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+        }
+      }
+    }
+    // grid overlay
+    if(showGrid){
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = 1;
+      for(let i=0;i<=gridSize;i++){
+        ctx.beginPath();
+        ctx.moveTo(i*pixelSize+0.5,0);
+        ctx.lineTo(i*pixelSize+0.5,canvas.height);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0,i*pixelSize+0.5);
+        ctx.lineTo(canvas.width,i*pixelSize+0.5);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // History
+  function pushHistory() {
+    const snap = cloneGrid(grid);
+    // avoid duplicate consecutive states
+    if(historyIndex>=0 && JSON.stringify(history[historyIndex])===JSON.stringify(snap)) return;
+    history = history.slice(0, historyIndex+1);
+    history.push(snap);
+    historyIndex++;
+    if(history.length>50){ history.shift(); historyIndex--; }
+    updateUndoRedoButtons();
+    persist();
+  }
+  function undo() {
+    if(historyIndex>0){
+      historyIndex--;
+      grid = cloneGrid(history[historyIndex]);
+      render();
+      updateUndoRedoButtons();
+      persist();
+    }
+  }
+  function redo() {
+    if(historyIndex < history.length-1){
+      historyIndex++;
+      grid = cloneGrid(history[historyIndex]);
+      render();
+      updateUndoRedoButtons();
+      persist();
+    }
+  }
+  function updateUndoRedoButtons(){
+    undoBtn.disabled = historyIndex<=0;
+    redoBtn.disabled = historyIndex>=history.length-1;
+  }
+
+  // Recent colors
+  function addRecent(color){
+    if(!color) return;
+    recentColors = recentColors.filter(c=>c!==color);
+    recentColors.unshift(color);
+    if(recentColors.length>8) recentColors.pop();
+    renderRecent();
+    persist();
+  }
+  function renderRecent(){
+    recentEl.innerHTML='';
+    recentColors.forEach(c=>{
+      const d=document.createElement('div');
+      d.className='swatch';
+      d.style.background=c;
+      d.title=c;
+      d.onclick=()=>{ currentColor=c; colorPicker.value=c; };
+      recentEl.appendChild(d);
+    });
+  }
+
+  // Palette UI
+  presets.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='swatch';
+    d.style.background=c;
+    d.title=c;
+    d.onclick=()=>{ currentColor=c; colorPicker.value=c; addRecent(c); };
+    paletteEl.appendChild(d);
+  });
+
+  // Flood fill BFS
+  function floodFill(sx,sy,newColor){
+    const oldColor = grid[sy][sx];
+    if(oldColor===newColor) return false;
+    const queue=[[sx,sy]];
+    let head=0;
+    while(head<queue.length){
+      const [x,y]=queue[head++];
+      if(x<0||x>=gridSize||y<0||y>=gridSize) continue;
+      if(grid[y][x]!==oldColor) continue;
+      grid[y][x]=newColor;
+      queue.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+    }
+    return true;
+  }
+
+  // Bresenham line for smooth drag
+  function paintLine(x0,y0,x1,y1,color){
+    let dx=Math.abs(x1-x0), dy=Math.abs(y1-y0);
+    let sx=x0<x1?1:-1, sy=y0<y1?1:-1;
+    let err=dx-dy;
+    let x=x0, y=y0;
+    while(true){
+      setPixel(x,y,color);
+      if(x===x1 && y===y1) break;
+      const e2=2*err;
+      if(e2>-dy){ err-=dy; x+=sx; }
+      if(e2<dx){ err+=dx; y+=sy; }
+    }
+  }
+
+  // Persistence
+  function persist(){
+    const data={gridSize,grid,currentColor,currentTool,showGrid,recentColors};
+    localStorage.setItem('pixelArtEditor', JSON.stringify(data));
+  }
+  function load(){
+    const raw=localStorage.getItem('pixelArtEditor');
+    if(!raw) return false;
+    try{
+      const data=JSON.parse(raw);
+      gridSize=data.gridSize||16;
+      grid=data.grid||createEmptyGrid(gridSize);
+      currentColor=data.currentColor||'#000000';
+      currentTool=data.currentTool||'pencil';
+      showGrid=data.showGrid!==false;
+      recentColors=data.recentColors||[];
+      colorPicker.value=currentColor;
+      gridToggle.checked=showGrid;
+      sizeSelect.value=String(gridSize);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  // Init
+  function init(){
+    if(!load()){
+      grid=createEmptyGrid(gridSize);
+    }
+    setCanvasSize();
+    render();
+    renderRecent();
+    updateUndoRedoButtons();
+    pushHistory(); // initial state
+    // UI bindings
+    document.querySelectorAll('[data-tool]').forEach(btn=>{
+      btn.onclick=()=>{
+        document.querySelectorAll('[data-tool]').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTool=btn.dataset.tool;
+        persist();
+      };
+    });
+    colorPicker.oninput=e=>{ currentColor=e.target.value; persist(); };
+    gridToggle.onchange=e=>{ showGrid=e.target.checked; render(); persist(); };
+    sizeSelect.onchange=e=>{
+      const newSize=parseInt(e.target.value,10);
+      if(newSize===gridSize) return;
+      if(grid.some(row=>row.some(c=>c!==null))){
+        if(!confirm('Changing size will clear the drawing. Continue?')){ sizeSelect.value=String(gridSize); return; }
+      }
+      gridSize=newSize;
+      grid=createEmptyGrid(gridSize);
+      setCanvasSize();
+      render();
+      pushHistory();
+    };
+    undoBtn.onclick=undo;
+    redoBtn.onclick=redo;
+    document.getElementById('clearBtn').onclick=()=>{
+      if(!confirm('Clear the canvas?')) return;
+      grid=createEmptyGrid(gridSize);
+      render();
+      pushHistory();
+    };
+    document.getElementById('downloadBtn').onclick=()=>{
+      const scale=10;
+      const exportCanvas=document.createElement('canvas');
+      exportCanvas.width=gridSize*scale;
+      exportCanvas.height=gridSize*scale;
+      const ectx=exportCanvas.getContext('2d');
+      ectx.imageSmoothingEnabled=false;
+      for(let y=0;y<gridSize;y++){
+        for(let x=0;x<gridSize;x++){
+          const c=grid[y][x];
+          if(c){
+            ectx.fillStyle=c;
+            ectx.fillRect(x*scale,y*scale,scale,scale);
+          }
+        }
+      }
+      const url=exportCanvas.toDataURL('image/png');
+      const a=document.createElement('a');
+      a.href=url;
+      a.download=`pixel-art-${gridSize}x${gridSize}.png`;
+      a.click();
+    };
+    // Keyboard shortcuts
+    window.addEventListener('keydown',e=>{
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){
+        e.preventDefault();
+        if(e.shiftKey) redo(); else undo();
+      }
+    });
+  }
+
+  // Mouse handling
+  let isDrawing=false;
+  let lastPos=null;
+  let beforeStroke=null;
+
+  canvas.addEventListener('mousedown',e=>{
+    const pos=getPixelFromEvent(e);
+    if(currentTool==='eyedropper'){
+      const c=grid[pos.y][pos.x];
+      if(c){ currentColor=c; colorPicker.value=c; }
+      return;
+    }
+    isDrawing=true;
+    lastPos=pos;
+    beforeStroke=cloneGrid(grid);
+    if(currentTool==='fill'){
+      const changed=floodFill(pos.x,pos.y,currentColor);
+      if(changed){ pushHistory(); addRecent(currentColor); render(); }
+      isDrawing=false;
+    }
+  });
+  canvas.addEventListener('mousemove',e=>{
+    if(!isDrawing) return;
+    const pos=getPixelFromEvent(e);
+    if(currentTool==='pencil' || currentTool==='eraser'){
+      const color = currentTool==='eraser'?null:currentColor;
+      paintLine(lastPos.x,lastPos.y,pos.x,pos.y,color);
+      lastPos=pos;
+      render();
+    }
+  });
+  window.addEventListener('mouseup',()=>{
+    if(isDrawing && (currentTool==='pencil'||currentTool==='eraser')){
+      isDrawing=false;
+      // push as single step
+      const changed = JSON.stringify(beforeStroke)!==JSON.stringify(grid);
+      if(changed){ pushHistory(); addRecent(currentColor); }
+    } else {
+      isDrawing=false;
+    }
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>

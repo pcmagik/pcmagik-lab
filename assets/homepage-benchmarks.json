@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated": "2026-11-08",
+  "generated": "2026-11-11",
   "source": "seria/harness/publikuj.py",
   "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
   "episodes": [
@@ -623,6 +623,1221 @@
       ],
       "date": "2026-10-25",
       "social_card": "episodes/24-claude-code-lokalnie/card.jpg"
+    },
+    {
+      "published": "2026-11-11",
+      "slug": "19-muse-glimmer-dwa-pliki",
+      "title": "Same model, two files: Meta vs Unsloth Muse Glimmer",
+      "kind": "pixel",
+      "task": "Pixel_Art_Editor",
+      "task_file": null,
+      "prompt_file": "episodes/19-muse-glimmer-dwa-pliki/prompt.txt",
+      "youtube": "https://www.youtube.com/shorts/dKNoML5N7fA",
+      "opis": "One model, Muse Glimmer, as two GGUF files: Meta Q4_K_M and Unsloth Q4_K_XL. Same pixel art editor prompt, 3 runs each. Without rules, the Unsloth file generates more tokens per second in every run (40.3–41.0 vs 38.8–39.1 tok/s) and still finishes later in every run (220–352 s vs 127–185 s), because it thinks longer (4 727–10 104 vs 1 670–3 185 thinking tokens). Scores out of 29 overlap: no rules 28 in all 3 runs vs 24–29, with rules 28–29 vs 28–29. With rules the time overlaps. Task: Pixel_Art_Editor from Prompt Vault, graded by a script with 29 checks. Harness: Pi. LM Studio defaults, no fixed seed; the model was reloaded before every run. Full cohort measurements, representative pages and prompts are available on the episode page.",
+      "thesis": {
+        "metric": "checks",
+        "models": [
+          {
+            "model": "meta/muse-glimmer",
+            "n_bare": 3,
+            "n_karpathy": 3,
+            "bare": {
+              "min": 23,
+              "max": 24,
+              "n": 3,
+              "mean": 23.7
+            },
+            "karpathy": {
+              "min": 23,
+              "max": 24,
+              "n": 3,
+              "mean": 23.3
+            },
+            "class": "nakladaja-sie",
+            "karpathy_ponizej_kazdego_bare": 0,
+            "karpathy_powyzej_kazdego_bare": 0,
+            "zmiana_sredniej_pct": -1.4
+          },
+          {
+            "model": "unsloth/muse-glimmer-30b",
+            "n_bare": 3,
+            "n_karpathy": 3,
+            "bare": {
+              "min": 21,
+              "max": 25,
+              "n": 3,
+              "mean": 23.3
+            },
+            "karpathy": {
+              "min": 21,
+              "max": 24,
+              "n": 3,
+              "mean": 22.3
+            },
+            "class": "nakladaja-sie",
+            "karpathy_ponizej_kazdego_bare": 0,
+            "karpathy_powyzej_kazdego_bare": 0,
+            "zmiana_sredniej_pct": -4.3
+          }
+        ],
+        "summary": {
+          "models": 2,
+          "karpathy-mniej": 0,
+          "nakladaja-sie": 2,
+          "karpathy-wiecej": 0,
+          "brak-danych": 0,
+          "jeden-wariant": 0
+        },
+        "total": 29,
+        "pary": [
+          {
+            "wariant": "bare",
+            "wszystkie": 1,
+            "rozstrzygniete": 0
+          },
+          {
+            "wariant": "karpathy",
+            "wszystkie": 1,
+            "rozstrzygniete": 0
+          }
+        ],
+        "claim": "0 of 2 models: every Karpathy run below every bare run (checks passed)"
+      },
+      "runs": [
+        {
+          "bieg": "muse-glimmer_bare_r3",
+          "model": "meta/muse-glimmer",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 175.39,
+          "tokeny": 6863,
+          "myslenie_pct": 35.25,
+          "tok_s": 39.13,
+          "linie": 483,
+          "tokeny_myslenia": 2419,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 23,
+            "total": 29,
+            "failed": [
+              "sizeClears",
+              "drawsDrag",
+              "eraser",
+              "undoDepth20",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/pixel-check.json"
+          },
+          "source_run": "pix-r3_muse-glimmer_bare_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "meta/muse-glimmer",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "muse-glimmer_karpathy_r1",
+          "model": "meta/muse-glimmer",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 177.65,
+          "tokeny": 6943,
+          "myslenie_pct": 45.99,
+          "tok_s": 39.08,
+          "linie": 416,
+          "tokeny_myslenia": 3193,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 23,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "undoDepth20",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/pixel-check.json"
+          },
+          "source_run": "pix-r1_muse-glimmer_karpathy_pi_emedium",
+          "powtorzenie": 1,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/preview-390.png",
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "meta/muse-glimmer",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/19-muse-glimmer-dwa-pliki/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "muse-glimmer-30b_bare_r2",
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 270.01,
+          "tokeny": 10884,
+          "myslenie_pct": 63.11,
+          "tok_s": 40.31,
+          "linie": 425,
+          "tokeny_myslenia": 6869,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 21,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "redoShortcut",
+              "undoDepth20",
+              "exportPng",
+              "persists",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/pixel-check.json"
+          },
+          "source_run": "pix-r2_muse-glimmer-30b_bare_pi_emedium",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "unsloth/muse-glimmer-30b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "muse-glimmer-30b_karpathy_r3",
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 231.23,
+          "tokeny": 9370,
+          "myslenie_pct": 55.29,
+          "tok_s": 40.52,
+          "linie": 492,
+          "tokeny_myslenia": 5181,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 24,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/pixel-check.json"
+          },
+          "source_run": "pix-r3_muse-glimmer-30b_karpathy_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/preview-390.png",
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "unsloth/muse-glimmer-30b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/19-muse-glimmer-dwa-pliki/rules/karpathy/AGENTS.md"
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "bieg": "muse-glimmer_bare_r1",
+          "model": "meta/muse-glimmer",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 127.0,
+          "tokeny": 4928,
+          "myslenie_pct": 33.89,
+          "tok_s": 38.8,
+          "linie": 337,
+          "tokeny_myslenia": 1670,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 24,
+            "total": 29,
+            "failed": [
+              "sizeConfirms",
+              "drawsDrag",
+              "eraser",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r1/pixel-check.json"
+          },
+          "source_run": "pix-r1_muse-glimmer_bare_pi_emedium",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r1/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r1/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r1/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r1/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "meta/muse-glimmer",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "muse-glimmer_bare_r2",
+          "model": "meta/muse-glimmer",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 184.63,
+          "tokeny": 7216,
+          "myslenie_pct": 44.14,
+          "tok_s": 39.08,
+          "linie": 446,
+          "tokeny_myslenia": 3185,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 24,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r2/pixel-check.json"
+          },
+          "source_run": "pix-r2_muse-glimmer_bare_pi_emedium",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r2/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r2/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r2/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "meta/muse-glimmer",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "muse-glimmer_bare_r3",
+          "model": "meta/muse-glimmer",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 175.39,
+          "tokeny": 6863,
+          "myslenie_pct": 35.25,
+          "tok_s": 39.13,
+          "linie": 483,
+          "tokeny_myslenia": 2419,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 23,
+            "total": 29,
+            "failed": [
+              "sizeClears",
+              "drawsDrag",
+              "eraser",
+              "undoDepth20",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/pixel-check.json"
+          },
+          "source_run": "pix-r3_muse-glimmer_bare_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_bare_r3/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "meta/muse-glimmer",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "muse-glimmer_karpathy_r1",
+          "model": "meta/muse-glimmer",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 177.65,
+          "tokeny": 6943,
+          "myslenie_pct": 45.99,
+          "tok_s": 39.08,
+          "linie": 416,
+          "tokeny_myslenia": 3193,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 23,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "undoDepth20",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/pixel-check.json"
+          },
+          "source_run": "pix-r1_muse-glimmer_karpathy_pi_emedium",
+          "powtorzenie": 1,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/preview-390.png",
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r1/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "meta/muse-glimmer",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/19-muse-glimmer-dwa-pliki/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "muse-glimmer_karpathy_r2",
+          "model": "meta/muse-glimmer",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 231.13,
+          "tokeny": 9086,
+          "myslenie_pct": 58.02,
+          "tok_s": 39.31,
+          "linie": 392,
+          "tokeny_myslenia": 5272,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 23,
+            "total": 29,
+            "failed": [
+              "sizeClears",
+              "drawsDrag",
+              "eraser",
+              "undoDepth20",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r2/pixel-check.json"
+          },
+          "source_run": "pix-r2_muse-glimmer_karpathy_pi_emedium",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r2/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r2/preview-390.png",
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r2/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r2/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "meta/muse-glimmer",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/19-muse-glimmer-dwa-pliki/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "muse-glimmer_karpathy_r3",
+          "model": "meta/muse-glimmer",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 121.35,
+          "tokeny": 4720,
+          "myslenie_pct": 17.97,
+          "tok_s": 38.9,
+          "linie": 417,
+          "tokeny_myslenia": 848,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 24,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "undoDepth20",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r3/pixel-check.json"
+          },
+          "source_run": "pix-r3_muse-glimmer_karpathy_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r3/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r3/preview-390.png",
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r3/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer_karpathy_r3/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "meta/muse-glimmer",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/19-muse-glimmer-dwa-pliki/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "muse-glimmer-30b_bare_r1",
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 220.07,
+          "tokeny": 8918,
+          "myslenie_pct": 53.01,
+          "tok_s": 40.52,
+          "linie": 475,
+          "tokeny_myslenia": 4727,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 25,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r1/pixel-check.json"
+          },
+          "source_run": "pix-r1_muse-glimmer-30b_bare_pi_emedium",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r1/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r1/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r1/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r1/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "unsloth/muse-glimmer-30b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "muse-glimmer-30b_bare_r2",
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 270.01,
+          "tokeny": 10884,
+          "myslenie_pct": 63.11,
+          "tok_s": 40.31,
+          "linie": 425,
+          "tokeny_myslenia": 6869,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 21,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "redoShortcut",
+              "undoDepth20",
+              "exportPng",
+              "persists",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/pixel-check.json"
+          },
+          "source_run": "pix-r2_muse-glimmer-30b_bare_pi_emedium",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r2/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "unsloth/muse-glimmer-30b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "muse-glimmer-30b_bare_r3",
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 352.07,
+          "tokeny": 14423,
+          "myslenie_pct": 70.05,
+          "tok_s": 40.97,
+          "linie": 447,
+          "tokeny_myslenia": 10104,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 24,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r3/pixel-check.json"
+          },
+          "source_run": "pix-r3_muse-glimmer-30b_bare_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r3/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r3/screenshot-390.png",
+          "zrzut_390_kadr": null,
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r3/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_bare_r3/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "unsloth/muse-glimmer-30b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          }
+        },
+        {
+          "bieg": "muse-glimmer-30b_karpathy_r1",
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 226.01,
+          "tokeny": 9258,
+          "myslenie_pct": 57.91,
+          "tok_s": 40.96,
+          "linie": 389,
+          "tokeny_myslenia": 5361,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 21,
+            "total": 29,
+            "failed": [
+              "sizeConfirms",
+              "drawsClick",
+              "drawsDrag",
+              "eraser",
+              "eyedropper",
+              "undoDepth20",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r1/pixel-check.json"
+          },
+          "source_run": "pix-r1_muse-glimmer-30b_karpathy_pi_emedium",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r1/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r1/preview-390.png",
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r1/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r1/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "unsloth/muse-glimmer-30b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/19-muse-glimmer-dwa-pliki/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "muse-glimmer-30b_karpathy_r2",
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 299.27,
+          "tokeny": 12096,
+          "myslenie_pct": 68.79,
+          "tok_s": 40.42,
+          "linie": 378,
+          "tokeny_myslenia": 8321,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 22,
+            "total": 29,
+            "failed": [
+              "checkerboard",
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "redoShortcut",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r2/pixel-check.json"
+          },
+          "source_run": "pix-r2_muse-glimmer-30b_karpathy_pi_emedium",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r2/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r2/preview-390.png",
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r2/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r2/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "unsloth/muse-glimmer-30b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/19-muse-glimmer-dwa-pliki/rules/karpathy/AGENTS.md"
+          }
+        },
+        {
+          "bieg": "muse-glimmer-30b_karpathy_r3",
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "karpathy",
+          "harness": "pi",
+          "sekundy": 231.23,
+          "tokeny": 9370,
+          "myslenie_pct": 55.29,
+          "tok_s": 40.52,
+          "linie": 492,
+          "tokeny_myslenia": 5181,
+          "efekty": null,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": {
+            "passed": 24,
+            "total": 29,
+            "failed": [
+              "drawsDrag",
+              "eraser",
+              "fill",
+              "exportPng",
+              "clearConfirms"
+            ],
+            "plik": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/pixel-check.json"
+          },
+          "source_run": "pix-r3_muse-glimmer-30b_karpathy_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/index.html",
+          "zrzut": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/preview-390.png",
+          "metrics": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/metrics.json",
+          "prompt": "episodes/19-muse-glimmer-dwa-pliki/muse-glimmer-30b_karpathy_r3/prompt.txt",
+          "efekty_plik": null,
+          "odtworzenie": {
+            "model": "unsloth/muse-glimmer-30b",
+            "quantization": {
+              "value": null,
+              "source": "not recorded"
+            },
+            "context_window": 131072,
+            "kv_cache": {
+              "value": "K f16 / V f16 (LM Studio default)",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 65536,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": "episodes/19-muse-glimmer-dwa-pliki/rules/karpathy/AGENTS.md"
+          }
+        }
+      ],
+      "cohorts": [
+        {
+          "model": "meta/muse-glimmer",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "B06-MUSE-GLIMMER-BARE",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "muse-glimmer_bare_r3",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "meta/muse-glimmer",
+          "wariant": "karpathy",
+          "n": 3,
+          "kod": "B06-MUSE-GLIMMER-KARP",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "muse-glimmer_karpathy_r1",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "B06-MUSE-GLIMMER-30B-BARE",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "muse-glimmer-30b_bare_r2",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "unsloth/muse-glimmer-30b",
+          "wariant": "karpathy",
+          "n": 3,
+          "kod": "B06-MUSE-GLIMMER-30B-KARP",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "muse-glimmer-30b_karpathy_r3",
+          "reprezentant_powod": null
+        }
+      ],
+      "date": "2026-09-21",
+      "social_card": "episodes/19-muse-glimmer-dwa-pliki/card.jpg"
     },
     {
       "published": "2026-11-04",

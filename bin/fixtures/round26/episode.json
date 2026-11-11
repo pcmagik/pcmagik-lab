@@ -1,0 +1,1009 @@
+{
+  "published": "2026-11-11",
+  "slug": "21-okno-kv-qwen38",
+  "title": "16 GB VRAM for Qwen3.8 27B? At 64k context it used 20.6–23.3 GB",
+  "kind": "zmienna",
+  "task": "Pixel_Art_Editor",
+  "task_file": null,
+  "prompt_file": "episodes/21-okno-kv-qwen38/prompt.txt",
+  "youtube": "",
+  "opis": "Same model (Qwen3.8 27B Q4_K_M), same 64k window, same task (Pixel_Art_Editor), three K/V cache types, 3 runs each, model reloaded before every run, RTX 3090 24 GB. VRAM used after loading, desktop subtracted: f16 23.3 GB, q8_0 21.6 GB, q4_0 20.6 GB — apart in every run. Past 16k of context f16 generated faster than q8_0 in every run (56.1–57.6 vs 49.8–54.3 tok/s, MTP on); at the start of a run the types overlap. Run time is not compared: the output limit cut thinking in 5 of 9 runs. Card memory cap (gpuStrictVramCap) was on in these runs.",
+  "thesis": {
+    "metric": "card memory",
+    "total": null,
+    "jednostka": "MiB",
+    "zmienna": "K/V cache",
+    "kohorty": [
+      {
+        "klucz": "kv-f16",
+        "etykieta": "F16",
+        "kolor": "#fecdd3",
+        "zakres": {
+          "min": 23828,
+          "max": 23841,
+          "n": 3,
+          "mean": 23834.0
+        }
+      },
+      {
+        "klucz": "kv-q8_0",
+        "etykieta": "Q8_0",
+        "kolor": "#fb7185",
+        "zakres": {
+          "min": 22106,
+          "max": 22113,
+          "n": 3,
+          "mean": 22108.7
+        }
+      },
+      {
+        "klucz": "kv-q4_0",
+        "etykieta": "Q4_0",
+        "kolor": "#f43f5e",
+        "zakres": {
+          "min": 21078,
+          "max": 21083,
+          "n": 3,
+          "mean": 21080.3
+        }
+      }
+    ],
+    "class": "rozlaczne",
+    "claim": "F16 23828–23841 MiB, Q8_0 22106–22113 MiB, Q4_0 21078–21083 MiB card memory across 9 runs; ranges do not overlap",
+    "models": [],
+    "pary": [],
+    "summary": {
+      "models": 1
+    }
+  },
+  "runs": [
+    {
+      "bieg": "kv-f16_r2",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 521.94,
+      "tokeny": 31000,
+      "myslenie_pct": 61.04,
+      "tok_s": 59.39,
+      "linie": 821,
+      "tokeny_myslenia": 18921,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 24,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-f16_r2/pixel-check.json"
+      },
+      "source_run": "kv1-f16-r2_qwen3.8-27b_bare_pi",
+      "powtorzenie": 2,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-f16_r2/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-f16_r2/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-f16_r2/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-f16_r2/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-f16_r2/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-f16_r2/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K f16 / V f16",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 23841,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "F16",
+      "kolor": "#fecdd3",
+      "grupa": "kv-f16"
+    },
+    {
+      "bieg": "kv-q8_0_r3",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 1769.09,
+      "tokeny": 69519,
+      "myslenie_pct": 67.18,
+      "tok_s": 39.3,
+      "linie": 791,
+      "tokeny_myslenia": 46704,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 23,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "undoDepth20",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/pixel-check.json"
+      },
+      "source_run": "kv1-q8-r3_qwen3.8-27b_bare_pi",
+      "powtorzenie": 3,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K q8_0 / V q8_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 22107,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "Q8_0",
+      "kolor": "#fb7185",
+      "grupa": "kv-q8_0"
+    },
+    {
+      "bieg": "kv-q4_0_r1",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 1380.38,
+      "tokeny": 64575,
+      "myslenie_pct": 63.93,
+      "tok_s": 46.78,
+      "linie": 851,
+      "tokeny_myslenia": 41280,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 24,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/pixel-check.json"
+      },
+      "source_run": "kv1-q4-r1_qwen3.8-27b_bare_pi",
+      "powtorzenie": 1,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 21083,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "Q4_0",
+      "kolor": "#f43f5e",
+      "grupa": "kv-q4_0"
+    }
+  ],
+  "measurements": [
+    {
+      "bieg": "kv-f16_r1",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 1154.6,
+      "tokeny": 56428,
+      "myslenie_pct": 65.0,
+      "tok_s": 48.87,
+      "linie": 813,
+      "tokeny_myslenia": 36680,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 24,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-f16_r1/pixel-check.json"
+      },
+      "source_run": "kv1-f16-r1_qwen3.8-27b_bare_pi",
+      "powtorzenie": 1,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-f16_r1/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-f16_r1/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-f16_r1/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-f16_r1/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-f16_r1/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-f16_r1/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K f16 / V f16",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 23828,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "F16",
+      "kolor": "#fecdd3",
+      "grupa": "kv-f16"
+    },
+    {
+      "bieg": "kv-f16_r2",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 521.94,
+      "tokeny": 31000,
+      "myslenie_pct": 61.04,
+      "tok_s": 59.39,
+      "linie": 821,
+      "tokeny_myslenia": 18921,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 24,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-f16_r2/pixel-check.json"
+      },
+      "source_run": "kv1-f16-r2_qwen3.8-27b_bare_pi",
+      "powtorzenie": 2,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-f16_r2/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-f16_r2/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-f16_r2/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-f16_r2/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-f16_r2/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-f16_r2/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K f16 / V f16",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 23841,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "F16",
+      "kolor": "#fecdd3",
+      "grupa": "kv-f16"
+    },
+    {
+      "bieg": "kv-f16_r3",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 539.8,
+      "tokeny": 32811,
+      "myslenie_pct": 99.73,
+      "tok_s": 60.78,
+      "linie": 0,
+      "tokeny_myslenia": 32722,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": null,
+      "source_run": "kv1-f16-r3_qwen3.8-27b_bare_pi",
+      "powtorzenie": 3,
+      "reprezentant": false,
+      "wady": [
+        "BRAK PLIKU"
+      ],
+      "zrzut_pusty": false,
+      "bez_strony": true,
+      "strona": null,
+      "zrzut": null,
+      "zrzut_390": null,
+      "zrzut_390_kadr": null,
+      "metrics": "episodes/21-okno-kv-qwen38/kv-f16_r3/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-f16_r3/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K f16 / V f16",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 23833,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "F16",
+      "kolor": "#fecdd3",
+      "grupa": "kv-f16"
+    },
+    {
+      "bieg": "kv-q8_0_r1",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 584.48,
+      "tokeny": 31781,
+      "myslenie_pct": 53.88,
+      "tok_s": 54.38,
+      "linie": 851,
+      "tokeny_myslenia": 17123,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 24,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-q8_0_r1/pixel-check.json"
+      },
+      "source_run": "kv1-q8-r1_qwen3.8-27b_bare_pi",
+      "powtorzenie": 1,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-q8_0_r1/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-q8_0_r1/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-q8_0_r1/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-q8_0_r1/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-q8_0_r1/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-q8_0_r1/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K q8_0 / V q8_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 22106,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "Q8_0",
+      "kolor": "#fb7185",
+      "grupa": "kv-q8_0"
+    },
+    {
+      "bieg": "kv-q8_0_r2",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 1898.54,
+      "tokeny": 79906,
+      "myslenie_pct": 64.28,
+      "tok_s": 42.09,
+      "linie": 1007,
+      "tokeny_myslenia": 51365,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 23,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms",
+          "crisp"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-q8_0_r2/pixel-check.json"
+      },
+      "source_run": "kv1-q8-r2_qwen3.8-27b_bare_pi",
+      "powtorzenie": 2,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-q8_0_r2/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-q8_0_r2/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-q8_0_r2/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-q8_0_r2/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-q8_0_r2/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-q8_0_r2/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K q8_0 / V q8_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 22113,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "Q8_0",
+      "kolor": "#fb7185",
+      "grupa": "kv-q8_0"
+    },
+    {
+      "bieg": "kv-q8_0_r3",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 1769.09,
+      "tokeny": 69519,
+      "myslenie_pct": 67.18,
+      "tok_s": 39.3,
+      "linie": 791,
+      "tokeny_myslenia": 46704,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 23,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "undoDepth20",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/pixel-check.json"
+      },
+      "source_run": "kv1-q8-r3_qwen3.8-27b_bare_pi",
+      "powtorzenie": 3,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-q8_0_r3/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K q8_0 / V q8_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 22107,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "Q8_0",
+      "kolor": "#fb7185",
+      "grupa": "kv-q8_0"
+    },
+    {
+      "bieg": "kv-q4_0_r1",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 1380.38,
+      "tokeny": 64575,
+      "myslenie_pct": 63.93,
+      "tok_s": 46.78,
+      "linie": 851,
+      "tokeny_myslenia": 41280,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 24,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/pixel-check.json"
+      },
+      "source_run": "kv1-q4-r1_qwen3.8-27b_bare_pi",
+      "powtorzenie": 1,
+      "reprezentant": true,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-q4_0_r1/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 21083,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "Q4_0",
+      "kolor": "#f43f5e",
+      "grupa": "kv-q4_0"
+    },
+    {
+      "bieg": "kv-q4_0_r2",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 1404.01,
+      "tokeny": 66849,
+      "myslenie_pct": 55.45,
+      "tok_s": 47.61,
+      "linie": 919,
+      "tokeny_myslenia": 37070,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 24,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-q4_0_r2/pixel-check.json"
+      },
+      "source_run": "kv1-q4-r2_qwen3.8-27b_bare_pi",
+      "powtorzenie": 2,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-q4_0_r2/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-q4_0_r2/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-q4_0_r2/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-q4_0_r2/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-q4_0_r2/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-q4_0_r2/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 21078,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "Q4_0",
+      "kolor": "#f43f5e",
+      "grupa": "kv-q4_0"
+    },
+    {
+      "bieg": "kv-q4_0_r3",
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "harness": "pi",
+      "sekundy": 1303.97,
+      "tokeny": 59161,
+      "myslenie_pct": 64.78,
+      "tok_s": 45.37,
+      "linie": 797,
+      "tokeny_myslenia": 38322,
+      "efekty": null,
+      "effort_zadany": null,
+      "effort_otrzymany": null,
+      "effort": {
+        "zadany": null,
+        "otrzymany": null,
+        "zrodlo": null,
+        "zgodny": null
+      },
+      "model_przeladowany": true,
+      "checks": {
+        "passed": 24,
+        "total": 29,
+        "failed": [
+          "sizeClears",
+          "drawsDrag",
+          "eraser",
+          "exportPng",
+          "clearConfirms"
+        ],
+        "plik": "episodes/21-okno-kv-qwen38/kv-q4_0_r3/pixel-check.json"
+      },
+      "source_run": "kv1-q4-r3_qwen3.8-27b_bare_pi",
+      "powtorzenie": 3,
+      "reprezentant": false,
+      "wady": [],
+      "zrzut_pusty": false,
+      "bez_strony": false,
+      "strona": "episodes/21-okno-kv-qwen38/kv-q4_0_r3/index.html",
+      "zrzut": "episodes/21-okno-kv-qwen38/kv-q4_0_r3/screenshot-1920.png",
+      "zrzut_390": "episodes/21-okno-kv-qwen38/kv-q4_0_r3/screenshot-390.png",
+      "zrzut_390_kadr": "episodes/21-okno-kv-qwen38/kv-q4_0_r3/preview-390.png",
+      "metrics": "episodes/21-okno-kv-qwen38/kv-q4_0_r3/metrics.json",
+      "prompt": "episodes/21-okno-kv-qwen38/kv-q4_0_r3/prompt.txt",
+      "efekty_plik": null,
+      "odtworzenie": {
+        "model": "qwen/qwen3.8-27b",
+        "quantization": {
+          "value": "Q4_K_M",
+          "source": "metrics.json"
+        },
+        "context_window": 65536,
+        "kv_cache": {
+          "value": "K q4_0 / V q4_0",
+          "source": "metrics.json"
+        },
+        "max_tokens": 32768,
+        "engine": {
+          "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+          "source": "metrics.json"
+        },
+        "harness": "pi 0.85.1",
+        "effort": null,
+        "rules": null
+      },
+      "wynik": {
+        "miara": "card memory",
+        "wartosc": 21080,
+        "jednostka": "MiB",
+        "zrodlo": "metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib"
+      },
+      "etykieta": "Q4_0",
+      "kolor": "#f43f5e",
+      "grupa": "kv-q4_0"
+    }
+  ],
+  "cohorts": [
+    {
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "n": 3,
+      "kod": "kv-f16",
+      "etykieta": "F16",
+      "kolor": "#fecdd3",
+      "n_w_badaniu": 3,
+      "wybor": null,
+      "reprezentant": "kv-f16_r2",
+      "reprezentant_powod": null
+    },
+    {
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "n": 3,
+      "kod": "kv-q8_0",
+      "etykieta": "Q8_0",
+      "kolor": "#fb7185",
+      "n_w_badaniu": 3,
+      "wybor": null,
+      "reprezentant": "kv-q8_0_r3",
+      "reprezentant_powod": null
+    },
+    {
+      "model": "qwen/qwen3.8-27b",
+      "wariant": "bare",
+      "n": 3,
+      "kod": "kv-q4_0",
+      "etykieta": "Q4_0",
+      "kolor": "#f43f5e",
+      "n_w_badaniu": 3,
+      "wybor": null,
+      "reprezentant": "kv-q4_0_r1",
+      "reprezentant_powod": null
+    }
+  ],
+  "date": "2026-09-22",
+  "social_card": "episodes/21-okno-kv-qwen38/card.jpg"
+}

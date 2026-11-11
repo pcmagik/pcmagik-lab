@@ -73,6 +73,8 @@
 .run-effects { display: flex; align-items: baseline; gap: 9px; }
 .run-effects strong { font-size: 36px; font-weight: 500; letter-spacing: -.04em; }
 .run-effects span { font: 12px ui-monospace, monospace; }
+.unit-score { flex-direction: column; align-items: flex-end; gap: 2px; }
+.unit-score strong { white-space: nowrap; font-size: clamp(24px, 2.5vw, 36px); }
 .run-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 12px; }
 .run-metrics strong { display: block; font-size: 21px; font-weight: 500; overflow-wrap: anywhere; }
 .run-metrics span { display: block; font: 11px ui-monospace, monospace; color: var(--muted); margin-top: 5px; }

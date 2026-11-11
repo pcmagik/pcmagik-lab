@@ -129,6 +129,10 @@ def load():
             if run['bieg'] in runs:
                 raise ValueError(f'{slug}: duplicate run {run["bieg"]}')
             runs.add(run['bieg'])
+            if run.get('bez_strony') and not unit_metric(episode):
+                raise ValueError(f'{slug}: bez_strony requires a non-checks metric')
+            if run.get('bez_strony') and any(run.get(k) for k in ['strona', 'zrzut', 'zrzut_390', 'zrzut_390_kadr']):
+                raise ValueError(f'{slug}: bez_strony must not contain page or screenshot links')
             for key in NUMBERS:
                 value = run.get(key)
                 if value is not None and (type(value) not in (int, float) or not math.isfinite(value) or value < 0):
@@ -170,8 +174,9 @@ def load():
         for run in episode['runs']:
             if run not in episode['measurements']:
                 raise ValueError(f'{slug}: representative differs from full measurements')
-            for key in ['strona', 'zrzut']:
-                artifact(run.get(key), slug)
+            if not run.get('bez_strony'):
+                for key in ['strona', 'zrzut']:
+                    artifact(run.get(key), slug)
         if len({r['bieg'] for r in episode['runs']}) != len(episode['runs']):
             raise ValueError(f'{slug}: duplicate representative')
     return feed
@@ -200,6 +205,10 @@ def checks_match_evidence(checks, evidence):
             and checks.get('passed') == checks['grader_passed'] + len(manual))
 
 
+def unit_metric(ep):
+    return ep.get('kind') == 'zmienna' and ep.get('thesis', {}).get('metric') != 'checks'
+
+
 def validate_variable_cohorts(ep):
     def reject():
         raise ValueError(f'{ep["slug"]}: invalid variable cohort or range')
@@ -224,12 +233,28 @@ def validate_variable_cohorts(ep):
         group = groups[code]
         if any(run.get(key) != group.get(key) for key in ['model', 'wariant', 'etykieta', 'kolor']):
             reject()
-        if not run.get('checks'):
+        if not unit_metric(ep) and not run.get('checks'):
             reject()
         measured[code].append(run)
     thesis = ep.get('thesis', {})
     summaries = thesis.get('kohorty')
-    if (thesis.get('metric') != 'checks' or thesis.get('class') not in CLASSES
+    if unit_metric(ep):
+        if thesis.get('metric') != 'card memory' or thesis.get('jednostka') != 'MiB' or thesis.get('total') is not None:
+            reject()
+        for run in ep['measurements']:
+            result = run.get('wynik')
+            if (not isinstance(result, dict) or result.get('miara') != thesis['metric']
+                    or result.get('jednostka') != thesis['jednostka']
+                    or result.get('zrodlo') != 'metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib'):
+                reject()
+            raw = json.loads(artifact(run['metrics'], ep['slug']).read_text())
+            memory = raw.get('gpu_memory') or {}
+            values = [memory.get('loaded_mib'), memory.get('idle_mib'), result.get('wartosc')]
+            if any(type(v) not in (int, float) or not math.isfinite(v) or v < 0 for v in values):
+                reject()
+            if result['wartosc'] != memory['loaded_mib'] - memory['idle_mib']:
+                raise ValueError(f'{ep["slug"]}/{run["bieg"]}: wynik differs from metrics.json GPU memory')
+    if (thesis.get('class') not in CLASSES
             or not isinstance(summaries, list) or len(summaries) != len(groups)):
         reject()
     seen = set()
@@ -239,11 +264,11 @@ def validate_variable_cohorts(ep):
             reject()
         seen.add(code)
         group, runs = groups[code], measured[code]
-        if len(runs) != group['n'] or any(r['checks']['total'] != thesis.get('total') for r in runs):
+        if len(runs) != group['n'] or (not unit_metric(ep) and any(r['checks']['total'] != thesis.get('total') for r in runs)):
             reject()
         if any(summary.get(key) != group[key] for key in ['etykieta', 'kolor']):
             reject()
-        scores = [r['checks']['passed'] for r in runs]
+        scores = [r['wynik']['wartosc'] if unit_metric(ep) else r['checks']['passed'] for r in runs]
         expected = dict(min=min(scores), max=max(scores), n=len(scores), mean=round(sum(scores)/len(scores), 1))
         if summary.get('zakres') != expected:
             reject()
@@ -341,16 +366,21 @@ def episode_result(runs):
 CLASSES = {'karpathy-mniej': 'Every Karpathy run below every bare run',
            'nakladaja-sie': 'Ranges overlap · no demonstrated difference',
            'karpathy-wiecej': 'Every Karpathy run above every bare run',
-           'brak-danych': 'No complete comparison', 'jeden-wariant': 'One variant'}
+           'brak-danych': 'No complete comparison', 'jeden-wariant': 'One variant',
+           'rozlaczne': 'Ranges do not overlap'}
 
 
 def thesis_result(ep):
     thesis = ep['thesis']
     verdict = text(thesis['claim'])
     if ep.get('kind') == 'zmienna':
-        verdict = ' · '.join(
-            f'<span style="color:{text(g["kolor"])}">{text(g["etykieta"])}: {variable_range(g["zakres"])} checks / {thesis["total"]}</span>'
+        separator = '<br>' if unit_metric(ep) else ' · '
+        suffix = text(thesis['jednostka']) if unit_metric(ep) else f'checks / {thesis["total"]}'
+        verdict = separator.join(
+            f'<span style="color:{text(g["kolor"])}">{text(g["etykieta"])}: {variable_range(g["zakres"], plain=unit_metric(ep))} {suffix}</span>'
             for g in thesis['kohorty'])
+        if unit_metric(ep):
+            verdict = text(thesis['claim']) + '<br>' + verdict
         verdict += ' · ' + text(CLASSES[thesis['class']])
     elif ep.get('kind') == 'para-wariantow':
         model = thesis['models'][0]
@@ -420,6 +450,8 @@ def result_card(runs, href, ep=None):
     model = ('COMPARISON RESULTS' if len({r['model'] for r in runs}) > 1 else model_label(ep)) if ep else runs[0]['model']
     result = thesis_result(ep) if ep and ep.get('thesis') else episode_result(runs)
     note = 'Checks measure completed requirements.' if ep and ep.get('kind') in ('pixel', 'zmienna') else 'Effects count CSS/JS constructs, not visual quality.'
+    if ep and unit_metric(ep):
+        note = text(ep['thesis']['metric'])
     return f'<div class="result-hero glass" data-fx="fx-border fx-pulse"><div><p class="eyebrow">{text(model)}</p>{result}<p class="measurement-note">{note}</p></div><a class="button" href="{text(href)}">Explore all {len(runs)} runs ↓</a></div>'
 
 
@@ -595,6 +627,8 @@ def episode_body(ep, feed):
                 description = ''
                 color_attr = f'style="color:{text(cohort[0]["kolor"])}"'
                 score_attr = f'class="run-effects" style="color:{text(cohort[0]["kolor"])}"'
+                if unit_metric(ep):
+                    score_attr = score_attr.replace('run-effects', 'run-effects unit-score')
             sample = f' · n={len(cohort)}'
             body.append(f'<div class="cohort"><div class="cohort-heading"><h3 {color_attr}>{label}</h3><span>{text(description)}{sample}</span></div>')
             for i, r in enumerate(cohort, 1):
@@ -602,7 +636,9 @@ def episode_body(ep, feed):
                 links = evidence_links(r)
                 if ep.get('prompt_file') is None and 'prompt_file' in ep:
                     links += f'<a href="/{text(r["prompt"])}">Prompt ↗</a>'
-                body.append(f'''<article class="run-result glass" id="run-{text(r['bieg'])}" data-run="{text(r['bieg'])}"><div class="run-result-head"><h4>Run {r.get("powtorzenie", f"{i:02}")}</h4><div {score_attr}><strong>{run_score(r)}</strong><span>{'checks' if ep.get('kind') in ('pixel', 'zmienna') else 'effects'}</span></div></div>{manual_checks_note(r)}<div class="run-metrics">{metrics}</div>{effort_note(r)}<p class="run-id">{text(r['bieg'])}</p>{f'<div class="foot">{links}</div>' if links else ''}</article>''')
+                score_label = ep['thesis']['metric'] if unit_metric(ep) else 'checks' if ep.get('kind') in ('pixel', 'zmienna') else 'effects'
+                grader = f'<p class="run-id">{checks_score(r)} checks</p>' if unit_metric(ep) and r.get('checks') else ''
+                body.append(f'''<article class="run-result glass" id="run-{text(r['bieg'])}" data-run="{text(r['bieg'])}"><div class="run-result-head"><h4>Run {r.get("powtorzenie", f"{i:02}")}</h4><div {score_attr}><strong>{run_score(r)}</strong><span>{text(score_label)}</span></div></div>{grader}{manual_checks_note(r)}<div class="run-metrics">{metrics}</div>{effort_note(r)}<p class="run-id">{text(r['bieg'])}</p>{f'<div class="foot">{links}</div>' if links else ''}</article>''')
             body.append('</div>')
         body.append('</div><p class="measurement-note">output = thinking + final code. Lines of code show the page size the model chose, not the cost of equivalent work.</p></section>')
         if compact:
@@ -629,6 +665,13 @@ def episode_body(ep, feed):
 
 
 def run_score(run):
+    if run.get('wynik'):
+        result = run['wynik']
+        return f'{text(result["wartosc"])} {text(result["jednostka"])}'
+    return checks_score(run) if run.get('checks') else number(run.get('efekty'))
+
+
+def checks_score(run):
     checks = run.get('checks')
     if checks:
         score = f'<a href="/{text(checks["plik"])}">{checks["passed"]} / {checks["total"]}</a>'
@@ -644,8 +687,9 @@ def manual_checks_note(run):
     return f'<p class="manual-checks">grader {checks["grader_passed"]} · {len(manual)} checks verified by hand: {text(", ".join(manual))}</p>'
 
 
-def variable_range(measured):
-    low, high = number(measured['min']), number(measured['max'])
+def variable_range(measured, plain=False):
+    display = text if plain else number
+    low, high = display(measured['min']), display(measured['max'])
     return low if measured['min'] == measured['max'] else f'{low}–{high}'
 
 
@@ -675,10 +719,12 @@ def thesis_comparison(ep, ident):
     thesis = ep['thesis']
     if ep.get('kind') == 'zmienna':
         rows = []
+        maximum = max(g['zakres']['max'] for g in thesis['kohorty']) or 1 if unit_metric(ep) else thesis['total']
+        suffix = f' {text(thesis["jednostka"])}' if unit_metric(ep) else f' / {thesis["total"]}'
         for group in thesis['kohorty']:
             measured = group['zakres']
-            rows.append(f'<div class="compare-row"><span class="compare-label" style="color:{text(group["kolor"])}">{text(group["etykieta"])} <span class="variant-sample">n={measured["n"]}</span></span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:{text(group["kolor"])};width:{measured["max"]/thesis["total"]*100:.4f}%"></div></div><strong class="compare-value">{variable_range(measured)} / {thesis["total"]}</strong></div>')
-        return '<div class="comparison"><div class="compare-top"><h4>Repeated ranges · checks</h4></div><div class="compare-rows">' + ''.join(rows) + '</div></div>'
+            rows.append(f'<div class="compare-row"><span class="compare-label" style="color:{text(group["kolor"])}">{text(group["etykieta"])} <span class="variant-sample">n={measured["n"]}</span></span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:{text(group["kolor"])};width:{measured["max"]/maximum*100:.4f}%"></div></div><strong class="compare-value">{variable_range(measured, plain=unit_metric(ep))}{suffix}</strong></div>')
+        return f'<div class="comparison"><div class="compare-top"><h4>Repeated ranges · {text(thesis["metric"])}</h4></div><div class="compare-rows">' + ''.join(rows) + '</div></div>'
     sizes = sorted({m[v]['n'] for m in thesis['models'] for v in ['bare', 'karpathy'] if m.get(v)})
     sample_in_heading = ep.get('_sample_in_heading') and len(sizes) == 1
     key, label = ('checks', 'Checks') if thesis['metric'] == 'checks' else ('effects', 'Effects')
@@ -809,7 +855,10 @@ def preview_card(r, slug, prompt_file=None):
         label = text(r['etykieta'])
         color_attr = f'style="color:{text(r["kolor"])}"'
         description = 'PUBLISHED OUTPUT'
-    return f'''<div class="run spotlight"><a class="shot" href="/{text(r['strona'])}">{picture}</a><div class="body"><div class="name"><b {color_attr}>{label}</b><span class="tag">{description}</span></div><div class="kv">{f'<div><b>{run_score(r)}</b><small>checks</small></div>' if r.get("checks") else ""}<div><b>{duration(r.get('sekundy'))}</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{thinking(r.get('myslenie_pct'))}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div>{effort_note(r)}</div>{manual_checks_note(r)}<div class="foot">{evidence_links(r)}{prompt_link}</div></div></div>'''
+    shot = '' if r.get('bez_strony') else f'<a class="shot" href="/{text(r["strona"])}">{picture}</a>'
+    score_label = text(r['wynik']['miara']) if r.get('wynik') else 'checks'
+    grader = f'<p class="run-id">{checks_score(r)} checks</p>' if r.get('wynik') and r.get('checks') else ''
+    return f'''<div class="run spotlight">{shot}<div class="body"><div class="name"><b {color_attr}>{label}</b><span class="tag">{description}</span></div><div class="kv">{f'<div><b>{run_score(r)}</b><small>{score_label}</small></div>' if r.get("checks") or r.get("wynik") else ""}<div><b>{duration(r.get('sekundy'))}</b><small>time</small></div><div><b>{number(r.get('tokeny'))}</b><small>output tokens</small></div><div><b>{thinking(r.get('myslenie_pct'))}</b><small>thinking</small></div><div><b>{number(r.get('linie'))}</b><small>lines of code</small></div>{effort_note(r)}</div>{grader}{manual_checks_note(r)}<div class="foot">{evidence_links(r)}{prompt_link}</div></div></div>'''
 
 
 def episode_teaser(ep, feed, latest=False):

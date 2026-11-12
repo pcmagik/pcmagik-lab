@@ -5,6 +5,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
 | 24 | [Claude Code for free on your own GPU? Qwen3.8 27B: 29 of 29, Pi 25–29](episodes/24-claude-code-lokalnie/README.md) | Pixel_Art_Editor | 6 | [YouTube](https://www.youtube.com/shorts/Xrn5v-s47O8) |
+| 21 | [16 GB VRAM for Qwen3.8 27B? At 64k context it used 20.6–23.3 GB](episodes/21-okno-kv-qwen38/README.md) | Pixel_Art_Editor | 9 | [YouTube](https://www.youtube.com/shorts/jcQGUPrtWcA) |
 | 19 | [Same model, two files: Meta vs Unsloth Muse Glimmer](episodes/19-muse-glimmer-dwa-pliki/README.md) | Pixel_Art_Editor | 12 | [YouTube](https://www.youtube.com/shorts/dKNoML5N7fA) |
 | 18 | [Local AI built 66 web pages. How many actually show up?](episodes/18-czy-strona-dziala/README.md) | easy | 9 | [YouTube](https://www.youtube.com/shorts/VR_8P5QqOBs) |
 | 17 | [Nemotron 3.5 Lightning said "Done." It overwrote its own work](episodes/17-pixel-nemotron-done/README.md) | Pixel_Art_Editor | 3 | [YouTube](https://www.youtube.com/shorts/3qSZqhZ6HAU) |

@@ -49,12 +49,13 @@ class MemoryEpisodeTest(unittest.TestCase):
         site.build(check=True)
         html = (self.root / 'episodes' / self.ep['slug'] / 'index.html').read_text()
         hero = re.search(r'<div class="result-hero.*?</div><a ', html, re.S)[0]
-        self.assertIn(self.ep['thesis']['claim'], hero)
+        self.assertNotIn(self.ep['thesis']['claim'], hero)
         self.assertIn('Ranges do not overlap', hero)
         for label, color, span in [('F16', '#fecdd3', '23828–23841'),
                                    ('Q8_0', '#fb7185', '22106–22113'),
                                    ('Q4_0', '#f43f5e', '21078–21083')]:
             self.assertIn(f'style="color:{color}">{label}: {span} MiB</span>', hero)
+            self.assertEqual(hero.count(f'{label}: {span} MiB'), 1)
         self.assertEqual(hero.count('<br>'), 3)
         for invalid in ['/ None', '/ null', 'not measured yet', 'checks /']:
             self.assertNotIn(invalid, hero)

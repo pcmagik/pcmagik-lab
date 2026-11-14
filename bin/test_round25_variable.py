@@ -118,6 +118,9 @@ class VariableEpisodeTest(unittest.TestCase):
         hero = re.search(r'<div class="result-hero.*?</div><a ', html, re.S)[0]
         self.assertNotIn(self.ep['thesis']['claim'], hero)
         self.assertIn('Ranges overlap · no demonstrated difference', hero)
+        self.assertIn('<br>Ranges overlap · no demonstrated difference</span>', hero)
+        self.assertEqual(hero.count('<br>'), len(self.ep['cohorts']))
+        self.assertIn('<p class="compare-summary">Ranges overlap · no demonstrated difference</p>', html)
         self.assertNotIn('not measured yet', hero)
         for label, color, span in [('CLAUDE CODE', '#d97757', '29'), ('PI AGENT', '#a3e635', '25–29')]:
             self.assertIn(f'style="color:{color}">{label}', html)

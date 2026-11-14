@@ -15,6 +15,14 @@ from urllib.parse import urlparse, parse_qs
 ROOT = Path(__file__).resolve().parents[1]
 NUMBERS = ['sekundy', 'tokeny', 'tokeny_myslenia', 'myslenie_pct', 'tok_s', 'linie', 'efekty']
 ARTIFACTS = ['metrics', 'prompt']
+# Only these measured fields may supply a variable episode's result.
+VARIABLE_METRICS = {
+    'metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib':
+        ('card memory', 'MiB', [('gpu_memory', 'loaded_mib'), ('gpu_memory', 'idle_mib')]),
+    'metrics.json: seconds': ('time per run', 's', [('seconds',)]),
+    'metrics.json: usage.completion_tokens': ('output tokens', 'tokens', [('usage', 'completion_tokens')]),
+    'metrics.json: usage.prompt_tokens': ('prompt tokens', 'tokens', [('usage', 'prompt_tokens')]),
+}
 CLOUDFLARE_ANALYTICS_TOKEN = '07bc67564faa42ceb381c751c2b66861'
 
 
@@ -220,9 +228,12 @@ def validate_variable_cohorts(ep):
             reject()
         if (not isinstance(group.get('kolor'), str)
                 or not re.fullmatch(r'#[0-9a-fA-F]{6}', group['kolor'])
-                or group['kolor'].lower() in ('#ff9f45', '#5ec8ff')
                 or not isinstance(group.get('etykieta'), str) or not group['etykieta'].strip()
                 or type(group.get('n')) is not int or group['n'] < 1):
+            reject()
+        reserved = {'#ff9f45': ('BARE', 'bare'), '#5ec8ff': ('KARPATHY', 'karpathy')}
+        color = group['kolor'].lower()
+        if color in reserved and (group['etykieta'], group.get('wariant')) != reserved[color]:
             reject()
         groups[code] = group
     measured = defaultdict(list)
@@ -239,21 +250,32 @@ def validate_variable_cohorts(ep):
     thesis = ep.get('thesis', {})
     summaries = thesis.get('kohorty')
     if unit_metric(ep):
-        if thesis.get('metric') != 'card memory' or thesis.get('jednostka') != 'MiB' or thesis.get('total') is not None:
+        if thesis.get('total') is not None:
             reject()
         for run in ep['measurements']:
             result = run.get('wynik')
-            if (not isinstance(result, dict) or result.get('miara') != thesis['metric']
-                    or result.get('jednostka') != thesis['jednostka']
-                    or result.get('zrodlo') != 'metrics.json: gpu_memory.loaded_mib - gpu_memory.idle_mib'):
+            if not isinstance(result, dict) or not isinstance(result.get('zrodlo'), str):
+                reject()
+            specification = VARIABLE_METRICS.get(result['zrodlo'])
+            if (specification is None
+                    or (result.get('miara'), result.get('jednostka')) != specification[:2]
+                    or result.get('miara') != thesis.get('metric')
+                    or result.get('jednostka') != thesis.get('jednostka')):
                 reject()
             raw = json.loads(artifact(run['metrics'], ep['slug']).read_text())
-            memory = raw.get('gpu_memory') or {}
-            values = [memory.get('loaded_mib'), memory.get('idle_mib'), result.get('wartosc')]
-            if any(type(v) not in (int, float) or not math.isfinite(v) or v < 0 for v in values):
+            values = []
+            for path in specification[2]:
+                value = raw
+                for key in path:
+                    value = value.get(key) if isinstance(value, dict) else None
+                values.append(value)
+            if any(type(v) not in (int, float) or not math.isfinite(v) or v < 0
+                   for v in [*values, result.get('wartosc')]):
                 reject()
-            if result['wartosc'] != memory['loaded_mib'] - memory['idle_mib']:
-                raise ValueError(f'{ep["slug"]}/{run["bieg"]}: wynik differs from metrics.json GPU memory')
+            expected = values[0] - values[1] if len(values) == 2 else values[0]
+            # Exports preserve these raw values exactly; no rounding tolerance is needed.
+            if result['wartosc'] != expected:
+                raise ValueError(f'{ep["slug"]}/{run["bieg"]}: wynik differs from {result["zrodlo"]}')
     if (thesis.get('class') not in CLASSES
             or not isinstance(summaries, list) or len(summaries) != len(groups)):
         reject()
@@ -367,21 +389,19 @@ CLASSES = {'karpathy-mniej': 'Every Karpathy run below every bare run',
            'nakladaja-sie': 'Ranges overlap · no demonstrated difference',
            'karpathy-wiecej': 'Every Karpathy run above every bare run',
            'brak-danych': 'No complete comparison', 'jeden-wariant': 'One variant',
-           'rozlaczne': 'Ranges do not overlap'}
+           'rozlaczne': 'Ranges do not overlap',
+           'czesciowo': 'Some pairs differ in every run, others overlap'}
 
 
 def thesis_result(ep):
     thesis = ep['thesis']
     verdict = text(thesis['claim'])
     if ep.get('kind') == 'zmienna':
-        separator = '<br>' if unit_metric(ep) else ' · '
         suffix = text(thesis['jednostka']) if unit_metric(ep) else f'checks / {thesis["total"]}'
-        verdict = separator.join(
-            f'<span style="color:{text(g["kolor"])}">{text(g["etykieta"])}: {variable_range(g["zakres"], plain=unit_metric(ep))} {suffix}</span>'
+        verdict = '<br>'.join(
+            f'<span style="color:{text(g["kolor"])}">{text(g["etykieta"])}: {variable_range(g["zakres"], unit=thesis.get("jednostka") if unit_metric(ep) else None)} {suffix}</span>'
             for g in thesis['kohorty'])
-        if unit_metric(ep):
-            verdict = text(thesis['claim']) + '<br>' + verdict
-        verdict += ' · ' + text(CLASSES[thesis['class']])
+        verdict += '<br>' + text(CLASSES[thesis['class']])
     elif ep.get('kind') == 'para-wariantow':
         model = thesis['models'][0]
         change = model.get('zmiana_sredniej_pct')
@@ -667,7 +687,7 @@ def episode_body(ep, feed):
 def run_score(run):
     if run.get('wynik'):
         result = run['wynik']
-        return f'{text(result["wartosc"])} {text(result["jednostka"])}'
+        return f'{unit_number(result["wartosc"], result["jednostka"])} {text(result["jednostka"])}'
     return checks_score(run) if run.get('checks') else number(run.get('efekty'))
 
 
@@ -687,9 +707,14 @@ def manual_checks_note(run):
     return f'<p class="manual-checks">grader {checks["grader_passed"]} · {len(manual)} checks verified by hand: {text(", ".join(manual))}</p>'
 
 
-def variable_range(measured, plain=False):
-    display = text if plain else number
-    low, high = display(measured['min']), display(measured['max'])
+def unit_number(value, unit):
+    if unit == 's':
+        return f'{value:,.0f}'
+    return text(value) if unit == 'MiB' else number(value)
+
+
+def variable_range(measured, unit=None):
+    low, high = unit_number(measured['min'], unit), unit_number(measured['max'], unit)
     return low if measured['min'] == measured['max'] else f'{low}–{high}'
 
 
@@ -723,8 +748,9 @@ def thesis_comparison(ep, ident):
         suffix = f' {text(thesis["jednostka"])}' if unit_metric(ep) else f' / {thesis["total"]}'
         for group in thesis['kohorty']:
             measured = group['zakres']
-            rows.append(f'<div class="compare-row"><span class="compare-label" style="color:{text(group["kolor"])}">{text(group["etykieta"])} <span class="variant-sample">n={measured["n"]}</span></span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:{text(group["kolor"])};width:{measured["max"]/maximum*100:.4f}%"></div></div><strong class="compare-value">{variable_range(measured, plain=unit_metric(ep))}{suffix}</strong></div>')
-        return f'<div class="comparison"><div class="compare-top"><h4>Repeated ranges · {text(thesis["metric"])}</h4></div><div class="compare-rows">' + ''.join(rows) + '</div></div>'
+            rows.append(f'<div class="compare-row"><span class="compare-label" style="color:{text(group["kolor"])}">{text(group["etykieta"])} <span class="variant-sample">n={measured["n"]}</span></span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:{text(group["kolor"])};width:{measured["max"]/maximum*100:.4f}%"></div></div><strong class="compare-value">{variable_range(measured, unit=thesis.get("jednostka") if unit_metric(ep) else None)}{suffix}</strong></div>')
+        verdict = f'<div class="compare-footer"><p class="compare-summary">{text(CLASSES[thesis["class"]])}</p></div>'
+        return f'<div class="comparison"><div class="compare-top"><h4>Repeated ranges · {text(thesis["metric"])}</h4></div><div class="compare-rows">' + ''.join(rows) + '</div>' + verdict + '</div>'
     sizes = sorted({m[v]['n'] for m in thesis['models'] for v in ['bare', 'karpathy'] if m.get(v)})
     sample_in_heading = ep.get('_sample_in_heading') and len(sizes) == 1
     key, label = ('checks', 'Checks') if thesis['metric'] == 'checks' else ('effects', 'Effects')

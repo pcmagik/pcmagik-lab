@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PC Magik Lab — Local models, real GPUs.</title>
+<meta name="description" content="PC Magik Lab is a YouTube series about running AI models on real, local GPUs. One rig — NVIDIA RTX 3090 24 GB with LM Studio — one variable changed per test, model reloaded before every run, and every prompt and result file published.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23060a14'/%3E%3Crect%20x='9'%20y='9'%20width='14'%20height='14'%20rx='3'%20fill='none'%20stroke='%2322e0ff'%20stroke-width='2.5'/%3E%3Ccircle%20cx='16'%20cy='16'%20r='3'%20fill='%2322e0ff'/%3E%3C/svg%3E">
+<script>document.documentElement.className += ' js';</script>
+<style>
+/* ============ base ============ */
+:root{
+  --bg:#04060c;
+  --text:#e9effc;
+  --muted:#9db0d0;
+  --line:rgba(151,170,205,.16);
+  --cyan:#22e0ff;
+  --violet:#8b5cf6;
+  --violet-soft:#a78bfa;
+  --green:#3dfc9a;
+  --magenta:#ff4fd8;
+  --amber:#ffc857;
+  --red:#ff5f57;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:96px}
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--sans);
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:rgba(34,224,255,.32);color:#fff}
+a{color:inherit;text-decoration:none}
+svg{display:block;max-width:100%}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.container{width:min(1120px,100% - 48px);margin-inline:auto}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:8px}
+
+/* ============ background ============ */
+.bg{
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(1100px 600px at 85% -10%, rgba(139,92,246,.14), transparent 60%),
+    radial-gradient(900px 520px at -10% 20%, rgba(34,224,255,.12), transparent 60%),
+    linear-gradient(180deg,#05070f 0%, #04060c 100%);
+}
+.bg::before{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(151,170,205,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(151,170,205,.06) 1px, transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(ellipse 90% 65% at 50% 0%, #000 25%, transparent 78%);
+          mask-image:radial-gradient(ellipse 90% 65% at 50% 0%, #000 25%, transparent 78%);
+}
+.bg::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(120% 90% at 50% 100%, transparent 55%, rgba(2,3,8,.55) 100%);
+}
+
+/* ============ buttons ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:14px 24px;border-radius:12px;font-weight:650;font-size:15px;letter-spacing:.01em;
+  border:1px solid transparent;white-space:nowrap;
+  transition:transform .25s ease,box-shadow .3s ease,border-color .3s ease,background .3s ease,color .3s ease;
+}
+.btn svg{width:18px;height:18px;flex:none}
+.btn:active{transform:translateY(0) scale(.985)}
+.btn-primary{
+  color:#03131c;
+  background:linear-gradient(135deg,#35e6ff 0%,#4cc9ff 45%,#8b7bff 100%);
+  box-shadow:0 10px 34px -8px rgba(34,224,255,.5);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 44px -8px rgba(34,224,255,.65)}
+.btn-ghost{color:#e6eeff;border-color:rgba(151,170,205,.35);background:rgba(151,170,205,.05)}
+.btn-ghost:hover{border-color:rgba(34,224,255,.55);background:rgba(34,224,255,.07);box-shadow:0 0 24px -4px rgba(34,224,255,.35);transform:translateY(-2px)}
+.btn-sm{padding:10px 16px;font-size:14px;border-radius:10px}
+
+/* ============ nav ============ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  border-bottom:1px solid transparent;
+  transition:background .3s ease,border-color .3s ease,box-shadow .3s ease;
+}
+.nav.scrolled{
+  background:rgba(6,10,20,.72);
+  backdrop-filter:blur(16px) saturate(150%);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);
+  border-bottom-color:rgba(151,170,205,.14);
+  box-shadow:0 12px 40px -18px rgba(0,0,0,.7);
+}
+.nav-inner{display:flex;align-items:center;gap:22px;height:70px}
+.brand{display:inline-flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.01em}
+.brand-chip{
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;
+  background:linear-gradient(160deg,rgba(34,224,255,.18),rgba(139,92,246,.18));
+  border:1px solid rgba(34,224,255,.4);color:var(--cyan);
+  box-shadow:0 0 18px rgba(34,224,255,.2);
+}
+.brand-name b{
+  background:linear-gradient(90deg,var(--cyan),var(--violet-soft));
+  -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;
+}
+.nav-menu{display:flex;align-items:center;gap:6px;margin-left:auto}
+.nav-link{padding:9px 14px;border-radius:10px;font-size:14.5px;color:#c3d1ea;position:relative;transition:color .25s ease,background .25s ease}
+.nav-link:hover{color:#fff;background:rgba(151,170,205,.08)}
+.nav-link.active{color:var(--cyan)}
+.nav-link.active::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:4px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));
+  box-shadow:0 0 8px rgba(34,224,255,.8);
+}
+.nav-cta{margin-left:10px}
+.progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;pointer-events:none}
+.progress i{
+  display:block;height:100%;transform-origin:0 50%;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--cyan),var(--violet));
+  box-shadow:0 0 12px rgba(34,224,255,.6);
+}
+.burger{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:44px;height:44px;border-radius:10px;border:1px solid var(--line);
+  background:rgba(151,170,205,.06);flex:none;
+}
+.burger span{display:block;width:20px;height:2px;margin:0 auto;background:#dbe6fb;border-radius:2px;transition:transform .3s ease,opacity .3s ease}
+.burger.active span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.active span:nth-child(2){opacity:0}
+.burger.active span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ============ cards / reveal / tilt ============ */
+.card{
+  position:relative;border-radius:18px;border:1px solid var(--line);
+  background:linear-gradient(160deg,rgba(20,29,50,.66),rgba(9,14,27,.62));
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+}
+.lift:hover{translate:0 -4px}
+.tiltable{
+  transform:perspective(950px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .16s ease-out,border-color .35s ease,box-shadow .35s ease;
+}
+.js .reveal{opacity:0;translate:0 26px;transition:opacity .7s ease,translate .7s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1;translate:0 0}
+
+/* ============ hero ============ */
+.hero{position:relative;padding:172px 0 116px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center}
+.badge{
+  display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border-radius:999px;
+  border:1px solid rgba(34,224,255,.35);background:rgba(34,224,255,.07);
+  color:#bfeeff;font-size:13px;letter-spacing:.04em;
+}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:led 2.4s ease-in-out infinite}
+.hero h1{
+  margin-top:22px;font-size:clamp(2.7rem,6.4vw,4.3rem);line-height:1.04;
+  letter-spacing:-.02em;font-weight:800;
+}
+.grad{
+  background:linear-gradient(92deg,var(--cyan),var(--violet-soft) 55%,var(--magenta));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(34,224,255,.35));
+}
+.tagline{
+  margin-top:16px;font-size:clamp(1.25rem,2.6vw,1.7rem);font-weight:650;letter-spacing:.01em;
+  background:linear-gradient(90deg,#dff6ff,#9fe8ff 45%,var(--violet-soft));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.lede{margin-top:18px;color:var(--muted);max-width:54ch;font-size:16.5px}
+.hero-cta{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
+.hero-facts{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.fact-chip{
+  display:inline-flex;align-items:center;gap:9px;padding:8px 14px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(13,20,36,.5);
+  font-family:var(--mono);font-size:12.5px;color:var(--muted);
+}
+.fact-chip i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);flex:none}
+.hero-visual{position:relative}
+.hero-visual::before{
+  content:"";position:absolute;inset:-8% -6% -14% -6%;z-index:-1;border-radius:40px;
+  background:radial-gradient(55% 55% at 50% 45%, rgba(34,224,255,.16), transparent 70%);
+  filter:blur(10px);
+}
+.terminal{
+  border-radius:16px;border:1px solid rgba(151,170,205,.22);
+  background:linear-gradient(165deg,rgba(16,24,44,.85),rgba(8,12,24,.92));
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.8),0 0 44px -10px rgba(34,224,255,.18);
+  overflow:hidden;
+}
+.term-head{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  border-bottom:1px solid rgba(151,170,205,.14);background:rgba(10,15,28,.6);
+}
+.tdots{display:flex;gap:6px}
+.tdots i{width:10px;height:10px;border-radius:50%}
+.tdots i:nth-child(1){background:#ff5f57}
+.tdots i:nth-child(2){background:#febc2e}
+.tdots i:nth-child(3){background:#28c840}
+.term-title{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:6px}
+.term-body{padding:18px 18px 14px;min-height:224px}
+#termBody .tl{white-space:pre;font-family:var(--mono);font-size:13.5px;line-height:1.78}
+#termBody .tl.cmd{color:#d7e6ff}
+#termBody .tl.ok{color:rgba(61,252,154,.85)}
+#termBody.fading .tl{opacity:0;transition:opacity .4s ease}
+.caret{
+  display:inline-block;width:9px;height:15px;margin-left:2px;vertical-align:-2px;
+  background:var(--cyan);box-shadow:0 0 10px rgba(34,224,255,.8);
+  animation:blink 1.1s steps(2,start) infinite;
+}
+.scroll-hint{
+  position:absolute;left:50%;bottom:20px;translate:-50% 0;color:var(--muted);
+  width:42px;height:42px;display:grid;place-items:center;border-radius:50%;
+  border:1px solid var(--line);background:rgba(13,20,36,.5);
+  transition:color .3s ease,border-color .3s ease;
+  animation:bob 2.4s ease-in-out infinite;
+}
+.scroll-hint:hover{color:var(--cyan);border-color:rgba(34,224,255,.5)}
+.scroll-hint svg{width:20px;height:20px}
+
+/* ============ sections ============ */
+.sec{padding:112px 0}
+.sec-head{max-width:660px;margin-bottom:46px}
+.sec-head.center{margin-inline:auto;text-align:center}
+.sec-tag{
+  font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--cyan);display:inline-flex;align-items:center;gap:10px;
+}
+.sec-tag::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.sec-head.center .sec-tag::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent);width:44px}
+.sec h2{font-size:clamp(1.9rem,4vw,2.55rem);letter-spacing:-.015em;margin-top:14px;line-height:1.15;font-weight:800}
+.sec-sub{margin-top:14px;color:var(--muted);max-width:58ch}
+.sec-head.center .sec-sub{margin-inline:auto}
+
+/* ============ method ============ */
+.method-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+.method-card{grid-column:span 2;padding:26px 24px 24px;display:flex;flex-direction:column;gap:14px;min-height:216px}
+.method-card.wide{grid-column:span 3}
+.method-card .idx{
+  position:absolute;top:18px;right:20px;font-family:var(--mono);font-size:11px;
+  color:rgba(157,176,208,.5);letter-spacing:.18em;
+}
+.iconbox{
+  width:48px;height:48px;border-radius:12px;display:grid;place-items:center;flex:none;
+  background:linear-gradient(160deg,var(--acc-soft),transparent 70%);
+  border:1px solid var(--acc-line);color:var(--acc);
+  transition:box-shadow .35s ease;
+}
+.iconbox svg{width:23px;height:23px}
+.method-card h3{font-size:17px;letter-spacing:.01em}
+.method-card p{color:var(--muted);font-size:14.5px}
+.method-card:hover{border-color:var(--acc-line);box-shadow:0 26px 70px -26px var(--acc-glow)}
+.method-card:hover .iconbox{box-shadow:0 0 26px var(--acc-glow)}
+.method-grid .method-card:nth-child(2){transition-delay:.07s}
+.method-grid .method-card:nth-child(3){transition-delay:.14s}
+.method-grid .method-card:nth-child(4){transition-delay:.21s}
+.method-grid .method-card:nth-child(5){transition-delay:.28s}
+.ac-cyan{--acc:#22e0ff;--acc-soft:rgba(34,224,255,.14);--acc-line:rgba(34,224,255,.4);--acc-glow:rgba(34,224,255,.22)}
+.ac-violet{--acc:#a78bfa;--acc-soft:rgba(139,92,246,.16);--acc-line:rgba(139,92,246,.45);--acc-glow:rgba(139,92,246,.25)}
+.ac-green{--acc:#3dfc9a;--acc-soft:rgba(61,252,154,.12);--acc-line:rgba(61,252,154,.4);--acc-glow:rgba(61,252,154,.2)}
+.ac-magenta{--acc:#ff4fd8;--acc-soft:rgba(255,79,216,.12);--acc-line:rgba(255,79,216,.4);--acc-glow:rgba(255,79,216,.22)}
+.ac-amber{--acc:#ffc857;--acc-soft:rgba(255,200,87,.12);--acc-line:rgba(255,200,87,.4);--acc-glow:rgba(255,200,87,.2)}
+
+/* ============ hardware ============ */
+.hw-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:22px;align-items:stretch}
+.gpu-panel{padding:20px 22px 18px;display:flex;flex-direction:column}
+.gpu-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.rig-chip{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.status{
+  display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);
+  font-size:11.5px;color:var(--green);letter-spacing:.14em;text-transform:uppercase;
+}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:led 2.4s ease-in-out infinite}
+.gpu-stage{flex:1;display:grid;place-items:center;padding:10px 0 8px}
+.gpu{
+  width:min(560px,100%);
+  filter:drop-shadow(0 0 20px rgba(34,224,255,.16)) drop-shadow(0 0 46px rgba(139,92,246,.12));
+}
+.gpu text{font-family:var(--mono)}
+.fanblades{animation:spin 15s linear infinite;transform-box:fill-box;transform-origin:center}
+.led{animation:led 2.6s ease-in-out infinite}
+.spec-card{padding:28px 26px;display:flex;flex-direction:column}
+.spec-card h3{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.specs li{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  padding:15px 6px;border-bottom:1px dashed rgba(151,170,205,.2);
+  transition:background .25s ease;
+}
+.specs li:last-of-type{border-bottom:none}
+.specs li:hover{background:rgba(34,224,255,.04)}
+.specs .k{color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.specs .v{font-weight:600;color:#eaf2ff;font-family:var(--mono);font-size:14px;text-align:right;transition:color .25s ease}
+.specs li:hover .v{color:var(--cyan)}
+.note{margin-top:auto;padding-top:18px;border-top:1px dashed rgba(151,170,205,.22);color:var(--muted);font-size:14px}
+.note b{color:#eaf2ff;font-weight:600}
+
+/* ============ about ============ */
+.about-wrap{max-width:780px;margin-inline:auto;text-align:center}
+.avatar{
+  width:98px;height:98px;margin:0 auto 28px;border-radius:50%;padding:4px;
+  background:conic-gradient(from 210deg,var(--cyan),var(--violet),var(--magenta),var(--cyan));
+  box-shadow:0 0 44px rgba(34,224,255,.28);
+}
+.avatar span{
+  display:grid;place-items:center;width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #13233f, #070c17 72%);
+  font-weight:800;font-size:27px;letter-spacing:.06em;color:#eaf4ff;
+}
+.about-text{font-size:17px;color:#c9d6ee;max-width:58ch;margin-inline:auto}
+.about-text strong{color:#fff;font-weight:700}
+.pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+
+/* ============ follow ============ */
+.follow-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.follow-card{display:flex;align-items:center;gap:20px;padding:28px 26px}
+.f-icon{width:60px;height:60px;border-radius:16px;display:grid;place-items:center;flex:none;transition:box-shadow .35s ease}
+.f-icon svg{width:30px;height:30px}
+.f-yt .f-icon{background:rgba(255,95,87,.1);border:1px solid rgba(255,95,87,.4);color:#ff7b74}
+.f-gh .f-icon{background:rgba(34,224,255,.1);border:1px solid rgba(34,224,255,.35);color:var(--cyan)}
+.f-body{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f-label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.f-title{font-size:19px;font-weight:700}
+.f-sub{font-family:var(--mono);font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.f-arrow{margin-left:auto;color:var(--muted);transition:transform .3s ease,color .3s ease;flex:none}
+.f-arrow svg{width:22px;height:22px}
+.follow-card:hover .f-arrow{transform:translateX(6px);color:#fff}
+.f-yt:hover{border-color:rgba(255,95,87,.5);box-shadow:0 26px 70px -26px rgba(255,95,87,.3)}
+.f-yt:hover .f-icon{box-shadow:0 0 26px rgba(255,95,87,.3)}
+.f-gh:hover{border-color:rgba(34,224,255,.5);box-shadow:0 26px 70px -26px rgba(34,224,255,.28)}
+.f-gh:hover .f-icon{box-shadow:0 0 26px rgba(34,224,255,.3)}
+
+/* ============ footer ============ */
+footer{
+  margin-top:70px;position:relative;
+  border-top:1px solid rgba(151,170,205,.14);
+  background:linear-gradient(180deg,rgba(8,12,24,.4),rgba(5,8,16,.9));
+}
+footer::before{
+  content:"";position:absolute;top:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(34,224,255,.55),rgba(139,92,246,.55),transparent);
+}
+.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:30px;padding:46px 0 32px}
+.foot-brand{display:inline-flex;align-items:center;gap:12px;font-weight:700}
+.foot-tag{font-family:var(--mono);color:var(--muted);margin-top:12px;font-size:13px;letter-spacing:.04em}
+.foot-col h4{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:500}
+.foot-col a{display:block;padding:5px 0;color:#c3d1ea;font-size:14.5px;transition:color .25s ease}
+.foot-col a:hover{color:var(--cyan)}
+.foot-bottom{border-top:1px solid rgba(151,170,205,.1);padding:18px 0}
+.foot-bottom p{font-size:13px;color:rgba(157,176,208,.75);text-align:center}
+
+/* ============ keyframes ============ */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{50%{opacity:0}}
+@keyframes led{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes bob{0%,100%{translate:-50% 0}50%{translate:-50% 7px}}
+
+/* ============ responsive ============ */
+@media (max-width:1000px){
+  .method-grid{grid-template-columns:repeat(2,1fr)}
+  .method-card,.method-card.wide{grid-column:auto}
+}
+@media (max-width:980px){
+  .hero{padding:150px 0 96px}
+  .hero-grid{grid-template-columns:1fr;gap:44px}
+  .hero-visual{max-width:600px}
+  .hw-grid{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .burger{display:flex}
+  .nav-menu{
+    position:absolute;top:70px;left:0;right:0;
+    flex-direction:column;align-items:stretch;gap:6px;
+    padding:18px 24px 24px;
+    background:rgba(7,11,22,.94);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--line);
+    transform:translateY(-12px);opacity:0;visibility:hidden;
+    transition:opacity .3s ease,transform .3s ease,visibility .3s;
+  }
+  .nav-menu.open{transform:none;opacity:1;visibility:visible}
+  .nav-link{padding:12px 14px}
+  .nav-link.active::after{display:none}
+  .nav-cta{margin-left:0;margin-top:10px}
+}
+@media (max-width:700px){
+  .sec{padding:84px 0}
+  .follow-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr;gap:26px}
+  .foot-bottom p{text-align:left}
+}
+@media (max-width:600px){
+  .method-grid{grid-template-columns:1fr}
+  .method-card{min-height:0}
+  .hero{padding:140px 0 90px}
+  .hero-cta .btn{width:100%}
+  .follow-card{padding:24px 20px;gap:16px}
+}
+
+/* ============ reduced motion ============ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  .js .reveal{opacity:1;translate:0 0}
+  .scroll-hint{animation:none}
+}
+</style>
+<noscript><style>
+  .nav-menu{position:static;opacity:1;visibility:visible;transform:none}
+  .burger{display:none}
+</style></noscript>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true"></div>
+
+<!-- ================= NAV ================= -->
+<header class="nav" id="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#top" aria-label="PC Magik Lab — home">
+      <span class="brand-chip" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <rect x="6" y="6" width="12" height="12" rx="2.5"/>
+          <rect x="9.5" y="9.5" width="5" height="5" rx="1"/>
+          <path d="M9 6V3.5M12 6V3.5M15 6V3.5M9 20.5V18M12 20.5V18M15 20.5V18M6 9H3.5M6 12H3.5M6 15H3.5M20.5 9H18M20.5 12H18M20.5 15H18"/>
+        </svg>
+      </span>
+      <span class="brand-name">PC Magik&nbsp;<b>Lab</b></span>
+    </a>
+
+    <nav class="nav-menu" id="navMenu" aria-label="Primary">
+      <a class="nav-link" data-section="method" href="#method">Method</a>
+      <a class="nav-link" data-section="hardware" href="#hardware">Hardware</a>
+      <a class="nav-link" data-section="about" href="#about">About</a>
+      <a class="nav-link" data-section="follow" href="#follow">Follow</a>
+      <a class="btn btn-primary btn-sm nav-cta" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.5 6.6v10.8a.7.7 0 0 0 1.06.6l8.9-5.4a.7.7 0 0 0 0-1.2l-8.9-5.4a.7.7 0 0 0-1.06.6Z"/></svg>
+        Watch
+      </a>
+    </nav>
+
+    <button class="burger" id="menuBtn" aria-label="Toggle menu" aria-expanded="false" aria-controls="navMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="progress" aria-hidden="true"><i id="progress"></i></div>
+</header>
+
+<main id="top">
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" aria-label="Intro">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="badge"><i aria-hidden="true"></i>YouTube series · AI models on real, local GPUs</span>
+        <h1>PC Magik <span class="grad">Lab</span></h1>
+        <p class="tagline">Local models, real GPUs.</p>
+        <p class="lede">
+          PC Magik Lab is a hands-on series about running AI models on real, local GPUs —
+          measured honestly, one variable at a time, with every prompt and result file published
+          so you can check the work for yourself.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.5 6.6v10.8a.7.7 0 0 0 1.06.6l8.9-5.4a.7.7 0 0 0 0-1.2l-8.9-5.4a.7.7 0 0 0-1.06.6Z"/></svg>
+            Watch the series
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+            Prompts &amp; results on GitHub
+          </a>
+        </div>
+        <div class="hero-facts" aria-label="The lab at a glance">
+          <span class="fact-chip"><i aria-hidden="true"></i>RTX 3090 · 24 GB</span>
+          <span class="fact-chip"><i aria-hidden="true"></i>LM Studio</span>
+          <span class="fact-chip"><i aria-hidden="true"></i>one rig</span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="terminal tiltable" role="img" aria-label="Animated terminal showing the lab method: same prompt, same rig, one variable per test, model reloaded before every run, prompts and result files published">
+          <div class="term-head">
+            <span class="tdots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="term-title">magik-lab — method</span>
+          </div>
+          <div class="term-body">
+            <div id="termBody">
+              <div class="tl cursorline"><span class="caret" aria-hidden="true"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a class="scroll-hint" href="#method" aria-label="Scroll to the method section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </a>
+  </section>
+
+  <!-- ================= METHOD ================= -->
+  <section class="sec" id="method" aria-labelledby="method-title">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="sec-tag">01 · Method</span>
+        <h2 id="method-title">How the series measures things</h2>
+        <p class="sec-sub">The rules of the lab are simple, and they are the same for every test.</p>
+      </div>
+
+      <div class="method-grid">
+        <article class="card method-card reveal ac-cyan">
+          <span class="idx" aria-hidden="true">01</span>
+          <span class="iconbox" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2Z"/><path d="M8 8h8M8 12h5"/></svg>
+          </span>
+          <h3>Same prompt</h3>
+          <p>The prompt is constant across the series. Same input, every single test — nothing is swapped or “optimized away”.</p>
+        </article>
+
+        <article class="card method-card reveal ac-violet">
+          <span class="idx" aria-hidden="true">02</span>
+          <span class="iconbox" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2.5"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 6V3.5M12 6V3.5M15 6V3.5M9 20.5V18M12 20.5V18M15 20.5V18M6 9H3.5M6 12H3.5M6 15H3.5M20.5 9H18M20.5 12H18M20.5 15H18"/></svg>
+          </span>
+          <h3>Same rig</h3>
+          <p>Every test runs on the one rig in the lab. Same machine, every time — no hardware changing behind the scenes.</p>
+        </article>
+
+        <article class="card method-card reveal ac-green">
+          <span class="idx" aria-hidden="true">03</span>
+          <span class="iconbox" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 8h9M19 8h1M4 16h1M11 16h9"/><circle cx="16" cy="8" r="2.5"/><circle cx="8" cy="16" r="2.5"/></svg>
+          </span>
+          <h3>One variable per test</h3>
+          <p>Each test changes exactly one variable — and only that one. When something moves, you know precisely what it is.</p>
+        </article>
+
+        <article class="card method-card wide reveal ac-magenta">
+          <span class="idx" aria-hidden="true">04</span>
+          <span class="iconbox" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+          </span>
+          <h3>Model reloaded before every run</h3>
+          <p>The model is reloaded before every run, so each test starts from a clean state instead of inheriting whatever the previous test left behind.</p>
+        </article>
+
+        <article class="card method-card wide reveal ac-amber">
+          <span class="idx" aria-hidden="true">05</span>
+          <span class="iconbox" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4l2 3h9a2 2 0 0 1 2 2Z"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg>
+          </span>
+          <h3>Everything published</h3>
+          <p>Every prompt and every result file is published in the repository. No screenshots of cherry-picked runs — the raw files are there to check.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HARDWARE ================= -->
+  <section class="sec" id="hardware" aria-labelledby="hw-title">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="sec-tag">02 · Hardware</span>
+        <h2 id="hw-title">One rig, one GPU</h2>
+        <p class="sec-sub">The whole lab is a single machine — so the hardware is never the unknown.</p>
+      </div>
+
+      <div class="hw-grid">
+        <div class="card gpu-panel tiltable reveal">
+          <div class="gpu-head">
+            <span class="rig-chip">The rig · one machine</span>
+            <span class="status"><i aria-hidden="true"></i>one rig</span>
+          </div>
+          <div class="gpu-stage">
+            <svg class="gpu" viewBox="0 0 640 400" role="img" aria-label="Stylized drawing of an RTX 3090 graphics card with two fans">
+              <!-- backplate -->
+              <rect x="70" y="80" width="500" height="210" rx="18" fill="#0b1120" stroke="rgba(34,224,255,.5)" stroke-width="1.5"/>
+              <rect x="86" y="96" width="468" height="178" rx="12" fill="none" stroke="rgba(151,170,205,.18)" stroke-width="1"/>
+              <!-- bracket -->
+              <rect x="40" y="104" width="24" height="150" rx="5" fill="#0a1120" stroke="rgba(151,170,205,.45)" stroke-width="1.5"/>
+              <rect x="46" y="122" width="12" height="7" rx="2" fill="rgba(151,170,205,.4)"/>
+              <rect x="46" y="152" width="12" height="7" rx="2" fill="rgba(151,170,205,.4)"/>
+              <rect x="46" y="182" width="12" height="7" rx="2" fill="rgba(151,170,205,.4)"/>
+              <!-- big fan -->
+              <circle cx="225" cy="185" r="72" fill="#060b15" stroke="rgba(34,224,255,.5)" stroke-width="1.5"/>
+              <g class="fanblades" fill="rgba(34,224,255,.14)" stroke="rgba(34,224,255,.55)" stroke-width="1">
+                <rect x="217" y="123" width="16" height="54" rx="8"/>
+                <rect x="217" y="123" width="16" height="54" rx="8" transform="rotate(60 225 185)"/>
+                <rect x="217" y="123" width="16" height="54" rx="8" transform="rotate(120 225 185)"/>
+                <rect x="217" y="123" width="16" height="54" rx="8" transform="rotate(180 225 185)"/>
+                <rect x="217" y="123" width="16" height="54" rx="8" transform="rotate(240 225 185)"/>
+                <rect x="217" y="123" width="16" height="54" rx="8" transform="rotate(300 225 185)"/>
+              </g>
+              <circle cx="225" cy="185" r="20" fill="#0a1120" stroke="rgba(34,224,255,.75)" stroke-width="1.5"/>
+              <circle cx="225" cy="185" r="7" fill="rgba(34,224,255,.85)"/>
+              <!-- fins -->
+              <g stroke="rgba(151,170,205,.22)" stroke-width="2">
+                <line x1="312" y1="121" x2="312" y2="249"/>
+                <line x1="324" y1="121" x2="324" y2="249"/>
+                <line x1="336" y1="121" x2="336" y2="249"/>
+                <line x1="348" y1="121" x2="348" y2="249"/>
+                <line x1="360" y1="121" x2="360" y2="249"/>
+                <line x1="372" y1="121" x2="372" y2="249"/>
+                <line x1="384" y1="121" x2="384" y2="249"/>
+              </g>
+              <!-- small fan -->
+              <circle cx="455" cy="185" r="50" fill="#060b15" stroke="rgba(139,92,246,.55)" stroke-width="1.5"/>
+              <g class="fanblades" fill="rgba(139,92,246,.16)" stroke="rgba(167,139,250,.6)" stroke-width="1">
+                <rect x="449" y="147" width="12" height="40" rx="6"/>
+                <rect x="449" y="147" width="12" height="40" rx="6" transform="rotate(60 455 185)"/>
+                <rect x="449" y="147" width="12" height="40" rx="6" transform="rotate(120 455 185)"/>
+                <rect x="449" y="147" width="12" height="40" rx="6" transform="rotate(180 455 185)"/>
+                <rect x="449" y="147" width="12" height="40" rx="6" transform="rotate(240 455 185)"/>
+                <rect x="449" y="147" width="12" height="40" rx="6" transform="rotate(300 455 185)"/>
+              </g>
+              <circle cx="455" cy="185" r="14" fill="#0a1120" stroke="rgba(167,139,250,.8)" stroke-width="1.5"/>
+              <circle cx="455" cy="185" r="5" fill="rgba(167,139,250,.9)"/>
+              <!-- details -->
+              <circle class="led" cx="98" cy="104" r="4" fill="#3dfc9a"/>
+              <rect x="520" y="100" width="36" height="28" rx="6" fill="#0a1120" stroke="rgba(255,200,87,.65)" stroke-width="1.5"/>
+              <circle cx="531" cy="114" r="2.4" fill="rgba(255,200,87,.8)"/>
+              <circle cx="540" cy="114" r="2.4" fill="rgba(255,200,87,.8)"/>
+              <circle cx="549" cy="114" r="2.4" fill="rgba(255,200,87,.8)"/>
+              <text x="320" y="272" text-anchor="middle" font-size="13" letter-spacing="4" fill="rgba(157,176,208,.85)">RTX 3090 · 24 GB</text>
+              <!-- edge connector -->
+              <g fill="#d9a441" opacity=".85">
+                <rect x="130" y="290" width="10" height="16" rx="2"/>
+                <rect x="146" y="290" width="10" height="16" rx="2"/>
+                <rect x="162" y="290" width="10" height="16" rx="2"/>
+                <rect x="178" y="290" width="10" height="16" rx="2"/>
+                <rect x="194" y="290" width="10" height="16" rx="2"/>
+                <rect x="210" y="290" width="10" height="16" rx="2"/>
+                <rect x="226" y="290" width="10" height="16" rx="2"/>
+                <rect x="242" y="290" width="10" height="16" rx="2"/>
+                <rect x="258" y="290" width="10" height="16" rx="2"/>
+                <rect x="274" y="290" width="10" height="16" rx="2"/>
+                <rect x="290" y="290" width="10" height="16" rx="2"/>
+                <rect x="322" y="290" width="10" height="16" rx="2"/>
+                <rect x="338" y="290" width="10" height="16" rx="2"/>
+                <rect x="354" y="290" width="10" height="16" rx="2"/>
+                <rect x="370" y="290" width="10" height="16" rx="2"/>
+                <rect x="386" y="290" width="10" height="16" rx="2"/>
+                <rect x="402" y="290" width="10" height="16" rx="2"/>
+                <rect x="418" y="290" width="10" height="16" rx="2"/>
+                <rect x="434" y="290" width="10" height="16" rx="2"/>
+                <rect x="450" y="290" width="10" height="16" rx="2"/>
+                <rect x="466" y="290" width="10" height="16" rx="2"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="card spec-card tiltable reveal">
+          <h3>Spec sheet</h3>
+          <ol class="specs">
+            <li><span class="k">Graphics card</span><span class="v">NVIDIA RTX 3090</span></li>
+            <li><span class="k">VRAM</span><span class="v">24 GB</span></li>
+            <li><span class="k">Model server</span><span class="v">LM Studio</span></li>
+            <li><span class="k">Rigs in the lab</span><span class="v">one</span></li>
+          </ol>
+          <p class="note">
+            That's the whole list. <b>One rig, one GPU, one model server</b> — so when a test
+            result comes out, the only thing that could have changed is the variable under test.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section class="sec" id="about" aria-labelledby="about-title">
+    <div class="container">
+      <div class="sec-head center reveal">
+        <span class="sec-tag">03 · About</span>
+        <h2 id="about-title">Who runs the lab</h2>
+      </div>
+      <div class="about-wrap reveal">
+        <div class="avatar" aria-hidden="true"><span>PM</span></div>
+        <p class="about-text">
+          PC Magik Lab is made by <strong>PC Magik (Mateusz Piekut)</strong> — a computer service
+          and homelab operator from Poland. The series lives in the same world as his everyday work:
+          real machines, real GPUs, and results published where anyone can look at them.
+        </p>
+        <div class="pills">
+          <span class="fact-chip"><i aria-hidden="true"></i>Computer service</span>
+          <span class="fact-chip"><i aria-hidden="true"></i>Homelab operator</span>
+          <span class="fact-chip"><i aria-hidden="true"></i>Poland</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOLLOW ================= -->
+  <section class="sec" id="follow" aria-labelledby="follow-title">
+    <div class="container">
+      <div class="sec-head center reveal">
+        <span class="sec-tag">04 · Follow</span>
+        <h2 id="follow-title">Watch it. Check it.</h2>
+        <p class="sec-sub">The series lives on YouTube. Every prompt and result file lives in the repository.</p>
+      </div>
+
+      <div class="follow-grid">
+        <a class="card follow-card f-yt lift reveal" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+          <span class="f-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5.5" width="19" height="13" rx="3.5"/><path d="M10.2 9.4v5.2l4.6-2.6-4.6-2.6Z" fill="currentColor" stroke="none"/></svg>
+          </span>
+          <span class="f-body">
+            <span class="f-label">YouTube channel</span>
+            <span class="f-title">Watch the series</span>
+            <span class="f-sub">youtube.com/@PCMagikLab</span>
+          </span>
+          <span class="f-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </span>
+        </a>
+
+        <a class="card follow-card f-gh lift reveal" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+          <span class="f-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+          </span>
+          <span class="f-body">
+            <span class="f-label">Repository</span>
+            <span class="f-title">Prompts &amp; result files</span>
+            <span class="f-sub">github.com/pcmagik/pcmagik-lab</span>
+          </span>
+          <span class="f-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="container foot-grid">
+    <div>
+      <span class="foot-brand">
+        <span class="brand-chip" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+            <rect x="6" y="6" width="12" height="12" rx="2.5"/>
+            <rect x="9.5" y="9.5" width="5" height="5" rx="1"/>
+            <path d="M9 6V3.5M12 6V3.5M15 6V3.5M9 20.5V18M12 20.5V18M15 20.5V18M6 9H3.5M6 12H3.5M6 15H3.5M20.5 9H18M20.5 12H18M20.5 15H18"/>
+          </svg>
+        </span>
+        PC Magik&nbsp;<b class="grad">Lab</b>
+      </span>
+      <p class="foot-tag">Local models, real GPUs.</p>
+    </div>
+    <nav class="foot-col" aria-label="Footer">
+      <h4>Sections</h4>
+      <a href="#method">Method</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#about">About</a>
+      <a href="#follow">Follow</a>
+    </nav>
+    <div class="foot-col">
+      <h4>Elsewhere</h4>
+      <a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">YouTube channel</a>
+      <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">GitHub repository</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <div class="container">
+      <p>© <span id="year">2025</span> PC Magik Lab · Made by PC Magik (Mateusz Piekut) — computer service &amp; homelab operator, Poland.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- footer year ---------- */
+  var yearEl = document.getElementById('year');
+  if (yearEl) { yearEl.textContent = String(new Date().getFullYear()); }
+
+  /* ---------- nav scroll state + progress bar ---------- */
+  var nav = document.querySelector('.nav');
+  var progress = document.getElementById('progress');
+  function onScroll() {
+    var y = window.scrollY || window.pageYOffset || 0;
+    if (nav) { nav.classList.toggle('scrolled', y > 24); }
+    if (progress) {
+      var doc = document.documentElement;
+      var h = doc.scrollHeight - window.innerHeight;
+      var p = h > 0 ? Math.min(1, Math.max(0, y / h)) : 0;
+      progress.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  /* ---------- mobile menu ---------- */
+  var burger = document.getElementById('menuBtn');
+  var menu = document.getElementById('navMenu');
+  function closeMenu() {
+    if (!menu || !burger) { return; }
+    menu.classList.remove('open');
+    burger.classList.remove('active');
+    burger.setAttribute('aria-expanded', 'false');
+  }
+  if (burger && menu) {
+    burger.addEventListener('click', function () {
+      var open = menu.classList.toggle('open');
+      burger.classList.toggle('active', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(menu.querySelectorAll('a'), function (a) {
+      a.addEventListener('click', closeMenu);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeMenu(); }
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  if (!reduced && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('in'); });
+  }
+
+  /* ---------- active nav link per section ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav-link[data-section]'));
+  if ('IntersectionObserver' in window && links.length) {
+    var linkFor = {};
+    links.forEach(function (l) {
+      var s = document.getElementById(l.getAttribute('data-section'));
+      if (s) { linkFor[s.id] = l; }
+    });
+    var so = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) { return; }
+        var active = linkFor[entry.target.id] || null;
+        links.forEach(function (l) { l.classList.toggle('active', l === active); });
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+    Object.keys(linkFor).forEach(function (id) { so.observe(document.getElementById(id)); });
+  }
+
+  /* ---------- tilt effect ---------- */
+  var fine = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  if (fine && !reduced) {
+    Array.prototype.slice.call(document.querySelectorAll('.tiltable')).forEach(function (card) {
+      var raf = 0;
+      card.addEventListener('mousemove', function (ev) {
+        var r = card.getBoundingClientRect();
+        if (!r.width || !r.height) { return; }
+        var px = (ev.clientX - r.left) / r.width - 0.5;
+        var py = (ev.clientY - r.top) / r.height - 0.5;
+        if (raf) { cancelAnimationFrame(raf); }
+        raf = requestAnimationFrame(function () {
+          card.style.setProperty('--ry', (px * 7).toFixed(2) + 'deg');
+          card.style.setProperty('--rx', (py * -6).toFixed(2) + 'deg');
+        });
+      });
+      card.addEventListener('mouseleave', function () {
+        if (raf) { cancelAnimationFrame(raf); }
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+      });
+    });
+  }
+
+  /* ---------- terminal typing loop ---------- */
+  var term = document.getElementById('termBody');
+  var LINES = [
+    { t: '$ pcmagik-lab method', c: 'cmd' },
+    { t: '  ✓ same prompt — every test', c: 'ok' },
+    { t: '  ✓ same rig — one machine', c: 'ok' },
+    { t: '  ✓ one variable changed per test', c: 'ok' },
+    { t: '  ✓ model reloaded before every run', c: 'ok' },
+    { t: '  ✓ every prompt + result file published', c: 'ok' },
+    { t: '$ next test: same prompt, same rig', c: 'cmd' }
+  ];
+
+  function renderStatic() {
+    if (!term) { return; }
+    var html = LINES.map(function (l) { return '<div class="tl ' + l.c + '"></div>'; }).join('');
+    html += '<div class="tl cursorline"><span class="caret"></span></div>';
+    term.innerHTML = html;
+    var ds = term.querySelectorAll('.tl');
+    LINES.forEach(function (l, i) { if (ds[i]) { ds[i].textContent = l.t; } });
+  }
+
+  if (term) {
+    if (reduced) {
+      renderStatic();
+    } else {
+      var cursorLine = term.querySelector('.cursorline');
+      function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+      function typeLoop() {
+        return (async function () {
+          while (true) {
+            for (var li = 0; li < LINES.length; li++) {
+              var line = LINES[li];
+              var div = document.createElement('div');
+              div.className = 'tl ' + line.c;
+              term.insertBefore(div, cursorLine);
+              for (var ci = 1; ci <= line.t.length; ci++) {
+                div.textContent = line.t.slice(0, ci);
+                await sleep(line.c === 'ok' ? 9 : 24);
+              }
+              await sleep(150);
+            }
+            await sleep(3600);
+            term.classList.add('fading');
+            await sleep(420);
+            Array.prototype.slice.call(term.children).forEach(function (el) {
+              if (el !== cursorLine) { el.parentNode.removeChild(el); }
+            });
+            term.classList.remove('fading');
+            await sleep(140);
+          }
+        })();
+      }
+      setTimeout(function () { typeLoop(); }, 700);
+    }
+  }
+})();
+</script>
+</body>
+</html>

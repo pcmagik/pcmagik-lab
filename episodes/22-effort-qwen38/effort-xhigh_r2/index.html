@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#05070d">
+<title>PC Magik Lab — Local models, real GPUs.</title>
+<meta name="description" content="PC Magik Lab is a YouTube series about running AI models on real, local GPUs. Local models, real GPUs. Same prompt, same rig, one variable per test — every prompt and result file published.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='6' fill='%2305070d' stroke='%2322d3ee' stroke-width='2'/%3E%3Crect x='11' y='11' width='10' height='10' rx='2' fill='%2322d3ee'/%3E%3Cpath d='M9 4v4M16 4v4M23 4v4M9 24v4M16 24v4M23 24v4M4 9h4M4 16h4M4 23h4M24 9h4M24 16h4M24 23h4' stroke='%23e879f9' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* ============================================================
+   PC Magik Lab — dark glass & neon landing page
+   Single file: CSS + JS inline, no external requests.
+   ============================================================ */
+
+:root{
+  --bg: #05070d;
+  --bg-soft: #0b1220;
+  --ink: #e7edf8;
+  --muted: #97a3bf;
+  --faint: #6b7894;
+  --cyan: #22d3ee;
+  --cyan-soft: #67e8f9;
+  --indigo: #818cf8;
+  --magenta: #e879f9;
+  --line: rgba(148,163,184,.16);
+  --line-strong: rgba(148,163,184,.3);
+  --glass: rgba(13,20,33,.55);
+  --glass-hi: rgba(148,163,184,.10);
+  --radius: 18px;
+  --grad: linear-gradient(135deg, var(--cyan), var(--indigo) 55%, var(--magenta));
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --shadow-card: 0 14px 44px rgba(1,4,12,.55);
+  --glow-cyan: 0 0 24px rgba(34,211,238,.22);
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html{
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body{
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection{ background: rgba(34,211,238,.32); color: #f0fdff; }
+
+a{ color: inherit; text-decoration: none; }
+button{ font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+ul{ margin: 0; padding: 0; list-style: none; }
+h1,h2,h3,p{ margin: 0; }
+
+:focus-visible{
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Custom scrollbar (WebKit) — subtle neon */
+::-webkit-scrollbar{ width: 11px; }
+::-webkit-scrollbar-track{ background: var(--bg); }
+::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, rgba(34,211,238,.5), rgba(232,115,249,.5));
+  border-radius: 8px;
+  border: 3px solid var(--bg);
+}
+
+/* ---------- Fixed background: orbs + grid ---------- */
+.bg{
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background:
+    radial-gradient(1100px 700px at 50% -12%, #0c1424 0%, transparent 60%),
+    radial-gradient(900px 600px at 100% 110%, #100a1e 0%, transparent 55%),
+    var(--bg);
+}
+.bg-grid{
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(148,163,184,.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,163,184,.075) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(920px 560px at 50% 140px, rgba(0,0,0,.95), transparent 72%);
+          mask-image: radial-gradient(920px 560px at 50% 140px, rgba(0,0,0,.95), transparent 72%);
+}
+.orb{
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(85px);
+  opacity: .55;
+  will-change: transform;
+}
+.orb-a{
+  width: 540px; height: 540px;
+  left: -160px; top: -140px;
+  background: radial-gradient(circle, rgba(34,211,238,.42), transparent 62%);
+  animation: drift-a 17s ease-in-out infinite alternate;
+}
+.orb-b{
+  width: 580px; height: 580px;
+  right: -180px; top: 26%;
+  background: radial-gradient(circle, rgba(232,115,249,.34), transparent 62%);
+  animation: drift-b 21s ease-in-out infinite alternate;
+}
+.orb-c{
+  width: 460px; height: 460px;
+  left: 30%; bottom: -220px;
+  background: radial-gradient(circle, rgba(129,140,248,.32), transparent 62%);
+  animation: drift-a 23s ease-in-out infinite alternate-reverse;
+}
+@keyframes drift-a{
+  from{ transform: translate3d(0,0,0); }
+  to  { transform: translate3d(70px, 50px, 0); }
+}
+@keyframes drift-b{
+  from{ transform: translate3d(0,0,0); }
+  to  { transform: translate3d(-60px, 70px, 0); }
+}
+
+/* ---------- Scroll progress bar ---------- */
+.progress{
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  z-index: 90;
+  background: var(--grad);
+  box-shadow: 0 0 12px rgba(34,211,238,.65);
+}
+
+/* ---------- Header / nav ---------- */
+.site-head{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 64px;
+  padding: 0 22px;
+  background: rgba(5,8,15,.6);
+  -webkit-backdrop-filter: blur(14px);
+          backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  font-size: 1.02rem;
+}
+.brand svg{ flex: none; filter: drop-shadow(0 0 8px rgba(34,211,238,.5)); }
+.brand b{
+  background: var(--grad);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+.nav{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav > a{
+  position: relative;
+  padding: 8px 12px;
+  font-size: .92rem;
+  color: var(--muted);
+  border-radius: 10px;
+  transition: color .25s, background .25s;
+}
+.nav > a:hover{ color: var(--ink); background: rgba(148,163,184,.08); }
+.nav > a.active{ color: var(--cyan-soft); }
+.nav > a.active::after{
+  content: "";
+  position: absolute;
+  left: 12px; right: 12px; bottom: 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--grad);
+  box-shadow: 0 0 10px rgba(34,211,238,.7);
+}
+.nav > .btn{ margin-left: 8px; }
+
+.nav-toggle{
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(148,163,184,.06);
+}
+.nav-toggle span{
+  display: block;
+  height: 2px;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: transform .3s, opacity .3s;
+}
+.nav-toggle[aria-expanded="true"] span:nth-child(1){ transform: translateY(7px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(2){ opacity: 0; }
+.nav-toggle[aria-expanded="true"] span:nth-child(3){ transform: translateY(-7px) rotate(-45deg); }
+
+/* ---------- Buttons ---------- */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: .94rem;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease, color .25s ease;
+  will-change: transform;
+}
+.btn svg{ flex: none; }
+.btn-primary{
+  color: #eafcff;
+  background: linear-gradient(135deg, rgba(34,211,238,.20), rgba(129,140,248,.16) 55%, rgba(232,115,249,.20));
+  border-color: rgba(34,211,238,.5);
+  box-shadow: inset 0 0 18px rgba(34,211,238,.10);
+}
+.btn-primary:hover{
+  transform: translateY(-2px);
+  border-color: var(--cyan);
+  box-shadow: 0 10px 30px rgba(34,211,238,.28), inset 0 0 22px rgba(34,211,238,.16);
+}
+.btn-ghost{
+  color: var(--ink);
+  background: rgba(148,163,184,.06);
+  border-color: var(--line);
+}
+.btn-ghost:hover{
+  transform: translateY(-2px);
+  border-color: rgba(129,140,248,.6);
+  background: rgba(129,140,248,.10);
+  box-shadow: 0 10px 28px rgba(0,0,0,.35), 0 0 18px rgba(129,140,248,.18);
+}
+.btn-sm{ padding: 9px 14px; font-size: .86rem; border-radius: 10px; }
+.btn:active{ transform: translateY(0); }
+
+/* ---------- Layout primitives ---------- */
+.section{
+  position: relative;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(72px, 10vw, 116px) 24px;
+  scroll-margin-top: 76px;
+}
+.sec-head{
+  max-width: 720px;
+  margin-bottom: clamp(30px, 5vw, 48px);
+}
+.kicker{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: .76rem;
+  font-weight: 600;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--cyan-soft);
+}
+.kicker::before{
+  content: "";
+  width: 26px; height: 2px;
+  border-radius: 2px;
+  background: var(--grad);
+  box-shadow: 0 0 8px rgba(34,211,238,.8);
+}
+.sec-head h2{
+  margin-top: 14px;
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+}
+.sec-lede{
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 1.02rem;
+  max-width: 60ch;
+}
+
+/* ---------- Cards (glass) ---------- */
+.card{
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 26px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(165deg, var(--glass-hi), rgba(148,163,184,.02) 46%),
+    var(--glass);
+  -webkit-backdrop-filter: blur(12px);
+          backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card);
+  transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+  transform-style: preserve-3d;
+}
+.card::before{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(34,211,238,.55), rgba(232,115,249,.45), transparent);
+  opacity: .55;
+}
+.card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), rgba(103,232,249,.10), transparent 42%);
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+.card:hover{
+  border-color: rgba(34,211,238,.38);
+  box-shadow: 0 18px 52px rgba(1,4,12,.6), 0 0 28px rgba(34,211,238,.13);
+}
+.card:hover::after{ opacity: 1; }
+.card > *{ position: relative; z-index: 1; }
+.tilt{ transition: transform .16s ease-out, border-color .3s ease, box-shadow .3s ease; }
+
+.cell{ display: flex; }
+.cell .card{ flex: 1; }
+
+/* ---------- Hero ---------- */
+.hero{
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: calc(64px + clamp(48px, 8vw, 88px)) 24px clamp(64px, 8vw, 96px);
+  display: grid;
+  grid-template-columns: 1.04fr .96fr;
+  gap: clamp(32px, 5vw, 56px);
+  align-items: center;
+  min-height: min(92svh, 900px);
+}
+.hero-copy > *{ animation: none; }
+.badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(34,211,238,.35);
+  background: rgba(34,211,238,.08);
+  color: var(--cyan-soft);
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  box-shadow: var(--glow-cyan);
+}
+.badge .pulse{
+  position: relative;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+}
+.badge .pulse::after{
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--cyan);
+  animation: ping 1.8s cubic-bezier(0,0,.2,1) infinite;
+}
+@keyframes ping{
+  0%   { transform: scale(.6); opacity: .9; }
+  80%, 100% { transform: scale(1.9); opacity: 0; }
+}
+.hero h1{
+  margin-top: 22px;
+  font-size: clamp(2.7rem, 6.4vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -.035em;
+  line-height: 1.02;
+}
+.hero h1 .grad{
+  background: var(--grad);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 20px rgba(34,211,238,.35));
+}
+.tagline{
+  margin-top: 16px;
+  font-size: clamp(1.35rem, 2.8vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -.01em;
+  background: linear-gradient(92deg, #d9fbff, var(--cyan-soft) 30%, var(--indigo) 60%, var(--magenta));
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(34,211,238,.28));
+}
+.lede{
+  margin-top: 16px;
+  max-width: 52ch;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+.cta-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 30px;
+}
+.hero-facts{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-top: 30px;
+}
+.hero-facts li{
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.hero-facts li::before{
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 2px;
+  background: var(--grad);
+  box-shadow: 0 0 8px rgba(34,211,238,.7);
+  transform: rotate(45deg);
+}
+
+/* ---------- Terminal ---------- */
+.hero-term{ position: relative; }
+.hero-term::before{
+  content: "";
+  position: absolute;
+  inset: 18px -14px -18px 14px;
+  border-radius: 20px;
+  background: var(--grad);
+  opacity: .16;
+  filter: blur(26px);
+  z-index: 0;
+}
+.term{
+  position: relative;
+  z-index: 1;
+  border-radius: 16px;
+  border: 1px solid rgba(34,211,238,.25);
+  background: rgba(6,10,18,.78);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  box-shadow: 0 24px 70px rgba(0,0,0,.55), 0 0 44px rgba(34,211,238,.08);
+  overflow: hidden;
+}
+.term-bar{
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(148,163,184,.05);
+}
+.term-bar .dot{ width: 11px; height: 11px; border-radius: 50%; }
+.dot.r{ background: #f87171; }
+.dot.y{ background: #fbbf24; }
+.dot.g{ background: #34d399; }
+.term-title{
+  margin-left: 9px;
+  font-family: var(--mono);
+  font-size: .74rem;
+  letter-spacing: .04em;
+  color: var(--faint);
+}
+.term-body{
+  padding: 20px 20px 24px;
+  min-height: 236px;
+  font-family: var(--mono);
+  font-size: .84rem;
+  line-height: 2.05;
+  transition: opacity .5s ease;
+}
+.term-body.fade{ opacity: 0; }
+.tline{ white-space: pre-wrap; word-break: break-word; }
+.tline.cmd{ color: var(--cyan-soft); }
+.tline.cmd .ps{ color: var(--magenta); margin-right: 8px; }
+.tline.cmd2{ color: #f0abfc; }
+.tline.kv{
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--muted);
+}
+.tline.kv .k{ color: #7dd3fc; flex: none; }
+.tline.kv .fill{
+  flex: 1;
+  min-width: 12px;
+  border-bottom: 1px dotted rgba(148,163,184,.4);
+  transform: translateY(-5px);
+}
+.tline.kv .v{ color: #dbe7ff; }
+.tline.hidden-line{ opacity: 0; transform: translateY(5px); transition: opacity .3s ease, transform .3s ease; }
+.tline.show{ opacity: 1; transform: none; }
+.cursor{
+  display: inline-block;
+  width: 8px;
+  height: 1.05em;
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  background: var(--cyan-soft);
+  box-shadow: 0 0 9px rgba(34,211,238,.9);
+  animation: blink 1.05s steps(1) infinite;
+}
+@keyframes blink{ 50%{ opacity: 0; } }
+
+/* ---------- Method grid ---------- */
+.method-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+  gap: 18px;
+}
+.method-card{ gap: 16px; }
+.method-card .idx{
+  position: absolute;
+  top: 14px; right: 18px;
+  font-family: var(--mono);
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  color: var(--faint);
+  opacity: .8;
+}
+.icon-tile{
+  width: 48px; height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #bdf3ff;
+  background: linear-gradient(135deg, rgba(34,211,238,.20), rgba(232,115,249,.16));
+  border: 1px solid rgba(34,211,238,.38);
+  box-shadow: inset 0 0 14px rgba(34,211,238,.14), 0 0 16px rgba(34,211,238,.12);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.card:hover .icon-tile{
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: inset 0 0 18px rgba(34,211,238,.22), 0 0 26px rgba(34,211,238,.30);
+}
+.method-card h3{
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+.method-card p{
+  color: var(--muted);
+  font-size: .92rem;
+}
+
+/* ---------- Hardware ---------- */
+.hw-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+.hw-card{ gap: 18px; align-items: center; }
+.hw-tag{
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cyan-soft);
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(34,211,238,.35);
+  background: rgba(34,211,238,.07);
+}
+.hw-card h3{
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -.015em;
+}
+.hw-card p{ color: var(--muted); font-size: .95rem; max-width: 46ch; }
+.hw-art{
+  width: 100%;
+  max-width: 430px;
+  margin: 4px auto 0;
+  display: block;
+}
+.gpu-svg{
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 8px 26px rgba(34,211,238,.16));
+}
+.fan-spin{
+  animation: spin 3.2s linear infinite;
+  animation-play-state: paused;
+}
+.hw-card:hover .fan-spin,
+.hw-card:focus-within .fan-spin{
+  animation-play-state: running;
+}
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+.lm-win{
+  width: 100%;
+  max-width: 380px;
+  margin: 4px auto 0;
+  border-radius: 14px;
+  border: 1px solid rgba(129,140,248,.4);
+  background: rgba(8,12,22,.8);
+  box-shadow: 0 10px 34px rgba(0,0,0,.45), 0 0 26px rgba(129,140,248,.10);
+  overflow: hidden;
+}
+.lm-bar{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(148,163,184,.06);
+}
+.lm-bar span{ width: 10px; height: 10px; border-radius: 50%; background: rgba(148,163,184,.35); }
+.lm-bar i{
+  margin-left: 8px;
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: .72rem;
+  letter-spacing: .05em;
+  color: var(--faint);
+}
+.lm-body{
+  padding: 16px 18px 18px;
+  font-family: var(--mono);
+  font-size: .82rem;
+  line-height: 2.1;
+}
+.lm-row{ display: flex; gap: 9px; color: var(--muted); }
+.lm-row .lm-key{
+  flex: none;
+  width: 7ch;
+  color: #c4b5fd;
+}
+.lm-row .lm-val{ color: #dbe7ff; }
+.lm-cmd .lm-prompt{ color: var(--magenta); }
+.lm-cursor{
+  display: inline-block;
+  width: 9px; height: 1.05em;
+  vertical-align: text-bottom;
+  background: var(--indigo);
+  box-shadow: 0 0 9px rgba(129,140,248,.9);
+  animation: blink 1.05s steps(1) infinite;
+}
+.hw-note{
+  max-width: 640px;
+  margin: 26px auto 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: .95rem;
+  padding: 0 12px;
+}
+.hw-note b{ color: var(--ink); font-weight: 600; }
+
+/* ---------- About ---------- */
+.about-wrap{
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+.about-id{
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+}
+.avatar{
+  position: relative;
+  width: 152px; height: 152px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 32% 28%, #17294a 0%, #0a1120 58%, #060a14 100%);
+  border: 1px solid rgba(129,140,248,.5);
+  box-shadow: 0 0 0 5px rgba(34,211,238,.06), 0 0 44px rgba(34,211,238,.22), inset 0 0 30px rgba(34,211,238,.10);
+}
+.avatar::before{
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 1px dashed rgba(34,211,238,.45);
+  animation: spin-slow 26s linear infinite;
+}
+@keyframes spin-slow{ to{ transform: rotate(360deg); } }
+.avatar .mono{
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  background: var(--grad);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 12px rgba(34,211,238,.4));
+}
+.about-id .who{ font-weight: 700; font-size: 1.05rem; }
+.about-id .who-sub{ color: var(--muted); font-size: .9rem; }
+.about-id .who-loc{
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 4px;
+  color: var(--cyan-soft);
+  font-family: var(--mono);
+  font-size: .74rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.about-card{ gap: 16px; }
+.about-card h2{
+  font-size: clamp(1.5rem, 3vw, 2.05rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+.about-card p{ color: var(--muted); max-width: 62ch; }
+.about-card p b{ color: var(--ink); font-weight: 600; }
+.about-links{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ---------- CTA band ---------- */
+.band{
+  text-align: center;
+  align-items: center;
+  gap: 18px;
+  padding: clamp(36px, 6vw, 60px) clamp(24px, 5vw, 56px);
+}
+.band h2{
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  max-width: 22ch;
+}
+.band p{ color: var(--muted); max-width: 56ch; }
+.band .cta-row{ justify-content: center; margin-top: 6px; }
+
+/* ---------- Footer ---------- */
+.site-foot{
+  border-top: 1px solid var(--line);
+  background: rgba(5,8,14,.65);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+}
+.foot-grid{
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 44px 24px 30px;
+  display: grid;
+  grid-template-columns: 1.3fr .8fr .9fr;
+  gap: 32px;
+}
+.foot-grid h4{
+  margin: 0 0 12px;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.foot-brand p{
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: .92rem;
+  max-width: 34ch;
+}
+.foot-links li + li{ margin-top: 9px; }
+.foot-links a{
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font-size: .93rem;
+  padding: 3px 0;
+  transition: color .25s, transform .25s;
+}
+.foot-links a:hover{ color: var(--cyan-soft); transform: translateX(3px); }
+.foot-cred{ color: var(--muted); font-size: .93rem; }
+.foot-cred b{ color: var(--ink); font-weight: 600; }
+.foot-bottom{
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 16px 24px 26px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  color: var(--faint);
+  font-size: .82rem;
+}
+.foot-bottom .tag{
+  font-weight: 600;
+  background: var(--grad);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Reveal on scroll ---------- */
+.js .reveal{
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.22, 1, .36, 1);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.js .reveal.in{
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px){
+  .hero{
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding-top: calc(64px + 44px);
+  }
+  .hero-term{ order: -1; }
+  .about-wrap{ grid-template-columns: 1fr; }
+  .about-id{ flex-direction: row; justify-content: center; flex-wrap: wrap; }
+}
+
+@media (max-width: 880px){
+  .nav-toggle{ display: inline-flex; }
+  .nav{
+    position: fixed;
+    top: 72px;
+    left: 14px;
+    right: 14px;
+    z-index: 79;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: rgba(8,12,22,.92);
+    -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(18px);
+    box-shadow: 0 24px 60px rgba(0,0,0,.6);
+    display: none;
+  }
+  .nav.open{ display: flex; animation: nav-in .25s ease; }
+  @keyframes nav-in{ from{ opacity: 0; transform: translateY(-8px); } to{ opacity: 1; transform: none; } }
+  .nav > a{ padding: 11px 12px; }
+  .nav > a.active::after{ display: none; }
+  .nav > .btn{ margin-left: 0; margin-top: 4px; }
+}
+
+@media (max-width: 560px){
+  .btn{ width: 100%; }
+  .cta-row, .about-links{ flex-direction: column; }
+  .hero-facts{ flex-direction: column; gap: 9px; }
+  .foot-grid{ grid-template-columns: 1fr; gap: 26px; }
+  .term-body{ font-size: .78rem; min-height: 250px; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *, *::before, *::after{
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .js .reveal{ opacity: 1; transform: none; }
+  .cursor, .lm-cursor{ animation: none; opacity: 1; }
+  .fan-spin{ animation: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background décor -->
+<div class="bg" aria-hidden="true">
+  <div class="bg-grid"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+</div>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- ================= Header ================= -->
+<header class="site-head">
+  <a class="brand" href="#top" aria-label="PC Magik Lab — back to top">
+    <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect x="4" y="4" width="24" height="24" rx="6" fill="#0a1120" stroke="#22d3ee" stroke-width="2"/>
+      <rect x="11" y="11" width="10" height="10" rx="2" fill="#22d3ee"/>
+      <path d="M9 4v3M16 4v3M23 4v3M9 25v3M16 25v3M23 25v3M4 9h3M4 16h3M4 23h3M25 9h3M25 16h3M25 23h3"
+            stroke="#e879f9" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>PC Magik <b>Lab</b></span>
+  </a>
+
+  <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="nav" aria-label="Toggle navigation menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <nav class="nav" id="nav" aria-label="Primary">
+    <a href="#method" data-target="method">Method</a>
+    <a href="#hardware" data-target="hardware">Hardware</a>
+    <a href="#about" data-target="about">About</a>
+    <a class="btn btn-ghost btn-sm" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/>
+      </svg>
+      YouTube
+    </a>
+    <a class="btn btn-primary btn-sm" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.42 7.86 10.95.58.1.79-.25.79-.55 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.04-.72.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.66.41.36.78 1.06.78 2.14 0 1.55-.02 2.79-.02 3.17 0 .3.2.66.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+      </svg>
+      GitHub
+    </a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ================= Hero ================= -->
+  <section class="hero" aria-label="Introduction">
+    <div class="hero-copy">
+      <span class="badge"><span class="pulse" aria-hidden="true"></span> YouTube series · local AI</span>
+      <h1>PC Magik <span class="grad">Lab</span></h1>
+      <p class="tagline">Local models, real GPUs.</p>
+      <p class="lede">
+        A hands-on YouTube series about running AI models on real, local GPUs —
+        every test run the same way on the same rig, with every prompt and result
+        file published in the open.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/>
+          </svg>
+          Watch on YouTube
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.42 7.86 10.95.58.1.79-.25.79-.55 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.04-.72.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.66.41.36.78 1.06.78 2.14 0 1.55-.02 2.79-.02 3.17 0 .3.2.66.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+          </svg>
+          Prompts &amp; results on GitHub
+        </a>
+      </div>
+      <ul class="hero-facts">
+        <li>Same prompt, every run</li>
+        <li>One rig — NVIDIA RTX 3090 24 GB</li>
+        <li>Every prompt &amp; result file published</li>
+      </ul>
+    </div>
+
+    <div class="hero-term reveal" style="--i:1">
+      <div class="term" role="img" aria-label="Terminal showing the test protocol of the series">
+        <div class="term-bar" aria-hidden="true">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="term-title">pcmagik-lab — protocol</span>
+        </div>
+        <div class="term-body" id="termBody" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Method ================= -->
+  <section id="method" class="section" aria-labelledby="method-title">
+    <header class="sec-head reveal">
+      <span class="kicker">Method</span>
+      <h2 id="method-title">How the series measures things</h2>
+      <p class="sec-lede">
+        One protocol for every test. Same prompt, same rig — and the only thing
+        that ever changes is the single variable under test.
+      </p>
+    </header>
+
+    <div class="method-grid">
+      <div class="cell reveal" style="--i:0">
+        <article class="card tilt method-card">
+          <span class="idx" aria-hidden="true">01</span>
+          <div class="icon-tile" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="4" width="19" height="16" rx="3"/>
+              <path d="M6.5 9.5 10 12.5 6.5 15.5"/>
+              <path d="M12.5 15.5h5"/>
+            </svg>
+          </div>
+          <h3>Same prompt</h3>
+          <p>Every test starts from the same prompt, so the model is always answering the exact same question.</p>
+        </article>
+      </div>
+
+      <div class="cell reveal" style="--i:1">
+        <article class="card tilt method-card">
+          <span class="idx" aria-hidden="true">02</span>
+          <div class="icon-tile" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="5" width="14" height="14" rx="2.5"/>
+              <rect x="9.5" y="9.5" width="5" height="5" rx="1"/>
+              <path d="M9 2.5v2.5M15 2.5v2.5M9 19v2.5M15 19v2.5M2.5 9H5M2.5 15H5M19 9h2.5M19 15h2.5"/>
+            </svg>
+          </div>
+          <h3>Same rig</h3>
+          <p>The same machine runs every test. The hardware never quietly changes behind the scenes.</p>
+        </article>
+      </div>
+
+      <div class="cell reveal" style="--i:2">
+        <article class="card tilt method-card">
+          <span class="idx" aria-hidden="true">03</span>
+          <div class="icon-tile" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7h10M18 7h2M4 12h3M11 12h9M4 17h13M20.5 17H22"/>
+              <circle cx="15.5" cy="7" r="2"/>
+              <circle cx="9" cy="12" r="2"/>
+              <circle cx="18" cy="17" r="2"/>
+            </svg>
+          </div>
+          <h3>One variable per test</h3>
+          <p>Each test changes exactly one thing. One change at a time is what makes a comparison meaningful.</p>
+        </article>
+      </div>
+
+      <div class="cell reveal" style="--i:3">
+        <article class="card tilt method-card">
+          <span class="idx" aria-hidden="true">04</span>
+          <div class="icon-tile" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+              <path d="M20 3.5V8h-4.5"/>
+            </svg>
+          </div>
+          <h3>Model reloaded before every run</h3>
+          <p>The model is reloaded fresh before every run, so each one starts from a clean state.</p>
+        </article>
+      </div>
+
+      <div class="cell reveal" style="--i:4">
+        <article class="card tilt method-card">
+          <span class="idx" aria-hidden="true">05</span>
+          <div class="icon-tile" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 15V4.5M8.5 8 12 4.5 15.5 8"/>
+              <path d="M4 14.5v3.5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3.5"/>
+            </svg>
+          </div>
+          <h3>Everything published</h3>
+          <p>Every prompt and every result file goes to the open repository — you can check the raw material yourself.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Hardware ================= -->
+  <section id="hardware" class="section" aria-labelledby="hw-title">
+    <header class="sec-head reveal">
+      <span class="kicker">Hardware</span>
+      <h2 id="hw-title">One rig. One GPU. One server.</h2>
+      <p class="sec-lede">
+        There is no rotating hardware fleet here. Every test in the series runs
+        on a single, known machine.
+      </p>
+    </header>
+
+    <div class="hw-grid">
+      <div class="cell reveal" style="--i:0">
+        <article class="card tilt hw-card">
+          <span class="hw-tag">GPU</span>
+          <svg class="gpu-svg" viewBox="0 0 360 148" role="img" aria-label="Stylized illustration of a graphics card with two cooling fans">
+            <defs>
+              <linearGradient id="pcbGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#121d33"/>
+                <stop offset="1" stop-color="#0a1220"/>
+              </linearGradient>
+              <linearGradient id="neonEdge" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#22d3ee"/>
+                <stop offset="1" stop-color="#e879f9"/>
+              </linearGradient>
+            </defs>
+
+            <!-- PCIe connector fingers -->
+            <g fill="#1c2b47">
+              <rect x="48" y="124" width="10" height="12" rx="1.5"/>
+              <rect x="66" y="124" width="10" height="12" rx="1.5"/>
+              <rect x="84" y="124" width="10" height="12" rx="1.5"/>
+              <rect x="102" y="124" width="10" height="12" rx="1.5"/>
+              <rect x="120" y="124" width="10" height="12" rx="1.5"/>
+              <rect x="138" y="124" width="10" height="12" rx="1.5"/>
+            </g>
+
+            <!-- PCB -->
+            <rect x="8" y="20" width="344" height="102" rx="12" fill="url(#pcbGrad)" stroke="rgba(148,163,184,.3)"/>
+            <rect x="12" y="23" width="336" height="2.6" rx="1.3" fill="url(#neonEdge)" opacity=".85"/>
+
+            <!-- heatsink fins between fans -->
+            <g stroke="rgba(148,163,184,.28)" stroke-width="3" stroke-linecap="round">
+              <line x1="152" y1="44" x2="152" y2="100"/>
+              <line x1="161" y1="44" x2="161" y2="100"/>
+              <line x1="170" y1="44" x2="170" y2="100"/>
+              <line x1="179" y1="44" x2="179" y2="100"/>
+              <line x1="188" y1="44" x2="188" y2="100"/>
+            </g>
+            <rect x="150" y="60" width="42" height="24" rx="3.5" fill="#13223c" stroke="rgba(34,211,238,.35)"/>
+            <rect x="157" y="66" width="28" height="12" rx="2" fill="none" stroke="rgba(148,163,184,.35)"/>
+
+            <!-- power connector -->
+            <rect x="300" y="34" width="42" height="24" rx="4" fill="#0d1830" stroke="rgba(148,163,184,.35)"/>
+            <g fill="#26365a">
+              <circle cx="310" cy="42" r="2.6"/><circle cx="318" cy="42" r="2.6"/><circle cx="326" cy="42" r="2.6"/><circle cx="334" cy="42" r="2.6"/>
+              <circle cx="310" cy="51" r="2.6"/><circle cx="318" cy="51" r="2.6"/><circle cx="326" cy="51" r="2.6"/><circle cx="334" cy="51" r="2.6"/>
+            </g>
+
+            <!-- fan 1 -->
+            <circle cx="105" cy="71" r="34" fill="#0b1424" stroke="rgba(34,211,238,.45)"/>
+            <g class="fan-spin" style="transform-origin: 105px 71px;" fill="none" stroke="#7dd3fc" stroke-width="4.5" stroke-linecap="round" opacity=".7">
+              <ellipse cx="105" cy="52" rx="6.5" ry="12.5"/>
+              <ellipse cx="105" cy="52" rx="6.5" ry="12.5" transform="rotate(72 105 71)"/>
+              <ellipse cx="105" cy="52" rx="6.5" ry="12.5" transform="rotate(144 105 71)"/>
+              <ellipse cx="105" cy="52" rx="6.5" ry="12.5" transform="rotate(216 105 71)"/>
+              <ellipse cx="105" cy="52" rx="6.5" ry="12.5" transform="rotate(288 105 71)"/>
+            </g>
+            <circle cx="105" cy="71" r="9.5" fill="#101d33" stroke="rgba(34,211,238,.55)"/>
+
+            <!-- fan 2 -->
+            <circle cx="235" cy="71" r="34" fill="#0b1424" stroke="rgba(34,211,238,.45)"/>
+            <g class="fan-spin" style="transform-origin: 235px 71px;" fill="none" stroke="#c4b5fd" stroke-width="4.5" stroke-linecap="round" opacity=".7">
+              <ellipse cx="235" cy="52" rx="6.5" ry="12.5"/>
+              <ellipse cx="235" cy="52" rx="6.5" ry="12.5" transform="rotate(72 235 71)"/>
+              <ellipse cx="235" cy="52" rx="6.5" ry="12.5" transform="rotate(144 235 71)"/>
+              <ellipse cx="235" cy="52" rx="6.5" ry="12.5" transform="rotate(216 235 71)"/>
+              <ellipse cx="235" cy="52" rx="6.5" ry="12.5" transform="rotate(288 235 71)"/>
+            </g>
+            <circle cx="235" cy="71" r="9.5" fill="#101d33" stroke="rgba(129,140,248,.55)"/>
+
+            <!-- memory chips -->
+            <g fill="#152441" stroke="rgba(148,163,184,.3)">
+              <rect x="14" y="106" width="24" height="10" rx="2"/>
+              <rect x="282" y="106" width="24" height="10" rx="2"/>
+              <rect x="312" y="106" width="24" height="10" rx="2"/>
+            </g>
+          </svg>
+          <h3>NVIDIA RTX 3090 24 GB</h3>
+          <p>The GPU doing the heavy lifting in every single test.</p>
+        </article>
+      </div>
+
+      <div class="cell reveal" style="--i:1">
+        <article class="card tilt hw-card">
+          <span class="hw-tag" style="color:#c4b5fd; border-color:rgba(129,140,248,.45); background:rgba(129,140,248,.08);">Model server</span>
+          <div class="lm-win" aria-hidden="true">
+            <div class="lm-bar">
+              <span></span><span></span><span></span>
+              <i>LM Studio</i>
+            </div>
+            <div class="lm-body">
+              <p class="lm-row"><span class="lm-key">running</span><span class="lm-val">LM Studio model server</span></p>
+              <p class="lm-row"><span class="lm-key">on</span><span class="lm-val">NVIDIA RTX 3090 24 GB</span></p>
+              <p class="lm-row lm-cmd"><span class="lm-prompt">›</span><span class="lm-cursor"></span></p>
+            </div>
+          </div>
+          <h3>LM Studio</h3>
+          <p>The model server running the models on the rig.</p>
+        </article>
+      </div>
+    </div>
+
+    <p class="hw-note reveal">
+      That's the whole hardware story: <b>one GPU</b> and <b>one model server</b>.
+      No swapping parts between tests — only the one variable under test changes.
+    </p>
+  </section>
+
+  <!-- ================= About ================= -->
+  <section id="about" class="section" aria-labelledby="about-title">
+    <div class="about-wrap">
+      <div class="cell reveal" style="--i:0">
+        <div class="card about-id tilt">
+          <div class="avatar" aria-hidden="true">
+            <span class="mono">PM</span>
+          </div>
+          <div>
+            <p class="who">PC Magik</p>
+            <p class="who-sub">Mateusz Piekut</p>
+          </div>
+          <span class="who-loc">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11z"/>
+              <circle cx="12" cy="10" r="2.5"/>
+            </svg>
+            Poland
+          </span>
+        </div>
+      </div>
+
+      <div class="cell reveal" style="--i:1">
+        <article class="card about-card tilt">
+          <span class="kicker">About</span>
+          <h2 id="about-title">The person behind the rig</h2>
+          <p>
+            <b>PC Magik (Mateusz Piekut)</b> is a computer service and homelab
+            operator from Poland. PC Magik Lab is that homelab pointed at local
+            AI: models running on a real, local GPU, on a YouTube series.
+          </p>
+          <p>
+            The idea is simple to follow and hard to fake — the same prompt, the
+            same rig, one variable changed per test, the model reloaded before
+            every run, and every prompt and result file published so anyone can
+            check the work for themselves.
+          </p>
+          <div class="about-links">
+            <a class="btn btn-primary" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/>
+              </svg>
+              YouTube channel
+            </a>
+            <a class="btn btn-ghost" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.42 7.86 10.95.58.1.79-.25.79-.55 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.04-.72.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.66.41.36.78 1.06.78 2.14 0 1.55-.02 2.79-.02 3.17 0 .3.2.66.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+              </svg>
+              Prompts &amp; results repository
+            </a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CTA band ================= -->
+  <section class="section" aria-labelledby="cta-title">
+    <div class="card band reveal">
+      <span class="kicker">Get involved</span>
+      <h2 id="cta-title">See it run, not just explained.</h2>
+      <p>
+        Every test is on the channel. Every prompt and every result file is in
+        the repository. Pick a side and check it all yourself.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/>
+          </svg>
+          Open the channel
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.42 7.86 10.95.58.1.79-.25.79-.55 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.04-.72.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.66.41.36.78 1.06.78 2.14 0 1.55-.02 2.79-.02 3.17 0 .3.2.66.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+          </svg>
+          Browse prompts &amp; results
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= Footer ================= -->
+<footer class="site-foot">
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <a class="brand" href="#top">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect x="4" y="4" width="24" height="24" rx="6" fill="#0a1120" stroke="#22d3ee" stroke-width="2"/>
+          <rect x="11" y="11" width="10" height="10" rx="2" fill="#22d3ee"/>
+          <path d="M9 4v3M16 4v3M23 4v3M9 25v3M16 25v3M23 25v3M4 9h3M4 16h3M4 23h3M25 9h3M25 16h3M25 23h3"
+                stroke="#e879f9" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>PC Magik <b>Lab</b></span>
+      </a>
+      <p>A YouTube series about running AI models on real, local GPUs — measured the same way every time.</p>
+    </div>
+
+    <nav class="foot-links" aria-label="Footer">
+      <h4>Links</h4>
+      <ul>
+        <li>
+          <a href="https://www.youtube.com/@PCMagikLab" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/>
+            </svg>
+            youtube.com/@PCMagikLab
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/pcmagik/pcmagik-lab" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.42 7.86 10.95.58.1.79-.25.79-.55 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.04-.72.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.66.41.36.78 1.06.78 2.14 0 1.55-.02 2.79-.02 3.17 0 .3.2.66.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+            </svg>
+            github.com/pcmagik/pcmagik-lab
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="foot-cred">
+      <h4>Credits</h4>
+      <p>
+        Created by <b>PC Magik (Mateusz Piekut)</b> —
+        computer service and homelab operator from Poland.
+      </p>
+    </div>
+  </div>
+
+  <div class="foot-bottom">
+    <span class="tag">Local models, real GPUs.</span>
+    <span>Built as a single HTML file — no trackers, no external requests.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  var $  = function(s){ return document.querySelector(s); };
+  var $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* ---------- Mobile nav ---------- */
+  var navToggle = $('#navToggle');
+  var nav = $('#nav');
+  if (navToggle && nav){
+    navToggle.addEventListener('click', function(){
+      var open = nav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    $$('#nav a').forEach(function(a){
+      a.addEventListener('click', function(){
+        nav.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  /* ---------- Scroll progress bar ---------- */
+  var progress = $('#progress');
+  if (progress){
+    var onScroll = function(){
+      var doc = document.documentElement;
+      var max = doc.scrollHeight - doc.clientHeight;
+      var y = window.pageYOffset !== undefined ? window.pageYOffset : doc.scrollTop;
+      progress.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
+  }
+
+  /* ---------- Reveal on scroll ---------- */
+  var revealEls = $$('.reveal');
+  if ('IntersectionObserver' in window && !prefersReducedMotion){
+    var revealObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.classList.add('in');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -36px 0px' });
+    revealEls.forEach(function(el){ revealObserver.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* ---------- Active nav link ---------- */
+  var navAnchors = $$('.nav a[data-target]');
+  if (navAnchors.length && 'IntersectionObserver' in window){
+    var byId = {};
+    navAnchors.forEach(function(a){ byId[a.getAttribute('data-target')] = a; });
+    var sectionObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && byId[entry.target.id]){
+          navAnchors.forEach(function(a){ a.classList.remove('active'); });
+          byId[entry.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+    ['method', 'hardware', 'about'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) sectionObserver.observe(el);
+    });
+  }
+
+  /* ---------- Tilt + cursor glow on cards ---------- */
+  if (finePointer && !prefersReducedMotion){
+    $$('.tilt').forEach(function(card){
+      var MAX = 5.5;
+      card.addEventListener('pointermove', function(e){
+        var r = card.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width;
+        var y = (e.clientY - r.top) / r.height;
+        card.style.transform =
+          'perspective(950px) rotateX(' + ((0.5 - y) * MAX).toFixed(3) + 'deg)' +
+          ' rotateY(' + ((x - 0.5) * MAX).toFixed(3) + 'deg) translateY(-3px)';
+        card.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+      });
+      card.addEventListener('pointerleave', function(){
+        card.style.transform = '';
+      });
+    });
+  }
+
+  /* ---------- Terminal typewriter ---------- */
+  var termBody = $('#termBody');
+  var TERM_LINES = [
+    { type: 'cmd',  text: 'pcmagik lab --run' },
+    { type: 'kv',   k: 'prompt',   v: 'same, every time' },
+    { type: 'kv',   k: 'rig',      v: 'NVIDIA RTX 3090 24 GB' },
+    { type: 'kv',   k: 'server',   v: 'LM Studio' },
+    { type: 'kv',   k: 'variable', v: 'one per test' },
+    { type: 'kv',   k: 'state',    v: 'model reloaded before every run' },
+    { type: 'kv',   k: 'output',   v: 'prompts + results -> github.com/pcmagik/pcmagik-lab' },
+    { type: 'cmd2', text: 'watch -> youtube.com/@PCMagikLab' }
+  ];
+
+  function makeLine(line, shown){
+    var el = document.createElement('div');
+    el.className = 'tline ' + line.type + (shown ? ' show' : ' hidden-line');
+    if (line.type === 'cmd' || line.type === 'cmd2'){
+      if (line.type === 'cmd'){
+        var ps = document.createElement('span');
+        ps.className = 'ps';
+        ps.textContent = '$';
+        el.appendChild(ps);
+      }
+      el.appendChild(document.createTextNode(line.text));
+    } else {
+      var k = document.createElement('span'); k.className = 'k'; k.textContent = line.k;
+      var f = document.createElement('span'); f.className = 'fill';
+      var v = document.createElement('span'); v.className = 'v'; v.textContent = line.v;
+      el.appendChild(k); el.appendChild(f); el.appendChild(v);
+    }
+    return el;
+  }
+
+  function renderStatic(){
+    termBody.innerHTML = '';
+    TERM_LINES.forEach(function(line){
+      termBody.appendChild(makeLine(line, true));
+    });
+    var cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    var last = termBody.lastElementChild;
+    if (last) last.appendChild(cursor);
+  }
+
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  async function typewriterLoop(){
+    var cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    while (true){
+      termBody.innerHTML = '';
+      termBody.classList.remove('fade');
+
+      // type the command line character by character
+      var first = TERM_LINES[0];
+      var firstEl = document.createElement('div');
+      firstEl.className = 'tline ' + first.type + ' show';
+      var ps = document.createElement('span');
+      ps.className = 'ps';
+      ps.textContent = '$';
+      firstEl.appendChild(ps);
+      termBody.appendChild(firstEl);
+      firstEl.appendChild(cursor);
+      for (var i = 0; i < first.text.length; i++){
+        firstEl.insertBefore(document.createTextNode(first.text.charAt(i)), cursor);
+        await sleep(26);
+      }
+      await sleep(340);
+
+      // reveal the rest one by one
+      for (var j = 1; j < TERM_LINES.length; j++){
+        var line = makeLine(TERM_LINES[j], false);
+        termBody.appendChild(line);
+        if (j === TERM_LINES.length - 1) line.appendChild(cursor);
+        // force reflow so the transition runs
+        void line.offsetWidth;
+        line.classList.add('show');
+        await sleep(320);
+      }
+
+      // hold, then fade out and loop
+      await sleep(3400);
+      termBody.classList.add('fade');
+      await sleep(620);
+    }
+  }
+
+  if (termBody){
+    if (prefersReducedMotion){
+      renderStatic();
+    } else if (typeof typewriterLoop === 'function'){
+      // start the loop (async, self-looping)
+      (async function(){
+        try { await typewriterLoop(); } catch (e) { renderStatic(); }
+      })();
+    }
+  }
+})();
+</script>
+</body>
+</html>

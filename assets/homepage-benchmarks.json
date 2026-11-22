@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated": "2026-11-12",
+  "generated": "2026-11-22",
   "source": "seria/harness/publikuj.py",
   "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
   "episodes": [
@@ -623,6 +623,1497 @@
       ],
       "date": "2026-10-25",
       "social_card": "episodes/24-claude-code-lokalnie/card.jpg"
+    },
+    {
+      "published": "2026-11-22",
+      "slug": "22-effort-qwen38",
+      "title": "Effort levels on Qwen3.8 27B: none 5–6 min, xhigh 24–27 min",
+      "kind": "zmienna",
+      "task": "easy",
+      "task_file": "tasks/easy.txt",
+      "prompt_file": "episodes/22-effort-qwen38/prompt.txt",
+      "youtube": "https://www.youtube.com/shorts/uqdMHxV4fTA",
+      "opis": "Same model (Qwen3.8 27B), same prompt (easy, a landing page), Pi, LM Studio; thinking level none, low, medium and xhigh, 3 runs each (8 at medium), level confirmed where reported in the LM Studio server log; for none, the log omits the field. Complete page in 20 of 20 runs. Minutes per run: none 5–6, low 15–27, medium 5–7, xhigh 24–27. Thinking tokens: none 0, low 24.9k–38.3k, medium 293–1,271, xhigh 25.7k–37.2k. Effect counts overlap in 6 of 6 pairs of levels. The task is open, so pages differ in scope: time is an observation, not the cost of the same work.",
+      "thesis": {
+        "metric": "time per run",
+        "total": null,
+        "jednostka": "s",
+        "zmienna": "effort",
+        "kohorty": [
+          {
+            "klucz": "effort-none",
+            "etykieta": "NONE",
+            "kolor": "#ccfbf1",
+            "zakres": {
+              "min": 294.83,
+              "max": 361.53,
+              "n": 3,
+              "mean": 318.2
+            }
+          },
+          {
+            "klucz": "effort-low",
+            "etykieta": "LOW",
+            "kolor": "#5eead4",
+            "zakres": {
+              "min": 923.97,
+              "max": 1610.26,
+              "n": 3,
+              "mean": 1264.3
+            }
+          },
+          {
+            "klucz": "effort-medium",
+            "etykieta": "MEDIUM",
+            "kolor": "#2dd4bf",
+            "zakres": {
+              "min": 275.87,
+              "max": 437.06,
+              "n": 8,
+              "mean": 360.1
+            }
+          },
+          {
+            "klucz": "effort-xhigh",
+            "etykieta": "XHIGH",
+            "kolor": "#0d9488",
+            "zakres": {
+              "min": 1438.65,
+              "max": 1632.1,
+              "n": 3,
+              "mean": 1550.7
+            }
+          }
+        ],
+        "class": "czesciowo",
+        "claim": "NONE 295–362 s, LOW 924–1,610 s, MEDIUM 276–437 s, XHIGH 1,439–1,632 s time per run across 17 runs; some pairs do not overlap, others do",
+        "models": [],
+        "pary": [],
+        "summary": {
+          "models": 1
+        }
+      },
+      "runs": [
+        {
+          "bieg": "effort-none_r2",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 298.37,
+          "tokeny": 19686,
+          "myslenie_pct": 0.0,
+          "tok_s": 65.98,
+          "linie": 1111,
+          "tokeny_myslenia": 0,
+          "efekty": 118,
+          "effort_zadany": "none",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "none",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-none-r2_qwen3.8-27b_bare_pi_enone",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-none_r2/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-none_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-none_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-none_r2/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-none_r2/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-none_r2/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-none_r2/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "none",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 298.37,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "NONE",
+          "kolor": "#ccfbf1",
+          "grupa": "effort-none"
+        },
+        {
+          "bieg": "effort-low_r3",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 1258.78,
+          "tokeny": 49557,
+          "myslenie_pct": 50.35,
+          "tok_s": 39.37,
+          "linie": 1036,
+          "tokeny_myslenia": 24950,
+          "efekty": 158,
+          "effort_zadany": "low",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "low",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-low-r3_qwen3.8-27b_bare_pi_elow",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-low_r3/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-low_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-low_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-low_r3/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-low_r3/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-low_r3/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-low_r3/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "low",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 1258.78,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "LOW",
+          "kolor": "#5eead4",
+          "grupa": "effort-low"
+        },
+        {
+          "bieg": "effort-medium_r2",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 349.16,
+          "tokeny": 19321,
+          "myslenie_pct": 1.73,
+          "tok_s": 55.33,
+          "linie": 1059,
+          "tokeny_myslenia": 334,
+          "efekty": 146,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "baremed-r2_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r2/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r2/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r2/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r2/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r2/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 349.16,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-xhigh_r3",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 1581.22,
+          "tokeny": 62080,
+          "myslenie_pct": 59.96,
+          "tok_s": 39.26,
+          "linie": 940,
+          "tokeny_myslenia": 37223,
+          "efekty": 137,
+          "effort_zadany": "xhigh",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "xhigh",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-xhigh-r3_qwen3.8-27b_bare_pi_exhigh",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-xhigh_r3/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-xhigh_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-xhigh_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-xhigh_r3/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-xhigh_r3/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-xhigh_r3/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-xhigh_r3/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "xhigh",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 1581.22,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "XHIGH",
+          "kolor": "#0d9488",
+          "grupa": "effort-xhigh"
+        }
+      ],
+      "measurements": [
+        {
+          "bieg": "effort-none_r1",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 294.83,
+          "tokeny": 19253,
+          "myslenie_pct": 0.0,
+          "tok_s": 65.3,
+          "linie": 1237,
+          "tokeny_myslenia": 0,
+          "efekty": 142,
+          "effort_zadany": "none",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "none",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-none-r1_qwen3.8-27b_bare_pi_enone",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-none_r1/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-none_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-none_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-none_r1/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-none_r1/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-none_r1/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-none_r1/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "none",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 294.83,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "NONE",
+          "kolor": "#ccfbf1",
+          "grupa": "effort-none"
+        },
+        {
+          "bieg": "effort-none_r2",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 298.37,
+          "tokeny": 19686,
+          "myslenie_pct": 0.0,
+          "tok_s": 65.98,
+          "linie": 1111,
+          "tokeny_myslenia": 0,
+          "efekty": 118,
+          "effort_zadany": "none",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "none",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-none-r2_qwen3.8-27b_bare_pi_enone",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-none_r2/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-none_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-none_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-none_r2/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-none_r2/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-none_r2/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-none_r2/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "none",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 298.37,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "NONE",
+          "kolor": "#ccfbf1",
+          "grupa": "effort-none"
+        },
+        {
+          "bieg": "effort-none_r3",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 361.53,
+          "tokeny": 22951,
+          "myslenie_pct": 0.0,
+          "tok_s": 63.48,
+          "linie": 1246,
+          "tokeny_myslenia": 0,
+          "efekty": 142,
+          "effort_zadany": "none",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "none",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-none-r3_qwen3.8-27b_bare_pi_enone",
+          "powtorzenie": 3,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-none_r3/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-none_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-none_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-none_r3/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-none_r3/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-none_r3/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-none_r3/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "none",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 361.53,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "NONE",
+          "kolor": "#ccfbf1",
+          "grupa": "effort-none"
+        },
+        {
+          "bieg": "effort-low_r1",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 923.97,
+          "tokeny": 43746,
+          "myslenie_pct": 56.91,
+          "tok_s": 47.35,
+          "linie": 732,
+          "tokeny_myslenia": 24895,
+          "efekty": 146,
+          "effort_zadany": "low",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "low",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-low-r1_qwen3.8-27b_bare_pi_elow",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-low_r1/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-low_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-low_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-low_r1/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-low_r1/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-low_r1/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-low_r1/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "low",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 923.97,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "LOW",
+          "kolor": "#5eead4",
+          "grupa": "effort-low"
+        },
+        {
+          "bieg": "effort-low_r2",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 1610.26,
+          "tokeny": 62905,
+          "myslenie_pct": 60.86,
+          "tok_s": 39.07,
+          "linie": 798,
+          "tokeny_myslenia": 38281,
+          "efekty": 111,
+          "effort_zadany": "low",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "low",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-low-r2_qwen3.8-27b_bare_pi_elow",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-low_r2/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-low_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-low_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-low_r2/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-low_r2/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-low_r2/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-low_r2/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "low",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 1610.26,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "LOW",
+          "kolor": "#5eead4",
+          "grupa": "effort-low"
+        },
+        {
+          "bieg": "effort-low_r3",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 1258.78,
+          "tokeny": 49557,
+          "myslenie_pct": 50.35,
+          "tok_s": 39.37,
+          "linie": 1036,
+          "tokeny_myslenia": 24950,
+          "efekty": 158,
+          "effort_zadany": "low",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "low",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-low-r3_qwen3.8-27b_bare_pi_elow",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-low_r3/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-low_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-low_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-low_r3/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-low_r3/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-low_r3/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-low_r3/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "low",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 1258.78,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "LOW",
+          "kolor": "#5eead4",
+          "grupa": "effort-low"
+        },
+        {
+          "bieg": "effort-medium_r1",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 419.96,
+          "tokeny": 22049,
+          "myslenie_pct": 5.76,
+          "tok_s": 52.5,
+          "linie": 1084,
+          "tokeny_myslenia": 1271,
+          "efekty": 152,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "baremed-r1_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r1/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r1/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r1/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r1/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r1/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 419.96,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-medium_r2",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 349.16,
+          "tokeny": 19321,
+          "myslenie_pct": 1.73,
+          "tok_s": 55.33,
+          "linie": 1059,
+          "tokeny_myslenia": 334,
+          "efekty": 146,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "baremed-r2_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 2,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r2/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r2/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r2/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r2/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r2/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 349.16,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-medium_r3",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 338.42,
+          "tokeny": 19052,
+          "myslenie_pct": 3.21,
+          "tok_s": 56.3,
+          "linie": 1033,
+          "tokeny_myslenia": 612,
+          "efekty": 130,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "baremed-r3_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 3,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r3/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r3/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r3/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r3/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r3/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 338.42,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-medium_r4",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 337.78,
+          "tokeny": 18858,
+          "myslenie_pct": 1.55,
+          "tok_s": 55.83,
+          "linie": 1122,
+          "tokeny_myslenia": 293,
+          "efekty": 129,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "baremed-r4_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 4,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r4/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r4/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r4/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r4/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r4/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r4/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r4/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 337.78,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-medium_r5",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 364.01,
+          "tokeny": 20397,
+          "myslenie_pct": 2.28,
+          "tok_s": 56.03,
+          "linie": 978,
+          "tokeny_myslenia": 466,
+          "efekty": 155,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "baremed-r5_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 5,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r5/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r5/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r5/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r5/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r5/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r5/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r5/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "LM Studio server log, model list at 2026-09-19T01:32:06 and 2026-09-20T13:20:21 (rig time); not logged by this run"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "rig model settings read 2026-09-21 18:20 (seria/pomiary/ustawienia-modeli-2026-09-21.json); K/V unchanged on the rig until 2026-09-26; not logged by this run"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "engine locked on the rig since 2026-09-19 01:20 (D58, seria/harness/wersje.json); not logged by this run"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 364.01,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-medium_r6",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 358.2,
+          "tokeny": 18311,
+          "myslenie_pct": 5.99,
+          "tok_s": 51.12,
+          "linie": 1136,
+          "tokeny_myslenia": 1096,
+          "efekty": 131,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-medium-r1_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 6,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r6/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r6/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r6/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r6/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r6/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r6/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r6/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 358.2,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-medium_r7",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 275.87,
+          "tokeny": 15519,
+          "myslenie_pct": 2.41,
+          "tok_s": 56.25,
+          "linie": 732,
+          "tokeny_myslenia": 374,
+          "efekty": 123,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-medium-r2_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 7,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r7/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r7/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r7/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r7/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r7/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r7/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r7/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 275.87,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-medium_r8",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 437.06,
+          "tokeny": 23002,
+          "myslenie_pct": 3.13,
+          "tok_s": 52.63,
+          "linie": 1493,
+          "tokeny_myslenia": 720,
+          "efekty": 167,
+          "effort_zadany": "medium",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "medium",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-medium-r3_qwen3.8-27b_bare_pi_emedium",
+          "powtorzenie": 8,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-medium_r8/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-medium_r8/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-medium_r8/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-medium_r8/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-medium_r8/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-medium_r8/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-medium_r8/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "medium",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 437.06,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "grupa": "effort-medium"
+        },
+        {
+          "bieg": "effort-xhigh_r1",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 1632.1,
+          "tokeny": 64074,
+          "myslenie_pct": 56.4,
+          "tok_s": 39.26,
+          "linie": 961,
+          "tokeny_myslenia": 36136,
+          "efekty": 128,
+          "effort_zadany": "xhigh",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "xhigh",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-xhigh-r1_qwen3.8-27b_bare_pi_exhigh",
+          "powtorzenie": 1,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-xhigh_r1/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-xhigh_r1/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-xhigh_r1/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-xhigh_r1/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-xhigh_r1/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-xhigh_r1/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-xhigh_r1/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "xhigh",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 1632.1,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "XHIGH",
+          "kolor": "#0d9488",
+          "grupa": "effort-xhigh"
+        },
+        {
+          "bieg": "effort-xhigh_r2",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 1438.65,
+          "tokeny": 57488,
+          "myslenie_pct": 44.63,
+          "tok_s": 39.96,
+          "linie": 1547,
+          "tokeny_myslenia": 25658,
+          "efekty": 142,
+          "effort_zadany": "xhigh",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "xhigh",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-xhigh-r2_qwen3.8-27b_bare_pi_exhigh",
+          "powtorzenie": 2,
+          "reprezentant": false,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-xhigh_r2/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-xhigh_r2/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-xhigh_r2/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-xhigh_r2/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-xhigh_r2/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-xhigh_r2/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-xhigh_r2/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "xhigh",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 1438.65,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "XHIGH",
+          "kolor": "#0d9488",
+          "grupa": "effort-xhigh"
+        },
+        {
+          "bieg": "effort-xhigh_r3",
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "harness": "pi",
+          "sekundy": 1581.22,
+          "tokeny": 62080,
+          "myslenie_pct": 59.96,
+          "tok_s": 39.26,
+          "linie": 940,
+          "tokeny_myslenia": 37223,
+          "efekty": 137,
+          "effort_zadany": "xhigh",
+          "effort_otrzymany": null,
+          "effort": {
+            "zadany": "xhigh",
+            "otrzymany": null,
+            "zrodlo": null,
+            "zgodny": null
+          },
+          "model_przeladowany": true,
+          "checks": null,
+          "source_run": "eff-xhigh-r3_qwen3.8-27b_bare_pi_exhigh",
+          "powtorzenie": 3,
+          "reprezentant": true,
+          "wady": [],
+          "zrzut_pusty": false,
+          "bez_strony": false,
+          "strona": "episodes/22-effort-qwen38/effort-xhigh_r3/index.html",
+          "zrzut": "episodes/22-effort-qwen38/effort-xhigh_r3/screenshot-1920.png",
+          "zrzut_390": "episodes/22-effort-qwen38/effort-xhigh_r3/screenshot-390.png",
+          "zrzut_390_kadr": "episodes/22-effort-qwen38/effort-xhigh_r3/preview-390.png",
+          "metrics": "episodes/22-effort-qwen38/effort-xhigh_r3/metrics.json",
+          "prompt": "episodes/22-effort-qwen38/effort-xhigh_r3/prompt.txt",
+          "efekty_plik": "episodes/22-effort-qwen38/effort-xhigh_r3/efekty.json",
+          "odtworzenie": {
+            "model": "qwen/qwen3.8-27b",
+            "quantization": {
+              "value": "Q4_K_M",
+              "source": "metrics.json"
+            },
+            "context_window": 262144,
+            "kv_cache": {
+              "value": "K q4_0 / V q4_0",
+              "source": "metrics.json"
+            },
+            "max_tokens": 131072,
+            "engine": {
+              "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+              "source": "metrics.json"
+            },
+            "harness": "pi 0.85.1",
+            "effort": "xhigh",
+            "rules": null
+          },
+          "wynik": {
+            "miara": "time per run",
+            "wartosc": 1581.22,
+            "jednostka": "s",
+            "zrodlo": "metrics.json: seconds"
+          },
+          "etykieta": "XHIGH",
+          "kolor": "#0d9488",
+          "grupa": "effort-xhigh"
+        }
+      ],
+      "cohorts": [
+        {
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "effort-none",
+          "etykieta": "NONE",
+          "kolor": "#ccfbf1",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "effort-none_r2",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "effort-low",
+          "etykieta": "LOW",
+          "kolor": "#5eead4",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "effort-low_r3",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "n": 8,
+          "kod": "effort-medium",
+          "etykieta": "MEDIUM",
+          "kolor": "#2dd4bf",
+          "n_w_badaniu": 8,
+          "wybor": null,
+          "reprezentant": "effort-medium_r2",
+          "reprezentant_powod": null
+        },
+        {
+          "model": "qwen/qwen3.8-27b",
+          "wariant": "bare",
+          "n": 3,
+          "kod": "effort-xhigh",
+          "etykieta": "XHIGH",
+          "kolor": "#0d9488",
+          "n_w_badaniu": 3,
+          "wybor": null,
+          "reprezentant": "effort-xhigh_r3",
+          "reprezentant_powod": null
+        }
+      ],
+      "date": "2026-09-19",
+      "social_card": "episodes/22-effort-qwen38/card.jpg"
     },
     {
       "published": "2026-11-12",

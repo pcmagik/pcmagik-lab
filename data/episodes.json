@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "generated": "2026-11-22",
+ "generated": "2026-11-24",
  "source": "seria/harness/publikuj.py",
  "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
  "episodes": [
@@ -623,6 +623,889 @@
    ],
    "date": "2026-10-25",
    "social_card": "episodes/24-claude-code-lokalnie/card.jpg"
+  },
+  {
+   "published": "2026-11-24",
+   "slug": "23-ponytail-qwen38",
+   "title": "Ponytail on Qwen3.8 27B: 6.6k–9.6k output tokens, no rules 8.1k–12.6k",
+   "kind": "zmienna",
+   "task": "Pixel_Art_Editor",
+   "task_file": null,
+   "prompt_file": "episodes/23-ponytail-qwen38/prompt.txt",
+   "youtube": "https://www.youtube.com/shorts/xCGpzBTdZgY",
+   "opis": "Same model (Qwen3.8 27B), same task (Pixel_Art_Editor, 29 checks, grader 5.1), Pi, LM Studio, effort medium, 3 runs per variant, model reloaded before every run. Variants: BARE (no rules file), PONYTAIL (Ponytail v5.3.2, AGENTS.md as system prompt text) and FOUR RULES (four lines: DRY, KISS, YAGNI, SINE). Output tokens: BARE 8.1k–12.6k, PONYTAIL 6.6k–9.6k, FOUR RULES 9.0k–11.0k — the ranges overlap, so neither file got past the run-to-run spread. Lines of code: PONYTAIL 494–556 against BARE 605–874 in 6 runs (a shorter file, not less written). Score of 29: BARE 28–29, PONYTAIL 25–29, FOUR RULES 15–29; one FOUR RULES page opened with a blank canvas (script error at start). 3 runs each: an observation on one model and one task, not a rule.",
+   "thesis": {
+    "metric": "output tokens",
+    "total": null,
+    "jednostka": "tokens",
+    "zmienna": "rules file",
+    "kohorty": [
+     {
+      "klucz": "bare",
+      "etykieta": "BARE",
+      "kolor": "#ff9f45",
+      "zakres": {
+       "min": 8137,
+       "max": 12622,
+       "n": 3,
+       "mean": 10639.0
+      }
+     },
+     {
+      "klucz": "ponytail",
+      "etykieta": "PONYTAIL",
+      "kolor": "#e879f9",
+      "zakres": {
+       "min": 6648,
+       "max": 9561,
+       "n": 3,
+       "mean": 8048.3
+      }
+     },
+     {
+      "klucz": "four-rules",
+      "etykieta": "FOUR RULES",
+      "kolor": "#34d399",
+      "zakres": {
+       "min": 8973,
+       "max": 10999,
+       "n": 3,
+       "mean": 10051.0
+      }
+     }
+    ],
+    "class": "nakladaja-sie",
+    "claim": "BARE 8137–12622 tokens, PONYTAIL 6648–9561 tokens, FOUR RULES 8973–10999 tokens output tokens across 9 runs; ranges overlap",
+    "models": [],
+    "pary": [],
+    "summary": {
+     "models": 1
+    }
+   },
+   "runs": [
+    {
+     "bieg": "bare_r2",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 217.85,
+     "tokeny": 11158,
+     "myslenie_pct": 16.3,
+     "tok_s": 51.22,
+     "linie": 703,
+     "tokeny_myslenia": 1819,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r2_qwen3.8-27b_bare_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/bare_r2/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": null,
+     "metrics": "episodes/23-ponytail-qwen38/bare_r2/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/bare_r2/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 11158,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "grupa": "bare"
+    },
+    {
+     "bieg": "ponytail_r3",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "ponytail",
+     "harness": "pi",
+     "sekundy": 152.49,
+     "tokeny": 7936,
+     "myslenie_pct": 31.28,
+     "tok_s": 52.04,
+     "linie": 494,
+     "tokeny_myslenia": 2482,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r3_qwen3.8-27b_ponytail_pi_emedium",
+     "powtorzenie": 3,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/ponytail_r3/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/ponytail_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/ponytail_r3/screenshot-390.png",
+     "zrzut_390_kadr": null,
+     "metrics": "episodes/23-ponytail-qwen38/ponytail_r3/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/ponytail_r3/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 7936,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "PONYTAIL",
+     "kolor": "#e879f9",
+     "grupa": "ponytail"
+    },
+    {
+     "bieg": "four-rules_r1",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "zasady",
+     "harness": "pi",
+     "sekundy": 202.8,
+     "tokeny": 10181,
+     "myslenie_pct": 18.13,
+     "tok_s": 50.2,
+     "linie": 645,
+     "tokeny_myslenia": 1846,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r1_qwen3.8-27b_zasady_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/four-rules_r1/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/four-rules_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/four-rules_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/23-ponytail-qwen38/four-rules_r1/preview-390.png",
+     "metrics": "episodes/23-ponytail-qwen38/four-rules_r1/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/four-rules_r1/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 10181,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "FOUR RULES",
+     "kolor": "#34d399",
+     "grupa": "four-rules"
+    }
+   ],
+   "measurements": [
+    {
+     "bieg": "bare_r1",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 152.09,
+     "tokeny": 8137,
+     "myslenie_pct": 8.86,
+     "tok_s": 53.5,
+     "linie": 715,
+     "tokeny_myslenia": 721,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r1_qwen3.8-27b_bare_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/bare_r1/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/bare_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/bare_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/23-ponytail-qwen38/bare_r1/preview-390.png",
+     "metrics": "episodes/23-ponytail-qwen38/bare_r1/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/bare_r1/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 8137,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "grupa": "bare"
+    },
+    {
+     "bieg": "bare_r2",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 217.85,
+     "tokeny": 11158,
+     "myslenie_pct": 16.3,
+     "tok_s": 51.22,
+     "linie": 703,
+     "tokeny_myslenia": 1819,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r2_qwen3.8-27b_bare_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/bare_r2/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": null,
+     "metrics": "episodes/23-ponytail-qwen38/bare_r2/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/bare_r2/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 11158,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "grupa": "bare"
+    },
+    {
+     "bieg": "bare_r3",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 237.47,
+     "tokeny": 12622,
+     "myslenie_pct": 21.03,
+     "tok_s": 53.15,
+     "linie": 661,
+     "tokeny_myslenia": 2655,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r3_qwen3.8-27b_bare_pi_emedium",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/bare_r3/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/bare_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/bare_r3/screenshot-390.png",
+     "zrzut_390_kadr": null,
+     "metrics": "episodes/23-ponytail-qwen38/bare_r3/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/bare_r3/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 12622,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "grupa": "bare"
+    },
+    {
+     "bieg": "ponytail_r1",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "ponytail",
+     "harness": "pi",
+     "sekundy": 192.42,
+     "tokeny": 9561,
+     "myslenie_pct": 17.69,
+     "tok_s": 49.69,
+     "linie": 553,
+     "tokeny_myslenia": 1691,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r1_qwen3.8-27b_ponytail_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/ponytail_r1/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/ponytail_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/ponytail_r1/screenshot-390.png",
+     "zrzut_390_kadr": null,
+     "metrics": "episodes/23-ponytail-qwen38/ponytail_r1/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/ponytail_r1/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 9561,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "PONYTAIL",
+     "kolor": "#e879f9",
+     "grupa": "ponytail"
+    },
+    {
+     "bieg": "ponytail_r2",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "ponytail",
+     "harness": "pi",
+     "sekundy": 126.32,
+     "tokeny": 6648,
+     "myslenie_pct": 17.34,
+     "tok_s": 52.63,
+     "linie": 556,
+     "tokeny_myslenia": 1153,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r2_qwen3.8-27b_ponytail_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/ponytail_r2/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/ponytail_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/ponytail_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/23-ponytail-qwen38/ponytail_r2/preview-390.png",
+     "metrics": "episodes/23-ponytail-qwen38/ponytail_r2/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/ponytail_r2/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 6648,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "PONYTAIL",
+     "kolor": "#e879f9",
+     "grupa": "ponytail"
+    },
+    {
+     "bieg": "ponytail_r3",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "ponytail",
+     "harness": "pi",
+     "sekundy": 152.49,
+     "tokeny": 7936,
+     "myslenie_pct": 31.28,
+     "tok_s": 52.04,
+     "linie": 494,
+     "tokeny_myslenia": 2482,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r3_qwen3.8-27b_ponytail_pi_emedium",
+     "powtorzenie": 3,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/ponytail_r3/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/ponytail_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/ponytail_r3/screenshot-390.png",
+     "zrzut_390_kadr": null,
+     "metrics": "episodes/23-ponytail-qwen38/ponytail_r3/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/ponytail_r3/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 7936,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "PONYTAIL",
+     "kolor": "#e879f9",
+     "grupa": "ponytail"
+    },
+    {
+     "bieg": "four-rules_r1",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "zasady",
+     "harness": "pi",
+     "sekundy": 202.8,
+     "tokeny": 10181,
+     "myslenie_pct": 18.13,
+     "tok_s": 50.2,
+     "linie": 645,
+     "tokeny_myslenia": 1846,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r1_qwen3.8-27b_zasady_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/four-rules_r1/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/four-rules_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/four-rules_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/23-ponytail-qwen38/four-rules_r1/preview-390.png",
+     "metrics": "episodes/23-ponytail-qwen38/four-rules_r1/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/four-rules_r1/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 10181,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "FOUR RULES",
+     "kolor": "#34d399",
+     "grupa": "four-rules"
+    },
+    {
+     "bieg": "four-rules_r2",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "zasady",
+     "harness": "pi",
+     "sekundy": 167.5,
+     "tokeny": 8973,
+     "myslenie_pct": 28.17,
+     "tok_s": 53.57,
+     "linie": 624,
+     "tokeny_myslenia": 2528,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r2_qwen3.8-27b_zasady_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/four-rules_r2/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/four-rules_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/four-rules_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/23-ponytail-qwen38/four-rules_r2/preview-390.png",
+     "metrics": "episodes/23-ponytail-qwen38/four-rules_r2/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/four-rules_r2/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 8973,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "FOUR RULES",
+     "kolor": "#34d399",
+     "grupa": "four-rules"
+    },
+    {
+     "bieg": "four-rules_r3",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "zasady",
+     "harness": "pi",
+     "sekundy": 208.87,
+     "tokeny": 10999,
+     "myslenie_pct": 27.95,
+     "tok_s": 52.66,
+     "linie": 655,
+     "tokeny_myslenia": 3074,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "o23-r3_qwen3.8-27b_zasady_pi_emedium",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/23-ponytail-qwen38/four-rules_r3/index.html",
+     "zrzut": "episodes/23-ponytail-qwen38/four-rules_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/23-ponytail-qwen38/four-rules_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/23-ponytail-qwen38/four-rules_r3/preview-390.png",
+     "metrics": "episodes/23-ponytail-qwen38/four-rules_r3/metrics.json",
+     "prompt": "episodes/23-ponytail-qwen38/four-rules_r3/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "output tokens",
+      "wartosc": 10999,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.completion_tokens"
+     },
+     "etykieta": "FOUR RULES",
+     "kolor": "#34d399",
+     "grupa": "four-rules"
+    }
+   ],
+   "cohorts": [
+    {
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "n": 3,
+     "kod": "bare",
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "bare_r2",
+     "reprezentant_powod": null
+    },
+    {
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "ponytail",
+     "n": 3,
+     "kod": "ponytail",
+     "etykieta": "PONYTAIL",
+     "kolor": "#e879f9",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "ponytail_r3",
+     "reprezentant_powod": null
+    },
+    {
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "zasady",
+     "n": 3,
+     "kod": "four-rules",
+     "etykieta": "FOUR RULES",
+     "kolor": "#34d399",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "four-rules_r1",
+     "reprezentant_powod": null
+    }
+   ],
+   "date": "2026-10-25",
+   "social_card": "episodes/23-ponytail-qwen38/card.jpg"
   },
   {
    "published": "2026-11-22",

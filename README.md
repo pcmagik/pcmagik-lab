@@ -5,6 +5,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
 | 24 | [Claude Code for free on your own GPU? Qwen3.8 27B: 29 of 29, Pi 25–29](episodes/24-claude-code-lokalnie/README.md) | Pixel_Art_Editor | 6 | [YouTube](https://www.youtube.com/shorts/Xrn5v-s47O8) |
+| 23 | [Ponytail on Qwen3.8 27B: 6.6k–9.6k output tokens, no rules 8.1k–12.6k](episodes/23-ponytail-qwen38/README.md) | Pixel_Art_Editor | 9 | [YouTube](https://www.youtube.com/shorts/xCGpzBTdZgY) |
 | 22 | [Effort levels on Qwen3.8 27B: none 5–6 min, xhigh 24–27 min](episodes/22-effort-qwen38/README.md) | easy | 17 | [YouTube](https://www.youtube.com/shorts/uqdMHxV4fTA) |
 | 21 | [16 GB VRAM for Qwen3.8 27B? At 64k context it used 20.6–23.3 GB](episodes/21-okno-kv-qwen38/README.md) | Pixel_Art_Editor | 9 | [YouTube](https://www.youtube.com/shorts/jcQGUPrtWcA) |
 | 19 | [Same model, two files: Meta vs Unsloth Muse Glimmer](episodes/19-muse-glimmer-dwa-pliki/README.md) | Pixel_Art_Editor | 12 | [YouTube](https://www.youtube.com/shorts/dKNoML5N7fA) |

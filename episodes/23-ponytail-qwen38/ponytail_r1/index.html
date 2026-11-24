@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Art Editor</title>
+<style>
+  :root {
+    --bg: #1e1f24;
+    --panel: #2a2c33;
+    --panel-2: #34363f;
+    --text: #e8e9ee;
+    --accent: #5b8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+  }
+  .app {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  /* ---- canvas panel ---- */
+  .canvas-panel {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  }
+  canvas#board {
+    display: block;
+    width: 512px;
+    height: 512px;
+    border-radius: 4px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  /* ---- sidebar ---- */
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 240px;
+  }
+  .box {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .box h2 {
+    margin: 0 0 8px;
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #9aa0b0;
+  }
+  /* ---- tools ---- */
+  .tools {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .tool-btn {
+    background: var(--panel-2);
+    border: 2px solid transparent;
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 4px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .tool-btn.active {
+    border-color: var(--accent);
+    background: #3a4463;
+  }
+  .tool-btn:hover { filter: brightness(1.15); }
+  /* ---- colors ---- */
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 2px solid #111;
+    flex-shrink: 0;
+  }
+  input[type="color"] {
+    width: 44px;
+    height: 34px;
+    padding: 0;
+    border: 2px solid #111;
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+  }
+  .hex-label { font-size: 13px; color: #9aa0b0; font-family: monospace; }
+  .palette, .recents {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 5px;
+  }
+  .chip {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,.6);
+    cursor: pointer;
+    padding: 0;
+  }
+  .chip:hover { transform: scale(1.12); }
+  .chip.empty { background: repeating-conic-gradient(#444 0 25%, #333 0 50%) 0 0 / 8px 8px; cursor: default; }
+  /* ---- actions ---- */
+  .actions { display: flex; flex-direction: column; gap: 8px; }
+  .actions button {
+    background: var(--panel-2);
+    color: var(--text);
+    border: none;
+    border-radius: 8px;
+    padding: 9px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .actions button:hover { filter: brightness(1.15); }
+  .actions button:disabled { opacity: .4; cursor: default; }
+  .actions button.primary { background: var(--accent); color: #fff; }
+  .actions button.danger:hover { background: #8b3a3a; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn-row button { flex: 1; }
+  label.row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    margin-top: 6px;
+    cursor: pointer;
+  }
+  select {
+    background: var(--panel-2);
+    color: var(--text);
+    border: none;
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="canvas-panel">
+    <canvas id="board" width="512" height="512"></canvas>
+  </div>
+
+  <div class="side">
+    <div class="box">
+      <h2>Tools</h2>
+      <div class="tools" id="tools">
+        <button class="tool-btn active" data-tool="pencil">✏️ Pencil</button>
+        <button class="tool-btn" data-tool="eraser">🧽 Eraser</button>
+        <button class="tool-btn" data-tool="fill">🪣 Fill</button>
+        <button class="tool-btn" data-tool="picker">💉 Picker</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Color</h2>
+      <div class="color-row">
+        <span class="swatch" id="currentSwatch"></span>
+        <input type="color" id="colorPicker" value="#ff5555">
+        <span class="hex-label" id="hexLabel">#ff5555</span>
+      </div>
+      <div class="palette" id="palette"></div>
+    </div>
+
+    <div class="box">
+      <h2>Recent colors</h2>
+      <div class="palette recents" id="recents"></div>
+    </div>
+
+    <div class="box actions">
+      <div class="btn-row">
+        <button id="undoBtn" title="Ctrl/Cmd+Z">↩ Undo</button>
+        <button id="redoBtn" title="Ctrl/Cmd+Shift+Z">↪ Redo</button>
+      </div>
+      <label class="row">
+        <input type="checkbox" id="gridToggle" checked> Show grid
+      </label>
+      <label class="row">
+        <select id="sizeSelect">
+          <option value="16">16 × 16</option>
+          <option value="32" selected>32 × 32</option>
+          <option value="64">64 × 64</option>
+        </select>
+      </label>
+      <button class="primary" id="downloadBtn">⬇ Download PNG</button>
+      <button class="danger" id="clearBtn">🗑 Clear canvas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ------------------------------------------------------------------
+  // State
+  // ------------------------------------------------------------------
+  const DISPLAY = 512;                       // canvas is always 512×512 CSS/px
+  const SIZES = [16, 32, 64];                // all divide 512 → integer cell size
+  const MAX_HISTORY = 20;                    // 20 undo steps
+  const STORAGE_KEY = "pixel-art-editor-v1";
+
+  let size = 32;                             // grid dimension (N×N)
+  let pixels = emptyGrid(32);                // N*N array of null | "#rrggbb"
+  let tool = "pencil";                       // pencil | eraser | fill | picker
+  let color = "#ff5555";                     // current color
+  let showGrid = true;
+  let recents = ["#ff5555"];                 // up to 8 recent colors
+  let undoStack = [];                        // array of pixel snapshots
+  let redoStack = [];
+  let painting = false;                      // mouse-down stroke in progress
+
+  const canvas = document.getElementById("board");
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;         // keep pixel edges crisp
+
+  function emptyGrid(n) { return new Array(n * n).fill(null); }
+  function clone(px) { return px.slice(); }
+  function idx(x, y) { return y * size + x; }
+
+  // ------------------------------------------------------------------
+  // Rendering
+  // ------------------------------------------------------------------
+  function render() {
+    const cell = DISPLAY / size;             // integer: 32 / 16 / 8
+    // Checkerboard base (shows through transparent pixels).
+    const sq = cell * 2;
+    ctx.clearRect(0, 0, DISPLAY, DISPLAY);
+    for (let y = 0; y < size / 2; y++) {
+      for (let x = 0; x < size / 2; x++) {
+        if ((x + y) % 2 === 0) continue;
+        ctx.fillStyle = "#c9cdd6";
+        ctx.fillRect(x * sq, y * sq, sq, sq);
+      }
+    }
+    ctx.fillStyle = "#f2f4f8";
+    ctx.fillRect(0, 0, DISPLAY, DISPLAY);
+    // Painted pixels.
+    for (let i = 0; i < pixels.length; i++) {
+      const c = pixels[i];
+      if (!c) continue;
+      ctx.fillStyle = c;
+      ctx.fillRect((i % size) * cell, ((i / size) | 0) * cell, cell, cell);
+    }
+    // Grid overlay.
+    if (showGrid) {
+      ctx.strokeStyle = "rgba(0,0,0,.25)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 1; i < size; i++) {
+        const p = i * cell + 0.5;             // half-pixel → crisp 1px line
+        ctx.moveTo(p, 0); ctx.lineTo(p, DISPLAY);
+        ctx.moveTo(0, p); ctx.lineTo(DISPLAY, p);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // History (undo / redo)
+  // ------------------------------------------------------------------
+  function pushHistory() {
+    undoStack.push(clone(pixels));
+    if (undoStack.length > MAX_HISTORY) undoStack.shift();
+    redoStack.length = 0;
+    updateHistoryButtons();
+  }
+  function undo() {
+    if (!undoStack.length) return;
+    redoStack.push(clone(pixels));
+    pixels = undoStack.pop();
+    persist(); render(); updateHistoryButtons();
+  }
+  function redo() {
+    if (!redoStack.length) return;
+    undoStack.push(clone(pixels));
+    pixels = redoStack.pop();
+    persist(); render(); updateHistoryButtons();
+  }
+  function updateHistoryButtons() {
+    document.getElementById("undoBtn").disabled = undoStack.length === 0;
+    document.getElementById("redoBtn").disabled = redoStack.length === 0;
+  }
+
+  // ------------------------------------------------------------------
+  // Tools
+  // ------------------------------------------------------------------
+  function setTool(t) {
+    tool = t;
+    for (const b of document.querySelectorAll("#tools .tool-btn"))
+      b.classList.toggle("active", b.dataset.tool === t);
+  }
+
+  function paintPixel(x, y, value) {
+    if (x < 0 || y < 0 || x >= size || y >= size) return;
+    pixels[idx(x, y)] = value;
+  }
+
+  // Iterative BFS flood fill — no recursion, safe at any grid size.
+  function floodFill(x, y, newValue) {
+    const target = pixels[idx(x, y)];
+    if (target === newValue) return false;
+    const queue = [[x, y]];
+    const seen = new Set([idx(x, y)]);
+    while (queue.length) {
+      const [cx, cy] = queue.pop();
+      if (pixels[idx(cx, cy)] !== target) continue;
+      pixels[idx(cx, cy)] = newValue;
+      const nbs = [[cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]];
+      for (const [nx, ny] of nbs) {
+        if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
+        const id = idx(nx, ny);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        queue.push([nx, ny]);
+      }
+    }
+    return true;
+  }
+
+  function pickPixel(x, y) {
+    const c = pixels[idx(x, y)];
+    if (c) setColor(c);
+    // Transparent pixel: nothing to pick, keep current color.
+  }
+
+  // ------------------------------------------------------------------
+  // Colors
+  // ------------------------------------------------------------------
+  const PALETTE = [
+    "#000000", "#ffffff", "#ff5555", "#ff9f1c",
+    "#ffe74c", "#59d959", "#3aa7e8", "#7a4fd6",
+    "#e84fa8", "#8d5524", "#555555", "#aaaaaa",
+    "#7fd4e8", "#c98f5a", "#b7e8a0", "#4a4e8d"
+  ];
+
+  function setColor(c) {
+    color = c;
+    document.getElementById("colorPicker").value = c;
+    document.getElementById("hexLabel").textContent = c;
+    document.getElementById("currentSwatch").style.background = c;
+  }
+
+  function pushRecent(c) {
+    recents = [c, ...recents.filter(x => x !== c)].slice(0, 8);
+    renderRecents();
+  }
+  function renderRecents() {
+    const el = document.getElementById("recents");
+    el.innerHTML = "";
+    for (let i = 0; i < 8; i++) {
+      const c = recents[i];
+      const b = document.createElement("button");
+      b.className = "chip" + (c ? "" : " empty");
+      if (c) {
+        b.style.background = c;
+        b.title = c;
+        b.addEventListener("click", () => setColor(c));
+      }
+      el.appendChild(b);
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Mouse input (click + drag)
+  // ------------------------------------------------------------------
+  function eventCell(e) {
+    const r = canvas.getBoundingClientRect();
+    const px = (e.clientX - r.left) * (DISPLAY / r.width);
+    const py = (e.clientY - r.top) * (DISPLAY / r.height);
+    return [Math.floor(px / (DISPLAY / size)), Math.floor(py / (DISPLAY / size))];
+  }
+
+  function strokeValue() {
+    return tool === "eraser" ? null : color;
+  }
+
+  canvas.addEventListener("mousedown", e => {
+    if (e.button !== 0) return;
+    const [x, y] = eventCell(e);
+    if (x < 0 || y < 0 || x >= size || y >= size) return;
+
+    if (tool === "fill") {
+      pushHistory();
+      if (floodFill(x, y, color)) pushRecent(color);
+      persist(); render();
+      return;
+    }
+    if (tool === "picker") {
+      pickPixel(x, y);
+      return;
+    }
+    // Pencil / eraser: one drag = one undo step.
+    painting = true;
+    pushHistory();
+    paintPixel(x, y, strokeValue());
+    if (tool === "pencil") pushRecent(color);
+    render();
+  });
+
+  canvas.addEventListener("mousemove", e => {
+    if (!painting) return;
+    const [x, y] = eventCell(e);
+    paintPixel(x, y, strokeValue());
+    render();
+  });
+
+  window.addEventListener("mouseup", () => {
+    if (!painting) return;
+    painting = false;
+    persist();
+  });
+
+  // ------------------------------------------------------------------
+  // Persistence (auto-save / restore)
+  // ------------------------------------------------------------------
+  function persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        size, pixels, recents, color
+      }));
+    } catch (err) { /* storage unavailable — ignore */ }
+  }
+
+  function restore() {
+    let data;
+    try { data = JSON.parse(localStorage.getItem(STORAGE_KEY)); }
+    catch (err) { data = null; }
+    if (!data || !SIZES.includes(data.size) || !Array.isArray(data.pixels)
+        || data.pixels.length !== data.size * data.size) return false;
+    size = data.size;
+    pixels = data.pixels.map(c => (typeof c === "string" && c.startsWith("#")) ? c : null);
+    recents = Array.isArray(data.recents)
+      ? data.recents.filter(c => typeof c === "string").slice(0, 8)
+      : recents;
+    if (typeof data.color === "string") color = data.color;
+    document.getElementById("sizeSelect").value = String(size);
+    return true;
+  }
+
+  // ------------------------------------------------------------------
+  // Export
+  // ------------------------------------------------------------------
+  function downloadPNG() {
+    const scale = 10;                        // each pixel → 10×10 block
+    const out = document.createElement("canvas");
+    out.width = out.height = size * scale;
+    const octx = out.getContext("2d");
+    // Transparent background preserved — only painted pixels are drawn.
+    for (let i = 0; i < pixels.length; i++) {
+      const c = pixels[i];
+      if (!c) continue;
+      octx.fillStyle = c;
+      octx.fillRect((i % size) * scale, ((i / size) | 0) * scale, scale, scale);
+    }
+    const a = document.createElement("a");
+    a.download = `pixel-art-${size}x${size}.png`;
+    a.href = out.toDataURL("image/png");
+    a.click();
+  }
+
+  // ------------------------------------------------------------------
+  // UI wiring
+  // ------------------------------------------------------------------
+  document.querySelectorAll("#tools .tool-btn").forEach(b =>
+    b.addEventListener("click", () => setTool(b.dataset.tool)));
+
+  document.getElementById("colorPicker").addEventListener("input",
+    e => setColor(e.target.value));
+
+  const paletteEl = document.getElementById("palette");
+  for (const c of PALETTE) {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.style.background = c;
+    b.title = c;
+    b.addEventListener("click", () => setColor(c));
+    paletteEl.appendChild(b);
+  }
+
+  document.getElementById("undoBtn").addEventListener("click", undo);
+  document.getElementById("redoBtn").addEventListener("click", redo);
+
+  document.getElementById("gridToggle").addEventListener("change",
+    e => { showGrid = e.target.checked; render(); });
+
+  document.getElementById("sizeSelect").addEventListener("change", e => {
+    const n = Number(e.target.value);
+    if (n === size) return;
+    if (!confirm("Change grid size? This clears your drawing.")) {
+      e.target.value = String(size);
+      return;
+    }
+    size = n;
+    pixels = emptyGrid(n);
+    undoStack = []; redoStack = [];
+    updateHistoryButtons();
+    persist(); render();
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    if (!confirm("Clear the whole canvas?")) return;
+    pushHistory();
+    pixels = emptyGrid(size);
+    persist(); render();
+  });
+
+  document.getElementById("downloadBtn").addEventListener("click", downloadPNG);
+
+  // Keyboard shortcuts: Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z (and Ctrl+Y).
+  window.addEventListener("keydown", e => {
+    const mod = e.ctrlKey || e.metaKey;
+    if (!mod || e.key.toLowerCase() !== "z") return;
+    e.preventDefault();
+    if (e.shiftKey) redo(); else undo();
+  });
+
+  // ------------------------------------------------------------------
+  // Init
+  // ------------------------------------------------------------------
+  restore();
+  setColor(color);
+  renderRecents();
+  updateHistoryButtons();
+  render();
+})();
+</script>
+</body>
+</html>

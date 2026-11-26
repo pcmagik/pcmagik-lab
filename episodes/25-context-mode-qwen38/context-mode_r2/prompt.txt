@@ -1,0 +1,15 @@
+Create a single HTML file with a report on the benchmark runs stored in the data directory in the current working directory. Each run is one folder in data, named after the run, with two files: metrics.json (the run's model, variant and token usage) and pixel-check-grader5b.json (the result of an automatic grader with 29 checks).
+
+The report should show how many runs and how many different models there are, how many runs scored 29 out of 29, the lowest score and the run that got it, the run with the most output tokens and that number, the total output tokens and the total input tokens over all runs, the check that did not pass in the most runs and in how many runs, in how many runs the check persists did not pass, which checks passed in every run, and a table with one row per model giving the lowest and the highest score of its bare runs and of its karpathy runs.
+
+It should be a clear, readable page that someone can check against the data value by value.
+
+Meaning of the data: a run's model is the model field of its metrics.json and its variant is the variant field; output tokens are usage.completion_tokens and input tokens are usage.prompt_tokens in metrics.json; the score is the score field of the grader file; a check did not pass in a run when its value under checks is anything other than true. A run is named by its folder name.
+
+Put each answer in the element with this id: runs, models, perfect-runs, lowest-score, most-output, total-output, total-input, most-failed-check, persists-failed, always-passed. Put the table in a table element with the id models-table, one row per model, with the columns in this order: model, bare lowest, bare highest, karpathy lowest, karpathy highest. Write numbers as plain digits without thousands separators, and write model names, folder names and check names exactly as they appear in the data.
+
+Use only the data in the data directory. Do not invent, estimate or round any value, and do not change anything in the data directory.
+
+Keep everything in one HTML file with the CSS included, no external files, no network requests, no raster images, system fonts only; every value must be written into the HTML itself, not loaded or computed when the page opens. Name the file index.html and write it to the current working directory.
+
+Once finished, review your code, make sure every value matches the data, and fix anything wrong or incomplete before giving the final answer.

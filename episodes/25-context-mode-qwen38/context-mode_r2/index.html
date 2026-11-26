@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel-check benchmark run report</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #1a1f27;
+    --muted: #5b6472;
+    --line: #dfe3ea;
+    --accent: #1f4e8c;
+    --ok: #146c43;
+    --bad: #a33227;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 56px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 0 0 12px; border-bottom: 2px solid var(--line); padding-bottom: 6px; }
+  .sub { color: var(--muted); margin: 0 0 28px; font-size: .95rem; }
+  section { margin-bottom: 36px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .card .label { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 4px; }
+  .card .value { font-size: 1.25rem; font-weight: 650; }
+  .card .detail { font-size: .85rem; color: var(--muted); margin-top: 4px; word-break: break-all; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: .92rem;
+  }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  thead th { background: #eef1f5; font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .84rem; word-break: break-all; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .bad { color: var(--bad); font-weight: 600; }
+  ul.runs { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 24px; }
+  ul.runs li { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .8rem; padding: 2px 0; break-inside: avoid; }
+  .note { font-size: .85rem; color: var(--muted); margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Pixel-check benchmark run report</h1>
+  <p class="sub">Source: the <span class="mono">data/</span> directory &mdash; one folder per run, each with <span class="mono">metrics.json</span> (model, variant, token usage) and <span class="mono">pixel-check-grader5b.json</span> (automatic grader, 29 checks). A check is counted as not passed whenever its value is anything other than <span class="mono">true</span>.</p>
+
+  <section>
+    <h2>Headline numbers</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="label">Runs</div>
+        <div class="value" id="runs">72</div>
+      </div>
+      <div class="card">
+        <div class="label">Different models</div>
+        <div class="value" id="models">12</div>
+      </div>
+      <div class="card">
+        <div class="label">Runs scoring 29 of 29</div>
+        <div class="value" id="perfect-runs">14</div>
+        <div class="detail">See the full list under &ldquo;Runs scoring 29 of 29&rdquo; below.</div>
+      </div>
+      <div class="card">
+        <div class="label">Lowest score</div>
+        <div class="value" id="lowest-score">3 &mdash; pix-r3_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</div>
+        <div class="detail">the only run with this score</div>
+      </div>
+      <div class="card">
+        <div class="label">Most output tokens</div>
+        <div class="value" id="most-output">pix-r1_gemma-4-26b-a4b-qat_karpathy_pi_emedium &mdash; 138010</div>
+        <div class="detail">138010 output (completion) tokens; no other run has this number</div>
+      </div>
+      <div class="card">
+        <div class="label">Total output tokens (all runs)</div>
+        <div class="value" id="total-output">1161526</div>
+      </div>
+      <div class="card">
+        <div class="label">Total input tokens (all runs)</div>
+        <div class="value" id="total-input">11879085</div>
+      </div>
+      <div class="card">
+        <div class="label">Check not passing in the most runs</div>
+        <div class="value" id="most-failed-check">undoDepth20 &mdash; 38 runs</div>
+        <div class="detail">not passed in 38 of 72 runs; the next highest is 32, so this one is unique</div>
+      </div>
+      <div class="card">
+        <div class="label">Check &ldquo;persists&rdquo; not passing</div>
+        <div class="value" id="persists-failed">31 runs</div>
+        <div class="detail">out of 72 runs &mdash; full list below</div>
+      </div>
+      <div class="card">
+        <div class="label">Checks passing in every run</div>
+        <div class="value" id="always-passed">singleFile, noLibraries</div>
+        <div class="detail">the only two of the 29 checks with a 0 failure count</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Scores by model and variant</h2>
+    <table id="models-table">
+      <thead>
+        <tr><th>model</th><th class="num">bare lowest</th><th class="num">bare highest</th><th class="num">karpathy lowest</th><th class="num">karpathy highest</th></tr>
+      </thead>
+      <tbody>
+      <tr><td>google/gemma-4-26b-a4b-qat</td><td class="num">16</td><td class="num">28</td><td class="num">7</td><td class="num">25</td></tr>
+      <tr><td>google/gemma-4-31b-qat</td><td class="num">26</td><td class="num">29</td><td class="num">27</td><td class="num">29</td></tr>
+      <tr><td>meta/muse-glimmer</td><td class="num">28</td><td class="num">28</td><td class="num">28</td><td class="num">29</td></tr>
+      <tr><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td class="num">3</td><td class="num">18</td><td class="num">6</td><td class="num">24</td></tr>
+      <tr><td>nvidia/nemotron-3-nano</td><td class="num">6</td><td class="num">17</td><td class="num">10</td><td class="num">13</td></tr>
+      <tr><td>ornith-1.0-35b</td><td class="num">20</td><td class="num">26</td><td class="num">22</td><td class="num">28</td></tr>
+      <tr><td>ornith-1.5-35b-a3b</td><td class="num">11</td><td class="num">26</td><td class="num">23</td><td class="num">28</td></tr>
+      <tr><td>qwen/qwen3.6-27b</td><td class="num">9</td><td class="num">29</td><td class="num">7</td><td class="num">27</td></tr>
+      <tr><td>qwen/qwen3.6-35b-a3b</td><td class="num">19</td><td class="num">29</td><td class="num">23</td><td class="num">27</td></tr>
+      <tr><td>qwen/qwen3.8-27b</td><td class="num">26</td><td class="num">29</td><td class="num">26</td><td class="num">29</td></tr>
+      <tr><td>unsloth/muse-glimmer-30b</td><td class="num">24</td><td class="num">29</td><td class="num">28</td><td class="num">29</td></tr>
+      <tr><td>zai-org/glm-4.7-flash</td><td class="num">6</td><td class="num">20</td><td class="num">22</td><td class="num">26</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Every model has 3 bare runs and 3 karpathy runs (pix-r1, pix-r2, pix-r3), so no cell is missing. Lowest and highest are over those 3 runs each.</p>
+  </section>
+
+  <section>
+    <h2>All 29 checks &mdash; how often each did not pass</h2>
+    <table>
+      <thead>
+        <tr><th>check</th><th class="num">runs not passing</th><th>result</th></tr>
+      </thead>
+      <tbody>
+      <tr><td class="mono">noJsErrors</td><td class="num">12</td><td>not passed in 12 of 72 runs</td></tr>
+      <tr><td class="mono">singleFile</td><td class="num">0</td><td>always passed</td></tr>
+      <tr><td class="mono">noLibraries</td><td class="num">0</td><td>always passed</td></tr>
+      <tr><td class="mono">surface</td><td class="num">3</td><td>not passed in 3 of 72 runs</td></tr>
+      <tr><td class="mono">sizes</td><td class="num">4</td><td>not passed in 4 of 72 runs</td></tr>
+      <tr><td class="mono">sizeConfirms</td><td class="num">14</td><td>not passed in 14 of 72 runs</td></tr>
+      <tr><td class="mono">sizeClears</td><td class="num">22</td><td>not passed in 22 of 72 runs</td></tr>
+      <tr><td class="mono">gridToggle</td><td class="num">18</td><td>not passed in 18 of 72 runs</td></tr>
+      <tr><td class="mono">checkerboard</td><td class="num">32</td><td>not passed in 32 of 72 runs</td></tr>
+      <tr><td class="mono">drawsClick</td><td class="num">20</td><td>not passed in 20 of 72 runs</td></tr>
+      <tr><td class="mono">drawsDrag</td><td class="num">16</td><td>not passed in 16 of 72 runs</td></tr>
+      <tr><td class="mono">toolbarActive</td><td class="num">12</td><td>not passed in 12 of 72 runs</td></tr>
+      <tr><td class="mono">pencil</td><td class="num">17</td><td>not passed in 17 of 72 runs</td></tr>
+      <tr><td class="mono">eraser</td><td class="num">18</td><td>not passed in 18 of 72 runs</td></tr>
+      <tr><td class="mono">fill</td><td class="num">27</td><td>not passed in 27 of 72 runs</td></tr>
+      <tr><td class="mono">fillLarge</td><td class="num">26</td><td>not passed in 26 of 72 runs</td></tr>
+      <tr><td class="mono">eyedropper</td><td class="num">23</td><td>not passed in 23 of 72 runs</td></tr>
+      <tr><td class="mono">colorPicker</td><td class="num">1</td><td>not passed in 1 of 72 runs</td></tr>
+      <tr><td class="mono">palette</td><td class="num">7</td><td>not passed in 7 of 72 runs</td></tr>
+      <tr><td class="mono">recentColors</td><td class="num">15</td><td>not passed in 15 of 72 runs</td></tr>
+      <tr><td class="mono">undoRedoButtons</td><td class="num">5</td><td>not passed in 5 of 72 runs</td></tr>
+      <tr><td class="mono">undoShortcut</td><td class="num">20</td><td>not passed in 20 of 72 runs</td></tr>
+      <tr><td class="mono">redoShortcut</td><td class="num">32</td><td>not passed in 32 of 72 runs</td></tr>
+      <tr><td class="mono">undoDepth20</td><td class="num">38</td><td>not passed in 38 of 72 runs</td></tr>
+      <tr><td class="mono">dragIsOneStep</td><td class="num">32</td><td>not passed in 32 of 72 runs</td></tr>
+      <tr><td class="mono">exportPng</td><td class="num">17</td><td>not passed in 17 of 72 runs</td></tr>
+      <tr><td class="mono">persists</td><td class="num">31</td><td>not passed in 31 of 72 runs</td></tr>
+      <tr><td class="mono">clearConfirms</td><td class="num">21</td><td>not passed in 21 of 72 runs</td></tr>
+      <tr><td class="mono">crisp</td><td class="num">9</td><td>not passed in 9 of 72 runs</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Check order is the order the checks appear in the grader file. A failure includes a value of <span class="mono">false</span> as well as <span class="mono">null</span> (unverified).</p>
+  </section>
+
+  <section>
+    <h2>Every run, value by value</h2>
+    <table>
+      <thead>
+        <tr><th>run (folder name)</th><th>model</th><th>variant</th><th class="num">score</th><th class="num">input tokens</th><th class="num">output tokens</th></tr>
+      </thead>
+      <tbody>
+      <tr><td class="mono">pix-r1_gemma-4-26b-a4b-qat_bare_pi_emedium</td><td>google/gemma-4-26b-a4b-qat</td><td>bare</td><td class="num">16</td><td class="num">41852</td><td class="num">18547</td></tr>
+      <tr><td class="mono">pix-r1_gemma-4-26b-a4b-qat_karpathy_pi_emedium</td><td>google/gemma-4-26b-a4b-qat</td><td>karpathy</td><td class="num">25</td><td class="num">13283</td><td class="num">138010</td></tr>
+      <tr><td class="mono">pix-r1_gemma-4-31b-qat_bare_pi_emedium</td><td>google/gemma-4-31b-qat</td><td>bare</td><td class="num">29</td><td class="num">34187</td><td class="num">12027</td></tr>
+      <tr><td class="mono">pix-r1_gemma-4-31b-qat_karpathy_pi_emedium</td><td>google/gemma-4-31b-qat</td><td>karpathy</td><td class="num">27</td><td class="num">40630</td><td class="num">13260</td></tr>
+      <tr><td class="mono">pix-r1_glm-4.7-flash_bare_pi_emedium</td><td>zai-org/glm-4.7-flash</td><td>bare</td><td class="num">6</td><td class="num">35790</td><td class="num">6444</td></tr>
+      <tr><td class="mono">pix-r1_glm-4.7-flash_karpathy_pi_emedium</td><td>zai-org/glm-4.7-flash</td><td>karpathy</td><td class="num">22</td><td class="num">40358</td><td class="num">6826</td></tr>
+      <tr><td class="mono">pix-r1_muse-glimmer-30b_bare_pi_emedium</td><td>unsloth/muse-glimmer-30b</td><td>bare</td><td class="num">29</td><td class="num">18924</td><td class="num">8918</td></tr>
+      <tr><td class="mono">pix-r1_muse-glimmer-30b_karpathy_pi_emedium</td><td>unsloth/muse-glimmer-30b</td><td>karpathy</td><td class="num">28</td><td class="num">17665</td><td class="num">9258</td></tr>
+      <tr><td class="mono">pix-r1_muse-glimmer_bare_pi_emedium</td><td>meta/muse-glimmer</td><td>bare</td><td class="num">28</td><td class="num">14379</td><td class="num">4928</td></tr>
+      <tr><td class="mono">pix-r1_muse-glimmer_karpathy_pi_emedium</td><td>meta/muse-glimmer</td><td>karpathy</td><td class="num">29</td><td class="num">20623</td><td class="num">6943</td></tr>
+      <tr><td class="mono">pix-r1_nemotron-3-nano_bare_pi_emedium</td><td>nvidia/nemotron-3-nano</td><td>bare</td><td class="num">6</td><td class="num">11218</td><td class="num">5973</td></tr>
+      <tr><td class="mono">pix-r1_nemotron-3-nano_karpathy_pi_emedium</td><td>nvidia/nemotron-3-nano</td><td>karpathy</td><td class="num">12</td><td class="num">31102</td><td class="num">23485</td></tr>
+      <tr><td class="mono">pix-r1_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</td><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td>bare</td><td class="num">18</td><td class="num">1298471</td><td class="num">48706</td></tr>
+      <tr><td class="mono">pix-r1_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_emedium</td><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td>karpathy</td><td class="num">24</td><td class="num">1362354</td><td class="num">34509</td></tr>
+      <tr><td class="mono">pix-r1_ornith-1.0-35b_bare_pi_emedium</td><td>ornith-1.0-35b</td><td>bare</td><td class="num">26</td><td class="num">138889</td><td class="num">23082</td></tr>
+      <tr><td class="mono">pix-r1_ornith-1.0-35b_karpathy_pi_emedium</td><td>ornith-1.0-35b</td><td>karpathy</td><td class="num">22</td><td class="num">16168</td><td class="num">9076</td></tr>
+      <tr><td class="mono">pix-r1_ornith-1.5-35b-a3b_bare_pi_emedium</td><td>ornith-1.5-35b-a3b</td><td>bare</td><td class="num">16</td><td class="num">24545</td><td class="num">8835</td></tr>
+      <tr><td class="mono">pix-r1_ornith-1.5-35b-a3b_karpathy_pi_emedium</td><td>ornith-1.5-35b-a3b</td><td>karpathy</td><td class="num">26</td><td class="num">37213</td><td class="num">8931</td></tr>
+      <tr><td class="mono">pix-r1_qwen3.6-27b_bare_pi_emedium</td><td>qwen/qwen3.6-27b</td><td>bare</td><td class="num">29</td><td class="num">23607</td><td class="num">8254</td></tr>
+      <tr><td class="mono">pix-r1_qwen3.6-27b_karpathy_pi_emedium</td><td>qwen/qwen3.6-27b</td><td>karpathy</td><td class="num">23</td><td class="num">15384</td><td class="num">8065</td></tr>
+      <tr><td class="mono">pix-r1_qwen3.6-35b-a3b_bare_pi_emedium</td><td>qwen/qwen3.6-35b-a3b</td><td>bare</td><td class="num">29</td><td class="num">33713</td><td class="num">8326</td></tr>
+      <tr><td class="mono">pix-r1_qwen3.6-35b-a3b_karpathy_pi_emedium</td><td>qwen/qwen3.6-35b-a3b</td><td>karpathy</td><td class="num">27</td><td class="num">23836</td><td class="num">7446</td></tr>
+      <tr><td class="mono">pix-r1_qwen3.8-27b_bare_pi_emedium</td><td>qwen/qwen3.8-27b</td><td>bare</td><td class="num">29</td><td class="num">35541</td><td class="num">9107</td></tr>
+      <tr><td class="mono">pix-r1_qwen3.8-27b_karpathy_pi_emedium</td><td>qwen/qwen3.8-27b</td><td>karpathy</td><td class="num">27</td><td class="num">112855</td><td class="num">11152</td></tr>
+      <tr><td class="mono">pix-r2_gemma-4-26b-a4b-qat_bare_pi_emedium</td><td>google/gemma-4-26b-a4b-qat</td><td>bare</td><td class="num">26</td><td class="num">70296</td><td class="num">28832</td></tr>
+      <tr><td class="mono">pix-r2_gemma-4-26b-a4b-qat_karpathy_pi_emedium</td><td>google/gemma-4-26b-a4b-qat</td><td>karpathy</td><td class="num">7</td><td class="num">69852</td><td class="num">17794</td></tr>
+      <tr><td class="mono">pix-r2_gemma-4-31b-qat_bare_pi_emedium</td><td>google/gemma-4-31b-qat</td><td>bare</td><td class="num">29</td><td class="num">32908</td><td class="num">11648</td></tr>
+      <tr><td class="mono">pix-r2_gemma-4-31b-qat_karpathy_pi_emedium</td><td>google/gemma-4-31b-qat</td><td>karpathy</td><td class="num">27</td><td class="num">38388</td><td class="num">12307</td></tr>
+      <tr><td class="mono">pix-r2_glm-4.7-flash_bare_pi_emedium</td><td>zai-org/glm-4.7-flash</td><td>bare</td><td class="num">20</td><td class="num">11190</td><td class="num">6090</td></tr>
+      <tr><td class="mono">pix-r2_glm-4.7-flash_karpathy_pi_emedium</td><td>zai-org/glm-4.7-flash</td><td>karpathy</td><td class="num">23</td><td class="num">66320</td><td class="num">6752</td></tr>
+      <tr><td class="mono">pix-r2_muse-glimmer-30b_bare_pi_emedium</td><td>unsloth/muse-glimmer-30b</td><td>bare</td><td class="num">24</td><td class="num">18941</td><td class="num">10884</td></tr>
+      <tr><td class="mono">pix-r2_muse-glimmer-30b_karpathy_pi_emedium</td><td>unsloth/muse-glimmer-30b</td><td>karpathy</td><td class="num">29</td><td class="num">20926</td><td class="num">12096</td></tr>
+      <tr><td class="mono">pix-r2_muse-glimmer_bare_pi_emedium</td><td>meta/muse-glimmer</td><td>bare</td><td class="num">28</td><td class="num">18982</td><td class="num">7216</td></tr>
+      <tr><td class="mono">pix-r2_muse-glimmer_karpathy_pi_emedium</td><td>meta/muse-glimmer</td><td>karpathy</td><td class="num">29</td><td class="num">17508</td><td class="num">9086</td></tr>
+      <tr><td class="mono">pix-r2_nemotron-3-nano_bare_pi_emedium</td><td>nvidia/nemotron-3-nano</td><td>bare</td><td class="num">17</td><td class="num">26475</td><td class="num">11916</td></tr>
+      <tr><td class="mono">pix-r2_nemotron-3-nano_karpathy_pi_emedium</td><td>nvidia/nemotron-3-nano</td><td>karpathy</td><td class="num">13</td><td class="num">185078</td><td class="num">17374</td></tr>
+      <tr><td class="mono">pix-r2_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</td><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td>bare</td><td class="num">6</td><td class="num">1193867</td><td class="num">36322</td></tr>
+      <tr><td class="mono">pix-r2_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_emedium</td><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td>karpathy</td><td class="num">6</td><td class="num">1159505</td><td class="num">31701</td></tr>
+      <tr><td class="mono">pix-r2_ornith-1.0-35b_bare_pi_emedium</td><td>ornith-1.0-35b</td><td>bare</td><td class="num">20</td><td class="num">60143</td><td class="num">20129</td></tr>
+      <tr><td class="mono">pix-r2_ornith-1.0-35b_karpathy_pi_emedium</td><td>ornith-1.0-35b</td><td>karpathy</td><td class="num">27</td><td class="num">131794</td><td class="num">33277</td></tr>
+      <tr><td class="mono">pix-r2_ornith-1.5-35b-a3b_bare_pi_emedium</td><td>ornith-1.5-35b-a3b</td><td>bare</td><td class="num">11</td><td class="num">33868</td><td class="num">8479</td></tr>
+      <tr><td class="mono">pix-r2_ornith-1.5-35b-a3b_karpathy_pi_emedium</td><td>ornith-1.5-35b-a3b</td><td>karpathy</td><td class="num">28</td><td class="num">41763</td><td class="num">9020</td></tr>
+      <tr><td class="mono">pix-r2_qwen3.6-27b_bare_pi_emedium</td><td>qwen/qwen3.6-27b</td><td>bare</td><td class="num">9</td><td class="num">20904</td><td class="num">6850</td></tr>
+      <tr><td class="mono">pix-r2_qwen3.6-27b_karpathy_pi_emedium</td><td>qwen/qwen3.6-27b</td><td>karpathy</td><td class="num">7</td><td class="num">32700</td><td class="num">6919</td></tr>
+      <tr><td class="mono">pix-r2_qwen3.6-35b-a3b_bare_pi_emedium</td><td>qwen/qwen3.6-35b-a3b</td><td>bare</td><td class="num">26</td><td class="num">23898</td><td class="num">8259</td></tr>
+      <tr><td class="mono">pix-r2_qwen3.6-35b-a3b_karpathy_pi_emedium</td><td>qwen/qwen3.6-35b-a3b</td><td>karpathy</td><td class="num">23</td><td class="num">56342</td><td class="num">8104</td></tr>
+      <tr><td class="mono">pix-r2_qwen3.8-27b_bare_pi_emedium</td><td>qwen/qwen3.8-27b</td><td>bare</td><td class="num">26</td><td class="num">31051</td><td class="num">12077</td></tr>
+      <tr><td class="mono">pix-r2_qwen3.8-27b_karpathy_pi_emedium</td><td>qwen/qwen3.8-27b</td><td>karpathy</td><td class="num">29</td><td class="num">151988</td><td class="num">42145</td></tr>
+      <tr><td class="mono">pix-r3_gemma-4-26b-a4b-qat_bare_pi_emedium</td><td>google/gemma-4-26b-a4b-qat</td><td>bare</td><td class="num">28</td><td class="num">41471</td><td class="num">14312</td></tr>
+      <tr><td class="mono">pix-r3_gemma-4-26b-a4b-qat_karpathy_pi_emedium</td><td>google/gemma-4-26b-a4b-qat</td><td>karpathy</td><td class="num">23</td><td class="num">13260</td><td class="num">8916</td></tr>
+      <tr><td class="mono">pix-r3_gemma-4-31b-qat_bare_pi_emedium</td><td>google/gemma-4-31b-qat</td><td>bare</td><td class="num">26</td><td class="num">82714</td><td class="num">23146</td></tr>
+      <tr><td class="mono">pix-r3_gemma-4-31b-qat_karpathy_pi_emedium</td><td>google/gemma-4-31b-qat</td><td>karpathy</td><td class="num">29</td><td class="num">48167</td><td class="num">17264</td></tr>
+      <tr><td class="mono">pix-r3_glm-4.7-flash_bare_pi_emedium</td><td>zai-org/glm-4.7-flash</td><td>bare</td><td class="num">7</td><td class="num">11671</td><td class="num">6754</td></tr>
+      <tr><td class="mono">pix-r3_glm-4.7-flash_karpathy_pi_emedium</td><td>zai-org/glm-4.7-flash</td><td>karpathy</td><td class="num">26</td><td class="num">12770</td><td class="num">6253</td></tr>
+      <tr><td class="mono">pix-r3_muse-glimmer-30b_bare_pi_emedium</td><td>unsloth/muse-glimmer-30b</td><td>bare</td><td class="num">29</td><td class="num">26309</td><td class="num">14423</td></tr>
+      <tr><td class="mono">pix-r3_muse-glimmer-30b_karpathy_pi_emedium</td><td>unsloth/muse-glimmer-30b</td><td>karpathy</td><td class="num">28</td><td class="num">18261</td><td class="num">9370</td></tr>
+      <tr><td class="mono">pix-r3_muse-glimmer_bare_pi_emedium</td><td>meta/muse-glimmer</td><td>bare</td><td class="num">28</td><td class="num">19541</td><td class="num">6863</td></tr>
+      <tr><td class="mono">pix-r3_muse-glimmer_karpathy_pi_emedium</td><td>meta/muse-glimmer</td><td>karpathy</td><td class="num">28</td><td class="num">11289</td><td class="num">4720</td></tr>
+      <tr><td class="mono">pix-r3_nemotron-3-nano_bare_pi_emedium</td><td>nvidia/nemotron-3-nano</td><td>bare</td><td class="num">14</td><td class="num">34577</td><td class="num">16421</td></tr>
+      <tr><td class="mono">pix-r3_nemotron-3-nano_karpathy_pi_emedium</td><td>nvidia/nemotron-3-nano</td><td>karpathy</td><td class="num">10</td><td class="num">160619</td><td class="num">16295</td></tr>
+      <tr><td class="mono">pix-r3_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</td><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td>bare</td><td class="num">3</td><td class="num">299924</td><td class="num">13393</td></tr>
+      <tr><td class="mono">pix-r3_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_emedium</td><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td>karpathy</td><td class="num">18</td><td class="num">1667225</td><td class="num">50687</td></tr>
+      <tr><td class="mono">pix-r3_ornith-1.0-35b_bare_pi_emedium</td><td>ornith-1.0-35b</td><td>bare</td><td class="num">22</td><td class="num">161620</td><td class="num">12799</td></tr>
+      <tr><td class="mono">pix-r3_ornith-1.0-35b_karpathy_pi_emedium</td><td>ornith-1.0-35b</td><td>karpathy</td><td class="num">28</td><td class="num">1191394</td><td class="num">34779</td></tr>
+      <tr><td class="mono">pix-r3_ornith-1.5-35b-a3b_bare_pi_emedium</td><td>ornith-1.5-35b-a3b</td><td>bare</td><td class="num">26</td><td class="num">614327</td><td class="num">20938</td></tr>
+      <tr><td class="mono">pix-r3_ornith-1.5-35b-a3b_karpathy_pi_emedium</td><td>ornith-1.5-35b-a3b</td><td>karpathy</td><td class="num">23</td><td class="num">174961</td><td class="num">13309</td></tr>
+      <tr><td class="mono">pix-r3_qwen3.6-27b_bare_pi_emedium</td><td>qwen/qwen3.6-27b</td><td>bare</td><td class="num">29</td><td class="num">21974</td><td class="num">7576</td></tr>
+      <tr><td class="mono">pix-r3_qwen3.6-27b_karpathy_pi_emedium</td><td>qwen/qwen3.6-27b</td><td>karpathy</td><td class="num">27</td><td class="num">33043</td><td class="num">7113</td></tr>
+      <tr><td class="mono">pix-r3_qwen3.6-35b-a3b_bare_pi_emedium</td><td>qwen/qwen3.6-35b-a3b</td><td>bare</td><td class="num">19</td><td class="num">70623</td><td class="num">9309</td></tr>
+      <tr><td class="mono">pix-r3_qwen3.6-35b-a3b_karpathy_pi_emedium</td><td>qwen/qwen3.6-35b-a3b</td><td>karpathy</td><td class="num">27</td><td class="num">24864</td><td class="num">7626</td></tr>
+      <tr><td class="mono">pix-r3_qwen3.8-27b_bare_pi_emedium</td><td>qwen/qwen3.8-27b</td><td>bare</td><td class="num">29</td><td class="num">119865</td><td class="num">13352</td></tr>
+      <tr><td class="mono">pix-r3_qwen3.8-27b_karpathy_pi_emedium</td><td>qwen/qwen3.8-27b</td><td>karpathy</td><td class="num">26</td><td class="num">61342</td><td class="num">10523</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Runs scoring 29 of 29 (14)</h2>
+    <ul class="runs">
+        <li class="mono">pix-r1_gemma-4-31b-qat_bare_pi_emedium</li>
+        <li class="mono">pix-r1_muse-glimmer-30b_bare_pi_emedium</li>
+        <li class="mono">pix-r1_muse-glimmer_karpathy_pi_emedium</li>
+        <li class="mono">pix-r1_qwen3.6-27b_bare_pi_emedium</li>
+        <li class="mono">pix-r1_qwen3.6-35b-a3b_bare_pi_emedium</li>
+        <li class="mono">pix-r1_qwen3.8-27b_bare_pi_emedium</li>
+        <li class="mono">pix-r2_gemma-4-31b-qat_bare_pi_emedium</li>
+        <li class="mono">pix-r2_muse-glimmer-30b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r2_muse-glimmer_karpathy_pi_emedium</li>
+        <li class="mono">pix-r2_qwen3.8-27b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r3_gemma-4-31b-qat_karpathy_pi_emedium</li>
+        <li class="mono">pix-r3_muse-glimmer-30b_bare_pi_emedium</li>
+        <li class="mono">pix-r3_qwen3.6-27b_bare_pi_emedium</li>
+        <li class="mono">pix-r3_qwen3.8-27b_bare_pi_emedium</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Runs where the check &ldquo;persists&rdquo; did not pass (31)</h2>
+    <ul class="runs">
+        <li class="mono">pix-r1_gemma-4-26b-a4b-qat_bare_pi_emedium</li>
+        <li class="mono">pix-r1_glm-4.7-flash_bare_pi_emedium</li>
+        <li class="mono">pix-r1_glm-4.7-flash_karpathy_pi_emedium</li>
+        <li class="mono">pix-r1_muse-glimmer_bare_pi_emedium</li>
+        <li class="mono">pix-r1_nemotron-3-nano_bare_pi_emedium</li>
+        <li class="mono">pix-r1_nemotron-3-nano_karpathy_pi_emedium</li>
+        <li class="mono">pix-r1_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</li>
+        <li class="mono">pix-r1_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r1_ornith-1.5-35b-a3b_bare_pi_emedium</li>
+        <li class="mono">pix-r1_qwen3.6-27b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r1_qwen3.6-35b-a3b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r2_gemma-4-26b-a4b-qat_karpathy_pi_emedium</li>
+        <li class="mono">pix-r2_glm-4.7-flash_bare_pi_emedium</li>
+        <li class="mono">pix-r2_glm-4.7-flash_karpathy_pi_emedium</li>
+        <li class="mono">pix-r2_muse-glimmer-30b_bare_pi_emedium</li>
+        <li class="mono">pix-r2_nemotron-3-nano_bare_pi_emedium</li>
+        <li class="mono">pix-r2_nemotron-3-nano_karpathy_pi_emedium</li>
+        <li class="mono">pix-r2_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</li>
+        <li class="mono">pix-r2_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r2_ornith-1.0-35b_bare_pi_emedium</li>
+        <li class="mono">pix-r2_ornith-1.5-35b-a3b_bare_pi_emedium</li>
+        <li class="mono">pix-r2_ornith-1.5-35b-a3b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r2_qwen3.6-27b_bare_pi_emedium</li>
+        <li class="mono">pix-r2_qwen3.6-27b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r3_gemma-4-31b-qat_bare_pi_emedium</li>
+        <li class="mono">pix-r3_glm-4.7-flash_bare_pi_emedium</li>
+        <li class="mono">pix-r3_nemotron-3-nano_bare_pi_emedium</li>
+        <li class="mono">pix-r3_nemotron-3-nano_karpathy_pi_emedium</li>
+        <li class="mono">pix-r3_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</li>
+        <li class="mono">pix-r3_nvidia-nemotron-3.5-lightning-30b-a3b_karpathy_pi_emedium</li>
+        <li class="mono">pix-r3_ornith-1.5-35b-a3b_karpathy_pi_emedium</li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>

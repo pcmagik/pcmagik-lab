@@ -4,6 +4,7 @@ Prompts and results from [PC Magik Lab](https://www.youtube.com/@PCMagikLab), a 
 
 | # | Episode | Task | Runs | Video |
 |---|---|---|---|---|
+| 25 | [context-mode on Qwen3.8 27B: its own tools used in 1 of 3 runs](episodes/25-context-mode-qwen38/README.md) | raport-biegow | 6 | [YouTube](https://www.youtube.com/shorts/XT8H1uD5-eE) |
 | 24 | [Claude Code for free on your own GPU? Qwen3.8 27B: 29 of 29, Pi 25–29](episodes/24-claude-code-lokalnie/README.md) | Pixel_Art_Editor | 6 | [YouTube](https://www.youtube.com/shorts/Xrn5v-s47O8) |
 | 23 | [Ponytail on Qwen3.8 27B: 6.6k–9.6k output tokens, no rules 8.1k–12.6k](episodes/23-ponytail-qwen38/README.md) | Pixel_Art_Editor | 9 | [YouTube](https://www.youtube.com/shorts/xCGpzBTdZgY) |
 | 22 | [Effort levels on Qwen3.8 27B: none 5–6 min, xhigh 24–27 min](episodes/22-effort-qwen38/README.md) | easy | 17 | [YouTube](https://www.youtube.com/shorts/uqdMHxV4fTA) |

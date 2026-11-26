@@ -1,9 +1,609 @@
 {
  "schema_version": 2,
- "generated": "2026-11-24",
+ "generated": "2026-11-26",
  "source": "seria/harness/publikuj.py",
  "note": "Counts come from the run files. Effects count CSS/JS constructs in the code, not visual quality.",
  "episodes": [
+  {
+   "published": "2026-11-26",
+   "slug": "25-context-mode-qwen38",
+   "title": "context-mode on Qwen3.8 27B: its own tools used in 1 of 3 runs",
+   "kind": "zmienna",
+   "task": "raport-biegow",
+   "task_file": "tasks/raport-biegow.txt",
+   "prompt_file": "episodes/25-context-mode-qwen38/prompt.txt",
+   "youtube": "https://www.youtube.com/shorts/XT8H1uD5-eE",
+   "opis": "Same model (Qwen3.8 27B), same task (an HTML report from 144 JSON files of our own measurements, 22 checks, raport-check), Pi, LM Studio, effort medium, 3 runs per variant, model reloaded before every run. Variants: BARE (Pi without extensions) and CONTEXT-MODE (context-mode 1.0.169). Input (prompt tokens, all requests of a run): BARE 35.6k–168.3k, CONTEXT-MODE 113.3k–397.0k — the ranges overlap. No saving: every CONTEXT-MODE request carried 7.0k more prompt tokens; the first one started at 8.6k against 1.6k (15 tools instead of 4). With one run each, run 1 would have shown the opposite (CONTEXT-MODE 113.3k, BARE 168.3k). The model used context-mode's own tools in 1 of 3 runs. In every run it read the data with one script; the largest tool output was 7,525 characters, so there was little to trim. Score of 22: BARE 19, CONTEXT-MODE 21–22; the values were right on all 6 pages, the BARE misses were the layout of the answer. 3 runs each: an observation on one model and one task, not a rule.",
+   "thesis": {
+    "metric": "prompt tokens",
+    "total": null,
+    "jednostka": "tokens",
+    "zmienna": "context tool",
+    "kohorty": [
+     {
+      "klucz": "bare",
+      "etykieta": "BARE",
+      "kolor": "#ff9f45",
+      "zakres": {
+       "min": 35553,
+       "max": 168320,
+       "n": 3,
+       "mean": 86393.7
+      }
+     },
+     {
+      "klucz": "context-mode",
+      "etykieta": "CONTEXT-MODE",
+      "kolor": "#fb7185",
+      "zakres": {
+       "min": 113251,
+       "max": 396999,
+       "n": 3,
+       "mean": 213133.3
+      }
+     }
+    ],
+    "class": "nakladaja-sie",
+    "claim": "BARE 35553–168320 tokens, CONTEXT-MODE 113251–396999 tokens prompt tokens across 6 runs; ranges overlap",
+    "models": [],
+    "pary": [],
+    "summary": {
+     "models": 1
+    }
+   },
+   "runs": [
+    {
+     "bieg": "bare_r2",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 111.77,
+     "tokeny": 5873,
+     "myslenie_pct": 6.79,
+     "tok_s": 52.55,
+     "linie": 256,
+     "tokeny_myslenia": 399,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "cm25-r2_qwen3.8-27b_bare_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/25-context-mode-qwen38/bare_r2/index.html",
+     "zrzut": "episodes/25-context-mode-qwen38/bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/25-context-mode-qwen38/bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/25-context-mode-qwen38/bare_r2/preview-390.png",
+     "metrics": "episodes/25-context-mode-qwen38/bare_r2/metrics.json",
+     "prompt": "episodes/25-context-mode-qwen38/bare_r2/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "prompt tokens",
+      "wartosc": 55308,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.prompt_tokens"
+     },
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "grupa": "bare"
+    },
+    {
+     "bieg": "context-mode_r1",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "contextmode",
+     "harness": "pi",
+     "sekundy": 185.72,
+     "tokeny": 7883,
+     "myslenie_pct": 24.75,
+     "tok_s": 42.45,
+     "linie": 192,
+     "tokeny_myslenia": 1951,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "cm25-r1_qwen3.8-27b_contextmode_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/25-context-mode-qwen38/context-mode_r1/index.html",
+     "zrzut": "episodes/25-context-mode-qwen38/context-mode_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/25-context-mode-qwen38/context-mode_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/25-context-mode-qwen38/context-mode_r1/preview-390.png",
+     "metrics": "episodes/25-context-mode-qwen38/context-mode_r1/metrics.json",
+     "prompt": "episodes/25-context-mode-qwen38/context-mode_r1/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "prompt tokens",
+      "wartosc": 113251,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.prompt_tokens"
+     },
+     "etykieta": "CONTEXT-MODE",
+     "kolor": "#fb7185",
+     "grupa": "context-mode"
+    }
+   ],
+   "measurements": [
+    {
+     "bieg": "bare_r1",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 231.46,
+     "tokeny": 10472,
+     "myslenie_pct": 25.85,
+     "tok_s": 45.24,
+     "linie": 173,
+     "tokeny_myslenia": 2707,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "cm25-r1_qwen3.8-27b_bare_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/25-context-mode-qwen38/bare_r1/index.html",
+     "zrzut": "episodes/25-context-mode-qwen38/bare_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/25-context-mode-qwen38/bare_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/25-context-mode-qwen38/bare_r1/preview-390.png",
+     "metrics": "episodes/25-context-mode-qwen38/bare_r1/metrics.json",
+     "prompt": "episodes/25-context-mode-qwen38/bare_r1/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "prompt tokens",
+      "wartosc": 168320,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.prompt_tokens"
+     },
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "grupa": "bare"
+    },
+    {
+     "bieg": "bare_r2",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 111.77,
+     "tokeny": 5873,
+     "myslenie_pct": 6.79,
+     "tok_s": 52.55,
+     "linie": 256,
+     "tokeny_myslenia": 399,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "cm25-r2_qwen3.8-27b_bare_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/25-context-mode-qwen38/bare_r2/index.html",
+     "zrzut": "episodes/25-context-mode-qwen38/bare_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/25-context-mode-qwen38/bare_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/25-context-mode-qwen38/bare_r2/preview-390.png",
+     "metrics": "episodes/25-context-mode-qwen38/bare_r2/metrics.json",
+     "prompt": "episodes/25-context-mode-qwen38/bare_r2/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "prompt tokens",
+      "wartosc": 55308,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.prompt_tokens"
+     },
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "grupa": "bare"
+    },
+    {
+     "bieg": "bare_r3",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "harness": "pi",
+     "sekundy": 94.72,
+     "tokeny": 5476,
+     "myslenie_pct": 7.58,
+     "tok_s": 57.81,
+     "linie": 284,
+     "tokeny_myslenia": 415,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "cm25-r3_qwen3.8-27b_bare_pi_emedium",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/25-context-mode-qwen38/bare_r3/index.html",
+     "zrzut": "episodes/25-context-mode-qwen38/bare_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/25-context-mode-qwen38/bare_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/25-context-mode-qwen38/bare_r3/preview-390.png",
+     "metrics": "episodes/25-context-mode-qwen38/bare_r3/metrics.json",
+     "prompt": "episodes/25-context-mode-qwen38/bare_r3/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "prompt tokens",
+      "wartosc": 35553,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.prompt_tokens"
+     },
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "grupa": "bare"
+    },
+    {
+     "bieg": "context-mode_r1",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "contextmode",
+     "harness": "pi",
+     "sekundy": 185.72,
+     "tokeny": 7883,
+     "myslenie_pct": 24.75,
+     "tok_s": 42.45,
+     "linie": 192,
+     "tokeny_myslenia": 1951,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "cm25-r1_qwen3.8-27b_contextmode_pi_emedium",
+     "powtorzenie": 1,
+     "reprezentant": true,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/25-context-mode-qwen38/context-mode_r1/index.html",
+     "zrzut": "episodes/25-context-mode-qwen38/context-mode_r1/screenshot-1920.png",
+     "zrzut_390": "episodes/25-context-mode-qwen38/context-mode_r1/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/25-context-mode-qwen38/context-mode_r1/preview-390.png",
+     "metrics": "episodes/25-context-mode-qwen38/context-mode_r1/metrics.json",
+     "prompt": "episodes/25-context-mode-qwen38/context-mode_r1/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "prompt tokens",
+      "wartosc": 113251,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.prompt_tokens"
+     },
+     "etykieta": "CONTEXT-MODE",
+     "kolor": "#fb7185",
+     "grupa": "context-mode"
+    },
+    {
+     "bieg": "context-mode_r2",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "contextmode",
+     "harness": "pi",
+     "sekundy": 478.96,
+     "tokeny": 19990,
+     "myslenie_pct": 30.46,
+     "tok_s": 41.74,
+     "linie": 330,
+     "tokeny_myslenia": 6089,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "cm25-r2_qwen3.8-27b_contextmode_pi_emedium",
+     "powtorzenie": 2,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/25-context-mode-qwen38/context-mode_r2/index.html",
+     "zrzut": "episodes/25-context-mode-qwen38/context-mode_r2/screenshot-1920.png",
+     "zrzut_390": "episodes/25-context-mode-qwen38/context-mode_r2/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/25-context-mode-qwen38/context-mode_r2/preview-390.png",
+     "metrics": "episodes/25-context-mode-qwen38/context-mode_r2/metrics.json",
+     "prompt": "episodes/25-context-mode-qwen38/context-mode_r2/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "prompt tokens",
+      "wartosc": 396999,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.prompt_tokens"
+     },
+     "etykieta": "CONTEXT-MODE",
+     "kolor": "#fb7185",
+     "grupa": "context-mode"
+    },
+    {
+     "bieg": "context-mode_r3",
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "contextmode",
+     "harness": "pi",
+     "sekundy": 166.06,
+     "tokeny": 7195,
+     "myslenie_pct": 12.3,
+     "tok_s": 43.33,
+     "linie": 171,
+     "tokeny_myslenia": 885,
+     "efekty": null,
+     "effort_zadany": "medium",
+     "effort_otrzymany": null,
+     "effort": {
+      "zadany": "medium",
+      "otrzymany": null,
+      "zrodlo": null,
+      "zgodny": null
+     },
+     "model_przeladowany": true,
+     "checks": null,
+     "source_run": "cm25-r3_qwen3.8-27b_contextmode_pi_emedium",
+     "powtorzenie": 3,
+     "reprezentant": false,
+     "wady": [],
+     "zrzut_pusty": false,
+     "bez_strony": false,
+     "strona": "episodes/25-context-mode-qwen38/context-mode_r3/index.html",
+     "zrzut": "episodes/25-context-mode-qwen38/context-mode_r3/screenshot-1920.png",
+     "zrzut_390": "episodes/25-context-mode-qwen38/context-mode_r3/screenshot-390.png",
+     "zrzut_390_kadr": "episodes/25-context-mode-qwen38/context-mode_r3/preview-390.png",
+     "metrics": "episodes/25-context-mode-qwen38/context-mode_r3/metrics.json",
+     "prompt": "episodes/25-context-mode-qwen38/context-mode_r3/prompt.txt",
+     "efekty_plik": null,
+     "odtworzenie": {
+      "model": "qwen/qwen3.8-27b",
+      "quantization": {
+       "value": "Q4_K_M",
+       "source": "metrics.json"
+      },
+      "context_window": 262144,
+      "kv_cache": {
+       "value": "K q4_0 / V q4_0",
+       "source": "metrics.json"
+      },
+      "max_tokens": 131072,
+      "engine": {
+       "value": "llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.41.0",
+       "source": "metrics.json"
+      },
+      "harness": "pi 0.85.1",
+      "effort": "medium",
+      "rules": null
+     },
+     "wynik": {
+      "miara": "prompt tokens",
+      "wartosc": 129150,
+      "jednostka": "tokens",
+      "zrodlo": "metrics.json: usage.prompt_tokens"
+     },
+     "etykieta": "CONTEXT-MODE",
+     "kolor": "#fb7185",
+     "grupa": "context-mode"
+    }
+   ],
+   "cohorts": [
+    {
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "bare",
+     "n": 3,
+     "kod": "bare",
+     "etykieta": "BARE",
+     "kolor": "#ff9f45",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "bare_r2",
+     "reprezentant_powod": null
+    },
+    {
+     "model": "qwen/qwen3.8-27b",
+     "wariant": "contextmode",
+     "n": 3,
+     "kod": "context-mode",
+     "etykieta": "CONTEXT-MODE",
+     "kolor": "#fb7185",
+     "n_w_badaniu": 3,
+     "wybor": null,
+     "reprezentant": "context-mode_r1",
+     "reprezentant_powod": null
+    }
+   ],
+   "date": "2026-10-25",
+   "social_card": "episodes/25-context-mode-qwen38/card.jpg"
+  },
   {
    "published": "2026-11-08",
    "slug": "24-claude-code-lokalnie",

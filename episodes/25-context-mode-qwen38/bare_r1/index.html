@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benchmark runs report</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --ink: #1c2430;
+    --muted: #5b6675;
+    --line: #d9dee5;
+    --accent: #2f6f4f;
+    --accent-soft: #e7f2ec;
+    --warn: #9a5b00;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    font-size: 15px;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
+  header h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: -0.01em; }
+  header p { margin: 0 0 28px; color: var(--muted); }
+  h2 {
+    font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin: 36px 0 12px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .card .label { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+  .card .value { font-size: 18px; font-weight: 600; word-break: break-word; }
+  .card .sub { color: var(--muted); font-size: 13px; margin-top: 4px; word-break: break-word; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    background: var(--accent-soft);
+    padding: 1px 5px;
+    border-radius: 5px;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .panel .value { font-size: 16px; font-weight: 600; }
+  .panel .label { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+  .panel .sub { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .note { color: var(--muted); font-size: 13px; margin: 10px 0 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+  thead th {
+    background: #eef1f4;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td:not(:first-child), th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+  footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Benchmark runs report</h1>
+    <p>Pixel-art editor benchmark, automatic grader (29 checks), values taken directly from the <code>data/</code> directory.</p>
+  </header>
+
+  <h2>Overview</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Runs</div>
+      <div class="value"><span id="runs">72</span></div>
+    </div>
+    <div class="card">
+      <div class="label">Different models</div>
+      <div class="value"><span id="models">12</span></div>
+    </div>
+    <div class="card">
+      <div class="label">Runs scoring 29 of 29</div>
+      <div class="value"><span id="perfect-runs">14</span></div>
+      <div class="sub">pix-r1_gemma-4-31b-qat_bare_pi_emedium; pix-r1_muse-glimmer-30b_bare_pi_emedium; pix-r1_muse-glimmer_karpathy_pi_emedium; pix-r1_qwen3.6-27b_bare_pi_emedium; pix-r1_qwen3.6-35b-a3b_bare_pi_emedium; pix-r1_qwen3.8-27b_bare_pi_emedium; pix-r2_gemma-4-31b-qat_bare_pi_emedium; pix-r2_muse-glimmer-30b_karpathy_pi_emedium; pix-r2_muse-glimmer_karpathy_pi_emedium; pix-r2_qwen3.8-27b_karpathy_pi_emedium; pix-r3_gemma-4-31b-qat_karpathy_pi_emedium; pix-r3_muse-glimmer-30b_bare_pi_emedium; pix-r3_qwen3.6-27b_bare_pi_emedium; pix-r3_qwen3.8-27b_bare_pi_emedium out of 72 runs</div>
+    </div>
+    <div class="card">
+      <div class="label">Lowest score</div>
+      <div class="value"><span id="lowest-score">3</span></div>
+      <div class="sub">run: <code>pix-r3_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</code></div>
+    </div>
+    <div class="card">
+      <div class="label">Most output tokens</div>
+      <div class="value"><span id="most-output">138010</span></div>
+      <div class="sub">run: <code>pix-r1_gemma-4-26b-a4b-qat_karpathy_pi_emedium</code></div>
+    </div>
+    <div class="card">
+      <div class="label">Total output tokens</div>
+      <div class="value"><span id="total-output">1161526</span></div>
+    </div>
+    <div class="card">
+      <div class="label">Total input tokens</div>
+      <div class="value"><span id="total-input">11879085</span></div>
+    </div>
+  </div>
+
+  <h2>Checks</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Check that did not pass in the most runs</div>
+      <div class="value"><span id="most-failed-check">undoDepth20</span></div>
+      <div class="sub">did not pass in 38 of 72 runs</div>
+    </div>
+    <div class="card">
+      <div class="label">Runs where <code>persists</code> did not pass</div>
+      <div class="value"><span id="persists-failed">31</span></div>
+      <div class="sub">of 72 runs</div>
+    </div>
+    <div class="card" style="grid-column: 1 / -1;">
+      <div class="label">Checks that passed in every run</div>
+      <div class="value"><span id="always-passed">noLibraries, singleFile</span></div>
+      <div class="sub">the only 2 of the 29 checks with a <code>true</code> value in all 72 runs</div>
+    </div>
+  </div>
+  <p class="note">A check did not pass in a run when its value under <code>checks</code> was <code>false</code> or <code>null</code>; only <code>true</code> counts as passing.</p>
+
+  <h2>Scores per model</h2>
+  <p class="note">Lowest and highest grader score (out of 29) for each model's bare and karpathy runs, across the 3 runs of each kind.</p>
+  <table id="models-table">
+    <thead>
+      <tr><th>model</th><th>bare lowest</th><th>bare highest</th><th>karpathy lowest</th><th>karpathy highest</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>google/gemma-4-26b-a4b-qat</td><td>16</td><td>28</td><td>7</td><td>25</td></tr>
+      <tr><td>google/gemma-4-31b-qat</td><td>26</td><td>29</td><td>27</td><td>29</td></tr>
+      <tr><td>meta/muse-glimmer</td><td>28</td><td>28</td><td>28</td><td>29</td></tr>
+      <tr><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td>3</td><td>18</td><td>6</td><td>24</td></tr>
+      <tr><td>nvidia/nemotron-3-nano</td><td>6</td><td>17</td><td>10</td><td>13</td></tr>
+      <tr><td>ornith-1.0-35b</td><td>20</td><td>26</td><td>22</td><td>28</td></tr>
+      <tr><td>ornith-1.5-35b-a3b</td><td>11</td><td>26</td><td>23</td><td>28</td></tr>
+      <tr><td>qwen/qwen3.6-27b</td><td>9</td><td>29</td><td>7</td><td>27</td></tr>
+      <tr><td>qwen/qwen3.6-35b-a3b</td><td>19</td><td>29</td><td>23</td><td>27</td></tr>
+      <tr><td>qwen/qwen3.8-27b</td><td>26</td><td>29</td><td>26</td><td>29</td></tr>
+      <tr><td>unsloth/muse-glimmer-30b</td><td>24</td><td>29</td><td>28</td><td>29</td></tr>
+      <tr><td>zai-org/glm-4.7-flash</td><td>6</td><td>20</td><td>22</td><td>26</td></tr>
+    </tbody>
+  </table>
+
+  <footer>
+    <p>Generated from <code>data/&lt;run&gt;/metrics.json</code> and <code>data/&lt;run&gt;/pixel-check-grader5b.json</code>. All values are written verbatim from the data; nothing is loaded or computed at page open.</p>
+  </footer>
+</div>
+</body>
+</html>

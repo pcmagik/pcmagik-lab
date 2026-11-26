@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benchmark Run Report</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #1c2430;
+    --muted: #5b6675;
+    --line: #dde3ea;
+    --accent: #2456a6;
+    --good: #1c7c46;
+    --bad: #b23b3b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 20px 56px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 28px; font-size: 0.95rem; }
+  h2 {
+    font-size: 1.1rem;
+    margin: 36px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--line);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .card .label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .card .value { font-size: 1.25rem; font-weight: 650; }
+  .card .detail { font-size: 0.85rem; color: var(--muted); margin-top: 4px; word-break: break-all; }
+  .num { font-variant-numeric: tabular-nums; }
+  .good { color: var(--good); }
+  .bad { color: var(--bad); }
+  code {
+    background: #eef1f5;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.9em;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+  thead th {
+    background: #eef1f5;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.model { font-weight: 600; }
+  td.score { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  th.score { text-align: right; }
+  .note { font-size: 0.85rem; color: var(--muted); margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Benchmark Run Report</h1>
+  <p class="sub">Report on the 72 benchmark runs in the <code>data</code> directory. Every value below is taken directly from each run's <code>metrics.json</code> and <code>pixel-check-grader5b.json</code>.</p>
+
+  <h2>Overview</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Runs</div>
+      <div class="value num" id="runs">72</div>
+    </div>
+    <div class="card">
+      <div class="label">Different models</div>
+      <div class="value num" id="models">12</div>
+    </div>
+    <div class="card">
+      <div class="label">Runs scoring 29 out of 29</div>
+      <div class="value num good" id="perfect-runs">14</div>
+    </div>
+  </div>
+
+  <h2>Scores</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Lowest score and the run that got it</div>
+      <div class="value bad num" id="lowest-score">3</div>
+      <div class="detail">pix-r3_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</div>
+    </div>
+  </div>
+
+  <h2>Token Usage</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Run with the most output tokens</div>
+      <div class="value num" id="most-output">138010</div>
+      <div class="detail">pix-r1_gemma-4-26b-a4b-qat_karpathy_pi_emedium</div>
+    </div>
+    <div class="card">
+      <div class="label">Total output tokens (all runs)</div>
+      <div class="value num" id="total-output">1161526</div>
+    </div>
+    <div class="card">
+      <div class="label">Total input tokens (all runs)</div>
+      <div class="value num" id="total-input">11879085</div>
+    </div>
+  </div>
+
+  <h2>Grader Checks</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Check that did not pass in the most runs</div>
+      <div class="value" id="most-failed-check">undoDepth20</div>
+      <div class="detail">did not pass in 38 runs</div>
+    </div>
+    <div class="card">
+      <div class="label">Runs where the check persists did not pass</div>
+      <div class="value num" id="persists-failed">31</div>
+    </div>
+    <div class="card">
+      <div class="label">Checks that passed in every run</div>
+      <div class="value" id="always-passed">noLibraries, singleFile</div>
+    </div>
+  </div>
+  <p class="note">A check is counted as not passing in a run when its value under <code>checks</code> is anything other than <code>true</code> (including <code>false</code> or <code>null</code>).</p>
+
+  <h2>Scores by Model</h2>
+  <table id="models-table">
+    <thead>
+      <tr>
+        <th>model</th>
+        <th class="score">bare lowest</th>
+        <th class="score">bare highest</th>
+        <th class="score">karpathy lowest</th>
+        <th class="score">karpathy highest</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="model">google/gemma-4-26b-a4b-qat</td>
+        <td class="score">16</td>
+        <td class="score">28</td>
+        <td class="score">7</td>
+        <td class="score">25</td>
+      </tr>
+      <tr>
+        <td class="model">google/gemma-4-31b-qat</td>
+        <td class="score">26</td>
+        <td class="score">29</td>
+        <td class="score">27</td>
+        <td class="score">29</td>
+      </tr>
+      <tr>
+        <td class="model">meta/muse-glimmer</td>
+        <td class="score">28</td>
+        <td class="score">28</td>
+        <td class="score">28</td>
+        <td class="score">29</td>
+      </tr>
+      <tr>
+        <td class="model">nvidia-nemotron-3.5-lightning-30b-a3b</td>
+        <td class="score">3</td>
+        <td class="score">18</td>
+        <td class="score">6</td>
+        <td class="score">24</td>
+      </tr>
+      <tr>
+        <td class="model">nvidia/nemotron-3-nano</td>
+        <td class="score">6</td>
+        <td class="score">17</td>
+        <td class="score">10</td>
+        <td class="score">13</td>
+      </tr>
+      <tr>
+        <td class="model">ornith-1.0-35b</td>
+        <td class="score">20</td>
+        <td class="score">26</td>
+        <td class="score">22</td>
+        <td class="score">28</td>
+      </tr>
+      <tr>
+        <td class="model">ornith-1.5-35b-a3b</td>
+        <td class="score">11</td>
+        <td class="score">26</td>
+        <td class="score">23</td>
+        <td class="score">28</td>
+      </tr>
+      <tr>
+        <td class="model">qwen/qwen3.6-27b</td>
+        <td class="score">9</td>
+        <td class="score">29</td>
+        <td class="score">7</td>
+        <td class="score">27</td>
+      </tr>
+      <tr>
+        <td class="model">qwen/qwen3.6-35b-a3b</td>
+        <td class="score">19</td>
+        <td class="score">29</td>
+        <td class="score">23</td>
+        <td class="score">27</td>
+      </tr>
+      <tr>
+        <td class="model">qwen/qwen3.8-27b</td>
+        <td class="score">26</td>
+        <td class="score">29</td>
+        <td class="score">26</td>
+        <td class="score">29</td>
+      </tr>
+      <tr>
+        <td class="model">unsloth/muse-glimmer-30b</td>
+        <td class="score">24</td>
+        <td class="score">29</td>
+        <td class="score">28</td>
+        <td class="score">29</td>
+      </tr>
+      <tr>
+        <td class="model">zai-org/glm-4.7-flash</td>
+        <td class="score">6</td>
+        <td class="score">20</td>
+        <td class="score">22</td>
+        <td class="score">26</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="note">Each model has 3 bare runs and 3 karpathy runs. The table shows the lowest and highest grader scores across those runs for each variant. The model name is the <code>model</code> field of the run's <code>metrics.json</code>.</p>
+</div>
+</body>
+</html>

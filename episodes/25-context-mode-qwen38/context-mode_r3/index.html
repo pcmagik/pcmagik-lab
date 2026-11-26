@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benchmark runs report — pixel-check grader (5.1)</title>
+<style>
+  :root {
+    --fg: #1a1d21;
+    --muted: #5c6470;
+    --line: #d8dce2;
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --accent: #2456a6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 20px 56px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.55rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 28px; font-size: .95rem; }
+  h2 {
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 6px;
+    margin: 36px 0 16px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .card .label { font-size: .78rem; color: var(--muted); margin-bottom: 4px; }
+  .card .value { font-size: 1.45rem; font-weight: 600; }
+  .card .value.small { font-size: 1.05rem; word-break: break-all; line-height: 1.35; }
+  .note { color: var(--muted); font-size: .85rem; margin-top: 8px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); font-size: .92rem; }
+  th { background: #eef1f5; font-weight: 600; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  ul.checks { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  ul.checks li {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-weight: 500;
+  }
+  footer { margin-top: 40px; color: var(--muted); font-size: .82rem; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Benchmark runs report</h1>
+  <p class="sub">72 benchmark runs &times; 12 models, scored by the automatic pixel-check grader (29 checks each). Source: <code>data/</code> — one folder per run with <code>metrics.json</code> and <code>pixel-check-grader5b.json</code>.</p>
+
+  <h2>Overview</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="label">Runs</div>
+      <div class="value" id="runs">72</div>
+    </div>
+    <div class="card">
+      <div class="label">Different models</div>
+      <div class="value" id="models">12</div>
+    </div>
+    <div class="card">
+      <div class="label">Runs scoring 29 of 29</div>
+      <div class="value" id="perfect-runs">14</div>
+    </div>
+    <div class="card">
+      <div class="label">Lowest score (run)</div>
+      <div class="value small" id="lowest-score">3 — pix-r3_nvidia-nemotron-3.5-lightning-30b-a3b_bare_pi_emedium</div>
+    </div>
+  </div>
+
+  <h2>Token usage</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="label">Most output tokens (run)</div>
+      <div class="value small" id="most-output">138010 — pix-r1_gemma-4-26b-a4b-qat_karpathy_pi_emedium</div>
+    </div>
+    <div class="card">
+      <div class="label">Total output tokens, all runs</div>
+      <div class="value" id="total-output">1161526</div>
+    </div>
+    <div class="card">
+      <div class="label">Total input tokens, all runs</div>
+      <div class="value" id="total-input">11879085</div>
+    </div>
+  </div>
+
+  <h2>Check results</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="label">Check not passing in the most runs</div>
+      <div class="value small" id="most-failed-check">undoDepth20 — not true in 38 runs</div>
+    </div>
+    <div class="card">
+      <div class="label">Runs where persists did not pass</div>
+      <div class="value" id="persists-failed">31</div>
+    </div>
+  </div>
+  <p class="note">A check is counted as not passing in a run when its value under <code>checks</code> is anything other than <code>true</code> (including <code>null</code>).</p>
+
+  <h2>Checks that passed in every run</h2>
+  <p id="always-passed">
+    <ul class="checks">
+      <li>singleFile</li>
+      <li>noLibraries</li>
+    </ul>
+  </p>
+
+  <h2>Scores per model</h2>
+  <table id="models-table">
+    <thead>
+      <tr>
+        <th>model</th>
+        <th class="num">bare lowest</th>
+        <th class="num">bare highest</th>
+        <th class="num">karpathy lowest</th>
+        <th class="num">karpathy highest</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>google/gemma-4-26b-a4b-qat</td><td class="num">16</td><td class="num">28</td><td class="num">7</td><td class="num">25</td></tr>
+      <tr><td>google/gemma-4-31b-qat</td><td class="num">26</td><td class="num">29</td><td class="num">27</td><td class="num">29</td></tr>
+      <tr><td>meta/muse-glimmer</td><td class="num">28</td><td class="num">28</td><td class="num">28</td><td class="num">29</td></tr>
+      <tr><td>nvidia-nemotron-3.5-lightning-30b-a3b</td><td class="num">3</td><td class="num">18</td><td class="num">6</td><td class="num">24</td></tr>
+      <tr><td>nvidia/nemotron-3-nano</td><td class="num">6</td><td class="num">17</td><td class="num">10</td><td class="num">13</td></tr>
+      <tr><td>ornith-1.0-35b</td><td class="num">20</td><td class="num">26</td><td class="num">22</td><td class="num">28</td></tr>
+      <tr><td>ornith-1.5-35b-a3b</td><td class="num">11</td><td class="num">26</td><td class="num">23</td><td class="num">28</td></tr>
+      <tr><td>qwen/qwen3.6-27b</td><td class="num">9</td><td class="num">29</td><td class="num">7</td><td class="num">27</td></tr>
+      <tr><td>qwen/qwen3.6-35b-a3b</td><td class="num">19</td><td class="num">29</td><td class="num">23</td><td class="num">27</td></tr>
+      <tr><td>qwen/qwen3.8-27b</td><td class="num">26</td><td class="num">29</td><td class="num">26</td><td class="num">29</td></tr>
+      <tr><td>unsloth/muse-glimmer-30b</td><td class="num">24</td><td class="num">29</td><td class="num">28</td><td class="num">29</td></tr>
+      <tr><td>zai-org/glm-4.7-flash</td><td class="num">6</td><td class="num">20</td><td class="num">22</td><td class="num">26</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Each model appears in 6 runs: 3 bare and 3 karpathy, across rounds r1–r3. Lowest and highest scores are per variant.</p>
+
+  <footer>All values are taken verbatim from the JSON files in <code>data/</code>; nothing is computed at page load.</footer>
+
+</div>
+</body>
+</html>
